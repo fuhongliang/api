@@ -64,6 +64,43 @@ class Store extends Model{
         return empty($data)?true:false;
     }
 
+    /**
+     * @param $condition
+     * @param string $field
+     * @return array|\PDOStatement|string|Model|null
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    static function getStoreClassInfo($condition, $field = '*')
+    {
+        return Db::name('store_goods_class')->field($field)->where($condition)->find();
+    }
+
+    /**
+     * @param $condition
+     * @param $up_data
+     * @return int|string
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    static function editStoreClassInfo($condition,$up_data)
+    {
+        return Db::name('store_goods_class')
+            ->where($condition)
+            ->update($up_data);
+    }
+
+    /**
+     * @param $condition
+     * @return int
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    static function delStoreClassInfo($condition)
+    {
+        return Db::name('store_goods_class')->where($condition)->delete();
+    }
 
 
 }

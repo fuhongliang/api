@@ -21,11 +21,15 @@ Route::group('', [
 
     'refuse_order'  => 'v1/Order/refuseOrder',    //拒单
 
-    'receive_order'=>'v1/Order/receiveOrder',    //拒单
+    'receive_order'=>'v1/Order/receiveOrder',    //接单
 
     'order_list'  => 'v1/Order/getOrderList',//根据状态获取订单列表
 
     'add_goods_class'  => 'v1/Store/addStoreGoodsClass',//店铺添加商品分类
+
+    'del_goods_class'  => 'v1/Store/delStoreGoodsClass',//店铺删除商品分类
+
+    'sort_goods_class'  => 'v1/Store/sortStoreGoodsClass',//店铺商品分类排序
 
 
 ]);
