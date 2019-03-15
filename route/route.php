@@ -16,13 +16,13 @@ Route::post('member_login','v1/Member/login');//商家登陆
 
 Route::post('get_neworder','v1/Order/newOrder');//获取新订单
 
-Route::post('refuse_order','v1/Order/refuseOrder');//拒单
+Route::get('refuse_order','v1/Order/refuseOrder');//拒单
 
 
-Route::post('order_list','v1/Order/getOrderList');//根据状态获取订单列表
+Route::get('order_list','v1/Order/getOrderList');//根据状态获取订单列表
 
 
-Route::post('add_goods_class','v1/Store/addStoreGoodsClass');//店铺添加商品分类
+Route::get('add_goods_class','v1/Store/addStoreGoodsClass');//店铺添加商品分类
 
 
 
