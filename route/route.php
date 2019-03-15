@@ -35,6 +35,8 @@ Route::group('', [
 
     'goods_list'  => 'v1/Store/storeGoodsList',//店铺商品列表
 
+    'add_goods'=>'v1/Goods/addGoods',//添加商品
+
 
 ]);
 
