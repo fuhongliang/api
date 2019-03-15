@@ -29,7 +29,11 @@ Route::group('', [
 
     'del_goods_class'  => 'v1/Store/delStoreGoodsClass',//店铺删除商品分类
 
+    'goods_class_list'  => 'v1/Store/storeGoodsClassList',//店铺商品分类列表
+
     'sort_goods_class'  => 'v1/Store/sortStoreGoodsClass',//店铺商品分类排序
+
+    'goods_list'  => 'v1/Store/storeGoodsList',//店铺商品列表
 
 
 ]);
