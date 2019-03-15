@@ -10,9 +10,12 @@ use think\Request;
  */
 class Order extends Base
 {
-    /** 获取新订单
+    /**获取新订单
      * @param Request $request
      * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function newOrder(Request $request)
     {
