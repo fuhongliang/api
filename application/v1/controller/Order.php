@@ -65,6 +65,10 @@ class Order extends Base
         //order_state  20新订单  30已发货  40 已收货   0已取消
         $order_state=$request->param('order_state');
         $store_id=$request->param('store_id');
+        if(!$order_state || !$store_id)
+        {
+            return Base::jsonReturn(1000,[],'参数缺失');
+        }
         $fileds='order_id,order_sn,buyer_id,add_time';
         $info=OrderModel::getNewOrder(['store_id'=>$store_id,'order_state'=>$order_state],array('order_goods','order_common'),$fileds);
         return Base::jsonReturn(200,$info,'获取成功');
