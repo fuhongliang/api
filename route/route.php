@@ -16,10 +16,17 @@
 */
 Route::group('', [
     'member_login'  => 'v1/Member/login',//商家登陆
+
     'get_neworder'  => 'v1/Order/newOrder',//获取新订单
+
     'refuse_order'  => 'v1/Order/refuseOrder',    //拒单
+
+    'receive_order'=>'v1/Order/receiveOrder',    //拒单
+
     'order_list'  => 'v1/Order/getOrderList',//根据状态获取订单列表
+
     'add_goods_class'  => 'v1/Store/addStoreGoodsClass',//店铺添加商品分类
+
 
 ]);
 

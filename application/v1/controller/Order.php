@@ -53,6 +53,29 @@ class Order extends Base
         }
     }
 
+    /**接单
+     * @param Request $request
+     * @return array
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    public function receiveOrder(Request $request)
+    {
+        $order_id=$request->param('order_id');
+        if(!$order_id)
+        {
+            return Base::jsonReturn(1000,[],'参数缺失');
+        }
+        $res=OrderModel::editOrder(['order_id'=>$order_id],['order_state'=>30]);
+        if($res)
+        {
+            return Base::jsonReturn(200,[],'接单成功');
+        }else{
+            return Base::jsonReturn(2000,[],'接单失败');
+        }
+
+    }
+
     /**  根据状态获取订单列表
      * @param Request $request
      * @return array
