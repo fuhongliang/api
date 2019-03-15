@@ -38,6 +38,32 @@ class Store extends Model{
             ->find();
     }
 
+    /**
+     * @param $ins_data
+     * @return int|string
+     */
+    static function addStoreGoodsClass($ins_data)
+    {
+        return Db::name('store_goods_class')->insert($ins_data);
+    }
+
+    /**
+     * @param $store_id
+     * @param $class_name
+     * @return bool
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    static function checkStoreGoodsClassExist($store_id,$class_name)
+    {
+        $data=Db::name('store_goods_class')
+            ->where('store_id',$store_id)
+            ->where('stc_name',$class_name)
+            ->find();
+        return empty($data)?true:false;
+    }
+
 
 
 }

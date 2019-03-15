@@ -22,6 +22,19 @@ class Member extends Model{
         return Db::name('member')->field($field)->where($condition)->find();
     }
 
+    /**
+     * @param $member_id
+     * @param string $fields
+     * @return array|\PDOStatement|string|Model|null
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    static function getMemberInfoByID($member_id, $fields = '*')
+    {
+        $member_info = self::getMemberInfo(array('member_id' => $member_id), $fields);
+        return $member_info;
+    }
 
 
 }

@@ -19,5 +19,14 @@ class Base
     {
         return ['code'=>$code,'data'=>$data,'msg'=>$msg];
     }
+    /**
+     * 生成token
+     */
+    public static function makeToken($member_name,$member_pwd)
+    {
+        $secret_key=md5(date('y-m-d h:i:s',time()).microtime());
+        return md5($member_name.$member_pwd.$secret_key);
+
+    }
 
 }
