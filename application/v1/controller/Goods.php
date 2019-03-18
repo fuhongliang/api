@@ -11,6 +11,13 @@ use app\v1\model\Store as StoreModel;
  */
 class Goods extends Base
 {
+    /** 添加商品
+     * @param Request $request
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function addGoods(Request $request)
     {
         $store_id=$request->param('store_id');
@@ -142,7 +149,16 @@ class Goods extends Base
     }
 
 
+    public function delGoods(Request $request)
+    {
+        $store_id=$request->param('store_id');
+        $goods_id=$request->param('class_id');//分类
+        if(!$store_id || !$goods_id)
+        {
+            return Base::jsonReturn(1000,[],'参数缺失');
+        }
 
+    }
 
 
 

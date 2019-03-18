@@ -37,6 +37,8 @@ Route::group('', [
 
     'add_goods'=>'v1/Goods/addGoods',//添加商品
 
+    'del_goods'=>'v1/Goods/delGoods',//添加商品
+
 
 ]);
 
