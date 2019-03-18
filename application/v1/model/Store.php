@@ -258,4 +258,20 @@ class Store extends Model{
         }
     }
 
+    /**
+     * @param $condition
+     * @param $up_data
+     * @return int|string
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    static function setWorkState($condition, $up_data)
+    {
+        return Db::name('store')
+            ->where($condition)
+            ->update($up_data);
+    }
+
+
+
 }

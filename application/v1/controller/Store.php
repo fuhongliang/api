@@ -129,7 +129,7 @@ class Store extends Base
         }
     }
 
-    /**
+    /** 商品列表
      * @param Request $request
      * @return array
      * @throws \think\db\exception\DataNotFoundException
@@ -149,6 +149,13 @@ class Store extends Base
         return Base::jsonReturn(200, $result, '获取成功');
     }
 
+    /** 店铺概况
+     * @param Request $request
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function getStoreSetting(Request $request)
     {
         $store_id = $request->param('store_id');
@@ -159,5 +166,79 @@ class Store extends Base
 a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electronic']);
         return Base::jsonReturn(200, $data, '获取成功');
     }
+
+    /** 设置店铺状态
+     * @param Request $request
+     * @return array
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    public function setWorkState(Request $request)
+    {
+        $store_id = $request->param('store_id');
+        $store_state = $request->param('store_state');
+        if (empty($store_id) || empty($store_state)) {
+            return Base::jsonReturn(1000, [], '参数缺失');
+        }
+        $res=StoreModel::setWorkState(['store_id'=>$store_id],['store_state'>$store_state]);
+        if ($res) {
+            return Base::jsonReturn(200, [], '设置成功');
+        } else {
+            return Base::jsonReturn(2000, [], '设置失败');
+        }
+    }
+
+    /** 设置公告
+     * @param Request $request
+     * @return array
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    public function setStoreDesc(Request $request)
+    {
+        $store_id = $request->param('store_id');
+        $store_desc = $request->param('store_desc');
+        if (empty($store_id) || empty($store_desc)) {
+            return Base::jsonReturn(1000, [], '参数缺失');
+        }
+        $res=StoreModel::setWorkState(['store_id'=>$store_id],['store_description'>$store_desc]);
+        if ($res) {
+            return Base::jsonReturn(200, [], '设置成功');
+        } else {
+            return Base::jsonReturn(2000, [], '设置失败');
+        }
+    }
+
+    /** 店铺设置电话
+     * @param Request $request
+     * @return array
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    public function setStorePhone(Request $request)
+    {
+        $store_id = $request->param('store_id');
+        $phone_number = $request->param('phone_number');
+        if (empty($store_id) || empty($phone_number)) {
+            return Base::jsonReturn(1000, [], '参数缺失');
+        }
+        $res=StoreModel::setWorkState(['store_id'=>$store_id],['store_phone'>$phone_number]);
+        if ($res) {
+            return Base::jsonReturn(200, [], '设置成功');
+        } else {
+            return Base::jsonReturn(2000, [], '设置失败');
+        }
+    }
+    public function setStoreWorkTime(Request $request)
+    {
+        $store_id = $request->param('store_id');
+        $work_time = $request->param('work_time');
+        if (empty($store_id) || empty($work_time)) {
+            return Base::jsonReturn(1000, [], '参数缺失');
+        }
+
+    }
+
+
 
 }

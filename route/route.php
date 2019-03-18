@@ -41,6 +41,13 @@ Route::group('', [
 
     'store_setting'=>'v1/Store/getStoreSetting',//门店设置详情
 
+    'store_set_workstate'=>'v1/Store/setWorkState',//门店设置营业状态
+
+    'store_set_desc'=>'v1/Store/setStoreDesc',//门店设置公告
+
+    'store_set_phone'=>'v1/Store/setStorePhone',//门店设置电话
+
+    'store_set_worktime'=>'v1/Store/setStoreWorkTime',//门店设置营业时间
 
 ]);
 
