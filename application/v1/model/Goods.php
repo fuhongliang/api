@@ -20,8 +20,22 @@ class Goods extends Model
     {
         return Db::name('goods')->field($field)->where($condition)->find();
     }
+    /**
+     * @param $data
+     * @return int|string
+     */
+    static function addGoodsCommon($data)
+    {
+        return  Db::name('goods_common')->insertGetId($data);
+    }
 
-
-
+    /**
+     * @param $data
+     * @return int|string
+     */
+    static function addGoods($data)
+    {
+        return  Db::name('goods')->insertGetId($data);
+    }
 
 }
