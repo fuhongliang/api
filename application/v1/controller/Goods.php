@@ -148,16 +148,25 @@ class Goods extends Base
 
     }
 
-
+    /**
+     * @param Request $request
+     * @return array
+     */
     public function delGoods(Request $request)
     {
         $store_id=$request->param('store_id');
-        $goods_id=$request->param('class_id');//分类
+        $goods_id=$request->param('goods_id');//
         if(!$store_id || !$goods_id)
         {
             return Base::jsonReturn(1000,[],'参数缺失');
         }
-
+        $res=GoodsModel::delGoods($store_id,$goods_id);
+        if($res)
+        {
+            return Base::jsonReturn(200,[],'删除成功');
+        }else{
+            return Base::jsonReturn(2000,[],'删除失败');
+        }
     }
 
 

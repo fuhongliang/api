@@ -38,4 +38,44 @@ class Goods extends Model
         return  Db::name('goods')->insertGetId($data);
     }
 
+    /**
+     * @param $condition
+     * @return int
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    static function delGoodsCommon($condition)
+    {
+        return  Db::name('goods_common')->where($condition)->delete();
+    }
+
+    /**
+     * @param $condition
+     * @return int
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    static function delGoodsById($condition)
+    {
+        return  Db::name('goods')->where($condition)->delete();
+    }
+
+    /**
+     * @param $store_id
+     * @param $goods_id
+     * @return bool
+     */
+    static function delGoods($store_id,$goods_id)
+    {
+        Db::transaction(function () use ($goods_id){
+            $data= self::getGoodsInfo(['goods_id'=>$goods_id],['goods_commonid']);
+            $where=array();
+            $where['goods_lock']=0;
+            $where['goods_commonid']=$data['goods_commonid'];
+            self::delGoodsCommon($where);
+            self::delGoodsById(['goods_id'=>$goods_id]);
+        });
+        return true;
+    }
+
 }

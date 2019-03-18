@@ -212,6 +212,50 @@ class Store extends Model{
         return Db::name('store_bind_class')->field($field)->where($condition)->find();
     }
 
+    /**
+     * @param $condition
+     * @param string $field
+     * @return array|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    static function getStoreData($condition, $field = '*')
+    {
+        $result=array();
+        $data=Db::name('store')
+            ->alias('a')
+            ->leftJoin('store_joinin b', 'a.member_id = b.member_id')
+            ->field($field)
+            ->where($condition)
+            ->find();
+        if (!empty($data))
+        {
+            $result['store_state']=self::getStoreState($data['store_state']);
+            $result['store_desc']=$data['store_description'];
+            $result['store_logo']=$data['store_label'];
+            $result['store_phone']=$data['store_phone'];
+            $result['address']=$data['area_info'].$data['store_address'];
+            $result['store_zizhi']=$data['business_licence_number_electronic'];
+        }
+        return $result;
+    }
 
+    /**
+     * @param $state
+     * @return string
+     */
+    static function getStoreState($state)
+    {
+        if($state == 0)
+        {
+            return '关闭中';
+        }elseif ($state == 1)
+        {
+            return '开启中';
+        }else{
+            return '审核中';
+        }
+    }
 
 }

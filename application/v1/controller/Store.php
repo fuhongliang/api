@@ -149,4 +149,15 @@ class Store extends Base
         return Base::jsonReturn(200, $result, '获取成功');
     }
 
+    public function getStoreSetting(Request $request)
+    {
+        $store_id = $request->param('store_id');
+        if (empty($store_id)) {
+            return Base::jsonReturn(1000, [], '参数缺失');
+        }
+        $data=StoreModel::getStoreData(['a.store_id'=>$store_id], ['a.store_state,a.store_description,a.store_label,a.store_phone,
+a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electronic']);
+        return Base::jsonReturn(200, $data, '获取成功');
+    }
+
 }

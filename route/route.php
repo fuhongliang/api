@@ -39,6 +39,8 @@ Route::group('', [
 
     'del_goods'=>'v1/Goods/delGoods',//添加商品
 
+    'store_setting'=>'v1/Store/getStoreSetting',//门店设置详情
+
 
 ]);
 
