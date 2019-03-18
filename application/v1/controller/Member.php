@@ -11,10 +11,15 @@ use think\Request;
  */
 class Member extends Base
 {
-
+    /**
+     * @param Request $request
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function login(Request $request)
     {
-
         $member_name=$request->param('member_name');
         $member_passwd=$request->param('member_passwd');
         if (empty($member_name) || empty($member_passwd))
