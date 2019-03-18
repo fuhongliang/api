@@ -79,7 +79,7 @@ class Store extends Base
     {
         $class_id = $request->param('class_id');
         $store_id = $request->param('store_id');
-        if (empty($class_id) || empty($class_name)) {
+        if (empty($class_id) || empty($store_id)) {
             return Base::jsonReturn(1000, [], '参数缺失');
         }
         $res=StoreModel::delStoreClassInfo(['stc_id'=>$class_id,'store_id'=>$store_id]);
