@@ -31,7 +31,7 @@ class Goods extends Base
 
         if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price || !$goods_storage || !$sell_time || !$goods_desc)
         {
-            return Base::jsonReturn(1000,[],'参数缺失');
+            return Base::jsonReturn(1000,null,'参数缺失');
         }
         $bind_class=StoreModel::getStoreBindClass(['store_id'=>$store_id], ['class_1,class_2,class_3']);
         $common_array=array();
@@ -141,9 +141,9 @@ class Goods extends Base
         $goods_id = GoodsModel::addGoods($goods);
         if($goods_id)
         {
-            return Base::jsonReturn(200,[],'添加成功');
+            return Base::jsonReturn(200,null,'添加成功');
         }else{
-            return Base::jsonReturn(2000,[],'添加失败');
+            return Base::jsonReturn(2000,null,'添加失败');
         }
 
     }
@@ -158,14 +158,14 @@ class Goods extends Base
         $goods_id=$request->param('goods_id');//
         if(!$store_id || !$goods_id)
         {
-            return Base::jsonReturn(1000,[],'参数缺失');
+            return Base::jsonReturn(1000,null,'参数缺失');
         }
         $res=GoodsModel::delGoods($store_id,$goods_id);
         if($res)
         {
-            return Base::jsonReturn(200,[],'删除成功');
+            return Base::jsonReturn(200,null,'删除成功');
         }else{
-            return Base::jsonReturn(2000,[],'删除失败');
+            return Base::jsonReturn(2000,null,'删除失败');
         }
     }
 
