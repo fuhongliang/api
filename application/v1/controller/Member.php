@@ -32,7 +32,7 @@ class Member extends Base
             if(md5($member_passwd)==$memberInfo['member_passwd'])
             {
                 //$field= 'a.store_id,a.store_name,IFNULL(a.store_avatar,"") as store_avatar,a.area_info,a.store_address,IFNULL(a.store_workingtime,"") as store_workingtime,a.store_state,a.store_description,IFNULL(b.business_licence_number_electronic,"") as business_licence_number_electronic,c.member_id,store_phone(c.member_mobile,"") as member_mobile';
-                $field= 'a.store_id,a.store_name';
+                $field= 'a.store_id,a.store_name,IFNULL(a.store_avatar,"") as store_avatar,a.area_info,a.store_address';
                 $data=StoreModel::getStoreAndJoinInfo($field);
                 $data['token']=Base::makeToken($member_name,$member_passwd);
                 return Base::jsonReturn(200,$data,'获取成功');
