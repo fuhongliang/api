@@ -311,7 +311,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         $new_passwd = $request->param('new_passwd');
         $con_new_passwd = $request->param('con_new_passwd');
         if (empty($verify_code) || empty($new_passwd) || empty($con_new_passwd)) {
-            return Base::jsonReturn(1000, null '参数缺失');
+            return Base::jsonReturn(1000, null ,'参数缺失');
         }
         if($new_passwd !==$con_new_passwd)
         {
