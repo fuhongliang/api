@@ -43,11 +43,8 @@ class Member extends Model{
      * @throws \think\Exception
      * @throws \think\exception\PDOException
      */
-<<<<<<< HEAD
-    static function editMemberInfo($condition,$up_data)
-=======
+
     static function editMemberInfo($condition, $up_data)
->>>>>>> develop
     {
         return Db::name('member')
             ->where($condition)

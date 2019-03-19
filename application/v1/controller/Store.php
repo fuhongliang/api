@@ -337,18 +337,11 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         }else{
             $res=MemberModel::editMemberInfo(['member_id'=>$member_id],['member_passwd'=>md5($new_passwd)]);
             if ($res) {
-<<<<<<< HEAD
                 return Base::jsonReturn(200, null, '修改成功');
             } else {
                 return Base::jsonReturn(2000, null, '修改失败');
             }
-=======
-                return Base::jsonReturn(200, null, '重置成功');
-            } else {
-                return Base::jsonReturn(2000, null, '重置失败');
-            }
 
->>>>>>> develop
         }
 
     }
