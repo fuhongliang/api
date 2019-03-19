@@ -76,7 +76,7 @@ class Sms
         //$request->setProtocol("https");
 
         // 必填，设置短信接收号码
-        $request->setPhoneNumbers('18594286622');
+        $request->setPhoneNumbers($phone_number);
 
         // 必填，设置签名名称，应严格按"签名名称"填写，请参考: https://dysms.console.aliyun.com/dysms.htm#/develop/sign
         $request->setSignName("邻邻发");
@@ -86,7 +86,7 @@ class Sms
 
         // 可选，设置模板参数, 假如模板中存在变量需要替换则为必填项
         $request->setTemplateParam(json_encode(array(  // 短信模板中字段的值
-            "code"=>'999999'
+            "code"=>$code
         ), JSON_UNESCAPED_UNICODE));
 
         // 可选，设置流水号
