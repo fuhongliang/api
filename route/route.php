@@ -55,6 +55,8 @@ Route::group('', [
 
     'edit_passwd'=>'v1/Store/editPasswd',//修改密码
 
+    'get_store_com'=>'v1/Store/getStoreCom',//获取店铺评论
+
 ]);
 
 

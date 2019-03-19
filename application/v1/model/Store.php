@@ -282,5 +282,87 @@ class Store extends Model{
         return  Db::name('app_feedback')->insertGetId($data);
     }
 
+    /**
+     * @param $condition
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    static function getStoreComAllData($condition)
+    {
+        $result=array();
+        $data=Db::name('store_com')
+            ->alias('a')
+            ->field('a.*,b.member_avatar,b.member_name')
+            ->leftJoin('member b','a.member_id=b.member_id')
+            ->where($condition)
+            ->select();
+        if(!empty($data))
+        {
+            foreach ($data as $k=>$v)
+            {
+                $result[$k]['com_id']=$v['com_id'];
+                $result[$k]['content']=$v['content'];
+                $result[$k]['haoping']=$v['haoping'];
+                $result[$k]['kouwei']=$v['kouwei'];
+                $result[$k]['baozhuang']=$v['baozhuang'];
+                $result[$k]['peisong']=$v['peisong'];
+                $result[$k]['add_time']=date('Y-m-d H:i:s',$v['add_time']);
+                $result[$k]['member_avatar']=$v['member_avatar'];
+                $result[$k]['member_name']=$v['member_name'];
+                $result[$k]['replay']=null;
+                if($v['is_replay'] == 1)
+                {
+                    $result[$k]['replay']=self::getComReplay($v['parent_id']);
+                }
+            }
+        }
+        return $result;
+
+    }
+
+    /**
+     * @param $parent_id
+     * @return array|\PDOStatement|string|Model|null
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    static function getComReplay($com_id)
+    {
+        $data=Db::name('store_com')
+            ->where(['parent_id'=>$com_id])
+            ->value('content');
+        return $data;
+    }
+
+    /**
+     * @param $store_id
+     * @return array
+     */
+    static function getComNums($store_id)
+    {
+        $result=array();
+        $result['all']=self::getHaopingNumsByType(['store_id'=>$store_id]);
+        $result['haoping']=self::getHaopingNumsByType(['store_id'=>$store_id,'haoping'=>1]);
+        $result['zhongping']=self::getHaopingNumsByType(['store_id'=>$store_id,'haoping'=>2]);
+        $result['chaping']=self::getHaopingNumsByType(['store_id'=>$store_id,'haoping'=>3]);
+        $result['rate']=0;
+        if($result['all'] !== 0)
+        {
+            $result['rate']=ceil($result['haoping']/$result['all']);
+        }
+        return $result;
+    }
+
+    /**
+     * @param $condition
+     * @return float|string
+     */
+    static function getHaopingNumsByType($condition)
+    {
+        return Db::name('store_com')->where($condition)->count();
+    }
 
 }

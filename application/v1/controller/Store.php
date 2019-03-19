@@ -341,12 +341,34 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
             } else {
                 return Base::jsonReturn(2000, null, '修改失败');
             }
-
         }
-
     }
 
-
+    /**
+     * @param Request $request
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getStoreCom(Request $request)
+    {
+        $store_id = $request->param('store_id');
+        $type = $request->param('type');// 1 好评  2 中评 3 差评
+        if (empty($store_id) || empty($type)) {
+            return Base::jsonReturn(1000, null ,'参数缺失');
+        }
+        $result=array();
+        $result['haping']=StoreModel::getComNums($store_id);
+        if(!$type)
+        {
+            $condition=['store_id'=>$store_id];
+        }else{
+            $condition=['store_id'=>$store_id,'haoping'=>$type];
+        }
+        $result['com_list']=StoreModel::getStoreComAllData($condition);
+        return Base::jsonReturn(200, $result, '获取成功');
+    }
 
 
 }

@@ -41,9 +41,7 @@ class Member extends Base
         }else{
             return Base::jsonReturn(1003,null,'你还不是商家');
         }
-
-
-
-        }
-
     }
+
+
+}
