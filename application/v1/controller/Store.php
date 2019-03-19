@@ -305,6 +305,13 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
             return Base::jsonReturn(2000, null, '发送失败');
         }
     }
+
+    /** 重置密码
+     * @param Request $request
+     * @return array
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
     public function editPasswd(Request $request)
     {
         $member_id = $request->param('member_id');
@@ -330,10 +337,18 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         }else{
             $res=MemberModel::editMemberInfo(['member_id'=>$member_id],['member_passwd'=>md5($new_passwd)]);
             if ($res) {
+<<<<<<< HEAD
                 return Base::jsonReturn(200, null, '修改成功');
             } else {
                 return Base::jsonReturn(2000, null, '修改失败');
             }
+=======
+                return Base::jsonReturn(200, null, '重置成功');
+            } else {
+                return Base::jsonReturn(2000, null, '重置失败');
+            }
+
+>>>>>>> develop
         }
 
     }

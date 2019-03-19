@@ -22,7 +22,7 @@ class Order extends Base
         $store_id=$request->param('store_id');
         if(!$store_id)
         {
-            return Base::jsonReturn(1000,[],'参数缺失');
+            return Base::jsonReturn(1000,null,'参数缺失');
         }
         $fileds='order_id,order_sn,buyer_id,add_time';
         $info=OrderModel::getNewOrder(['store_id'=>$store_id,'order_state'=>20],array('order_goods','order_common'),$fileds);
