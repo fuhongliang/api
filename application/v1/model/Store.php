@@ -35,6 +35,7 @@ class Store extends Model{
         return Db::name('store')
             ->alias('a')
             ->join('store_joinin b','a.member_id = b.member_id')
+            ->join('member c','a.member_id = c.member_id')
             ->field($field)
             ->find();
     }
@@ -272,6 +273,14 @@ class Store extends Model{
             ->update($up_data);
     }
 
+    /**
+     * @param $data
+     * @return int|string
+     */
+    static function addAppFeedBack($data)
+    {
+        return  Db::name('app_feedback')->insertGetId($data);
+    }
 
 
 }

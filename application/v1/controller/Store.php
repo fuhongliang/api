@@ -180,7 +180,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         if (empty($store_id) || empty($store_state)) {
             return Base::jsonReturn(1000, [], '参数缺失');
         }
-        $res=StoreModel::setWorkState(['store_id'=>$store_id],['store_state'>$store_state]);
+        $res=StoreModel::setWorkState(['store_id'=>$store_id],['store_state'=>$store_state]);
         if ($res) {
             return Base::jsonReturn(200, [], '设置成功');
         } else {
@@ -201,7 +201,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         if (empty($store_id) || empty($store_desc)) {
             return Base::jsonReturn(1000, [], '参数缺失');
         }
-        $res=StoreModel::setWorkState(['store_id'=>$store_id],['store_description'>$store_desc]);
+        $res=StoreModel::setWorkState(['store_id'=>$store_id],['store_description'=>$store_desc]);
         if ($res) {
             return Base::jsonReturn(200, [], '设置成功');
         } else {
@@ -222,22 +222,66 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         if (empty($store_id) || empty($phone_number)) {
             return Base::jsonReturn(1000, [], '参数缺失');
         }
-        $res=StoreModel::setWorkState(['store_id'=>$store_id],['store_phone'>$phone_number]);
+        $res=StoreModel::setWorkState(['store_id'=>$store_id],['store_phone'=>$phone_number]);
         if ($res) {
             return Base::jsonReturn(200, [], '设置成功');
         } else {
             return Base::jsonReturn(2000, [], '设置失败');
         }
     }
+
+    /** 修改营业时间
+     * @param Request $request
+     * @return array
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
     public function setStoreWorkTime(Request $request)
     {
         $store_id = $request->param('store_id');
-        $work_time = $request->param('work_time');
-        if (empty($store_id) || empty($work_time)) {
+        $work_start_time = $request->param('work_start_time');
+        $work_end_time = $request->param('work_end_time');
+        if (empty($store_id) || empty($work_start_time) || empty($work_end_time)) {
             return Base::jsonReturn(1000, [], '参数缺失');
+        }
+        $res=StoreModel::setWorkState(['store_id'=>$store_id],['work_start_time'=>$work_start_time,'work_end_time'=>$work_end_time]);
+        if ($res) {
+            return Base::jsonReturn(200, [], '设置成功');
+        } else {
+            return Base::jsonReturn(2000, [], '设置失败');
         }
 
     }
+
+    /** 意见反馈
+     * @param Request $request
+     * @return array
+     */
+    public function msgFeedBack(Request $request)
+    {
+        $store_id = $request->param('store_id');
+        $content = $request->param('content');
+        $type = $request->param('type');// 1 安卓 2 ios
+        if (empty($store_id) || empty($content) || empty($type)) {
+            return Base::jsonReturn(1000, [], '参数缺失');
+        }
+        $data=array(
+            'store_id'=>$store_id,
+            'content'=>$content,
+            'ftime'=>time(),
+            'type'=>$type
+        );
+        $res=StoreModel::addAppFeedBack($data);
+        if ($res) {
+            return Base::jsonReturn(200, [], '反馈成功');
+        } else {
+            return Base::jsonReturn(2000, [], '反馈失败');
+        }
+
+    }
+
+
+
 
 
 

@@ -49,6 +49,8 @@ Route::group('', [
 
     'store_set_worktime'=>'v1/Store/setStoreWorkTime',//门店设置营业时间
 
+    'store_msg_feedback'=>'v1/Store/msgFeedBack',//意见反馈
+
 ]);
 
 
