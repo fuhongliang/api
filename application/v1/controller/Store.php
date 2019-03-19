@@ -274,9 +274,9 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         );
         $res=StoreModel::addAppFeedBack($data);
         if ($res) {
-            return Base::jsonReturn(200, [], '反馈成功');
+            return Base::jsonReturn(200, null, '反馈成功');
         } else {
-            return Base::jsonReturn(2000, [], '反馈失败');
+            return Base::jsonReturn(2000, null, '反馈失败');
         }
 
     }
@@ -289,28 +289,44 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
     {
         $phone_number = $request->param('phone_number');
         if (empty($phone_number)) {
-            return Base::jsonReturn(1000, [], '参数缺失');
+            return Base::jsonReturn(1000, null, '参数缺失');
         }
         if(!preg_match("/^1[34578]{1}\d{9}$/",$phone_number))
         {
-            return Base::jsonReturn(1000, [], '手机号格式不正确');
+            return Base::jsonReturn(1000, null, '手机号格式不正确');
         }
         $code=rand('100000','999999');
         $res=SMSModel::sendSms($phone_number,'SMS_160860415',$code);
         if ($res) {
             Cache::set($phone_number,$code,300);
-            return Base::jsonReturn(200, [], '发送成功');
+            return Base::jsonReturn(200, null, '发送成功');
         } else {
-            return Base::jsonReturn(2000, [], '发送失败');
+            return Base::jsonReturn(2000, null, '发送失败');
         }
     }
     public function editPasswd(Request $request)
     {
+        $phone_number = $request->param('phone_number');
         $verify_code = $request->param('verify_code');
         $new_passwd = $request->param('new_passwd');
         $con_new_passwd = $request->param('con_new_passwd');
         if (empty($verify_code) || empty($new_passwd) || empty($con_new_passwd)) {
-            return Base::jsonReturn(1000, [], '参数缺失');
+            return Base::jsonReturn(1000, null '参数缺失');
+        }
+        if($new_passwd !==$con_new_passwd)
+        {
+            return Base::jsonReturn(2001, null, '密码不一致');
+        }
+        if(strlen(trim($new_passwd))<=6)
+        {
+            return Base::jsonReturn(2002, null, '密码最少6位');
+        }
+        $code=Cache::get($phone_number);
+        if(!$code || $code !== $verify_code)
+        {
+            return Base::jsonReturn(2003, null, '验证码错误');
+        }else{
+
         }
 
     }

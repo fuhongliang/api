@@ -15,8 +15,9 @@ class Base
     /**
      * @return array 返回json数组
      */
-    public static function jsonReturn($code=200,$data=[],$msg='')
+    public static function jsonReturn($code=200,$data,$msg='')
     {
+
         return ['code'=>$code,'data'=>$data,'msg'=>$msg];
     }
     /**

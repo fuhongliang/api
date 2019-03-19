@@ -24,7 +24,7 @@ class Member extends Base
         $member_passwd=$request->param('member_passwd');
         if (empty($member_name) || empty($member_passwd))
         {
-            return Base::jsonReturn(1000,[],'参数缺失');
+            return Base::jsonReturn(1000,null,'参数缺失');
         }
         $memberInfo=MemberModel::getMemberInfo(['member_name'=>$member_name]);
         if($memberInfo)
@@ -36,10 +36,10 @@ class Member extends Base
                 $data['token']=Base::makeToken($member_name,$member_passwd);
                 return Base::jsonReturn(200,$data,'获取成功');
             }else{
-                return Base::jsonReturn(1001,[],'账号或密码错误');
+                return Base::jsonReturn(1001,null,'账号或密码错误');
             }
         }else{
-            return Base::jsonReturn(1003,[],'你还不是商家');
+            return Base::jsonReturn(1003,null,'你还不是商家');
         }
 
 
