@@ -51,6 +51,10 @@ Route::group('', [
 
     'store_msg_feedback'=>'v1/Store/msgFeedBack',//意见反馈
 
+    'get_sms'=>'v1/Store/getSMS',//获取验证码
+
+    'edit_passwd'=>'v1/Store/editPasswd',//修改密码
+
 ]);
 
 

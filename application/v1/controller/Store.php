@@ -4,7 +4,8 @@ use app\v1\controller\Base;
 use app\v1\model\Order as OrderModel;
 use app\v1\model\Store as StoreModel;
 use think\Request;
-
+use app\v1\model\SMS as SMSModel;
+use think\facade\Cache;
 /**
  * Class Order  店铺
  * @package app\v1\controller
@@ -280,7 +281,39 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
 
     }
 
+    /** 发送短信
+     * @param Request $request
+     * @return array
+     */
+    public function getSMS(Request $request)
+    {
+        $phone_number = $request->param('phone_number');
+        if (empty($phone_number)) {
+            return Base::jsonReturn(1000, [], '参数缺失');
+        }
+        if(!preg_match("/^1[34578]{1}\d{9}$/",$phone_number))
+        {
+            return Base::jsonReturn(1000, [], '手机号格式不正确');
+        }
+        $code=rand('100000','999999');
+        $res=SMSModel::sendSms($phone_number,'SMS_160860415',$code);
+        if ($res) {
+            Cache::set($phone_number,$code,300);
+            return Base::jsonReturn(200, [], '发送成功');
+        } else {
+            return Base::jsonReturn(2000, [], '发送失败');
+        }
+    }
+    public function editPasswd(Request $request)
+    {
+        $verify_code = $request->param('verify_code');
+        $new_passwd = $request->param('new_passwd');
+        $con_new_passwd = $request->param('con_new_passwd');
+        if (empty($verify_code) || empty($new_passwd) || empty($con_new_passwd)) {
+            return Base::jsonReturn(1000, [], '参数缺失');
+        }
 
+    }
 
 
 
