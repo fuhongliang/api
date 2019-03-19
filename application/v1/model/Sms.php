@@ -70,7 +70,7 @@ class Sms
     public static function sendSms($phone_number,$template,$code) {
 
         // 初始化SendSmsRequest实例用于设置发送短信的参数
-        $request = new SendSmsRequest();
+        $request = new \SendSmsRequest();
 
         //可选-启用https协议
         //$request->setProtocol("https");
