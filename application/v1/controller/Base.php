@@ -18,7 +18,7 @@ class Base
     public static function jsonReturn($code=200,$data,$msg='')
     {
 
-        return ['code'=>$code,'data'=>$data,'msg'=>$msg];
+        return ['code'=>$code,'data'=>empty($data) ? null :$data,'msg'=>$msg];
     }
     /**
      * 生成token
