@@ -42,14 +42,14 @@ class Order extends Base
         $refuse_reason=$request->param('refuse_reason');
         if(!$order_id || !$refuse_reason)
         {
-            return Base::jsonReturn(1000,[],'参数缺失');
+            return Base::jsonReturn(1000,null,'参数缺失');
         }
         $res=OrderModel::cancelOrder($order_id,$refuse_reason);
         if($res)
         {
-            return Base::jsonReturn(200,[],'拒单成功');
+            return Base::jsonReturn(200,null,'拒单成功');
         }else{
-            return Base::jsonReturn(2000,[],'拒单失败');
+            return Base::jsonReturn(2000,null,'拒单失败');
         }
     }
 
@@ -64,14 +64,14 @@ class Order extends Base
         $order_id=$request->param('order_id');
         if(!$order_id)
         {
-            return Base::jsonReturn(1000,[],'参数缺失');
+            return Base::jsonReturn(1000,null,'参数缺失');
         }
         $res=OrderModel::editOrder(['order_id'=>$order_id],['order_state'=>30]);
         if($res)
         {
-            return Base::jsonReturn(200,[],'接单成功');
+            return Base::jsonReturn(200,null,'接单成功');
         }else{
-            return Base::jsonReturn(2000,[],'接单失败');
+            return Base::jsonReturn(2000,null,'接单失败');
         }
 
     }
@@ -90,7 +90,7 @@ class Order extends Base
         $store_id=$request->param('store_id');
         if(!$order_state || !$store_id)
         {
-            return Base::jsonReturn(1000,[],'参数缺失');
+            return Base::jsonReturn(1000,null,'参数缺失');
         }
         $fileds='order_id,order_sn,buyer_id,add_time';
         $info=OrderModel::getNewOrder(['store_id'=>$store_id,'order_state'=>$order_state],array('order_goods','order_common'),$fileds);

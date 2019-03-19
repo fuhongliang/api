@@ -6,6 +6,7 @@ use app\v1\model\Store as StoreModel;
 use think\Request;
 use app\v1\model\SMS as SMSModel;
 use think\facade\Cache;
+use app\v1\model\Member as MemberModel;
 /**
  * Class Order  店铺
  * @package app\v1\controller
@@ -27,7 +28,7 @@ class Store extends Base
         $store_id = $request->param('store_id');
         $class_name = $request->param('class_name');
         if (empty($store_id) || empty($class_name)) {
-            return Base::jsonReturn(1000, [], '参数缺失');
+            return Base::jsonReturn(1000, null, '参数缺失');
         }
         if(!$class_id)
         {
@@ -42,12 +43,12 @@ class Store extends Base
                 );
                 $res = StoreModel::addStoreGoodsClass($ins_data);
                 if ($res) {
-                    return Base::jsonReturn(200, [], '新增成功');
+                    return Base::jsonReturn(200, null, '新增成功');
                 } else {
-                    return Base::jsonReturn(2000, [], '新增失败');
+                    return Base::jsonReturn(2000, null, '新增失败');
                 }
             } else {
-                return Base::jsonReturn(2000, [], '名称已存在');
+                return Base::jsonReturn(2000, null, '名称已存在');
             }
         }else{
             //存在检测重名
@@ -56,15 +57,15 @@ class Store extends Base
             {
                 $res = StoreModel::editStoreClassInfo(['stc_id'=>$class_id],['stc_name'=>$class_name]);
                 if ($res) {
-                    return Base::jsonReturn(200, [], '更新成功');
+                    return Base::jsonReturn(200, null, '更新成功');
                 } else {
-                    return Base::jsonReturn(2000, [], '更新失败');
+                    return Base::jsonReturn(2000, null, '更新失败');
                 }
             }elseif ( $class_id == $store_info['stc_id'])
             {
-                return Base::jsonReturn(200, [], '更新成功');
+                return Base::jsonReturn(200, null, '更新成功');
             }else{
-                return Base::jsonReturn(2000, [], '名称已存在');
+                return Base::jsonReturn(2000, null, '名称已存在');
             }
         }
 
@@ -81,13 +82,13 @@ class Store extends Base
         $class_id = $request->param('class_id');
         $store_id = $request->param('store_id');
         if (empty($class_id) || empty($store_id)) {
-            return Base::jsonReturn(1000, [], '参数缺失');
+            return Base::jsonReturn(1000, null, '参数缺失');
         }
         $res=StoreModel::delStoreClassInfo(['stc_id'=>$class_id,'store_id'=>$store_id]);
         if ($res) {
-            return Base::jsonReturn(200, [], '删除成功');
+            return Base::jsonReturn(200, null, '删除成功');
         } else {
-            return Base::jsonReturn(2000, [], '删除失败');
+            return Base::jsonReturn(2000, null, '删除失败');
         }
     }
 
@@ -102,7 +103,7 @@ class Store extends Base
     {
         $store_id = $request->param('store_id');
         if (empty($store_id)) {
-            return Base::jsonReturn(1000, [], '参数缺失');
+            return Base::jsonReturn(1000, null, '参数缺失');
         }
         $data=StoreModel::getAllStoreClass(['store_id'=>$store_id],['stc_id,stc_name,stc_sort']);
         return Base::jsonReturn(200, $data, '获取成功');
@@ -120,13 +121,13 @@ class Store extends Base
         $class_ids = json_decode($request->param('class_ids'));
         $store_id = $request->param('store_id');
         if (empty($class_ids) || empty($store_id)) {
-            return Base::jsonReturn(1000, [], '参数缺失');
+            return Base::jsonReturn(1000, null, '参数缺失');
         }
         $res=StoreModel::sortStoreGoodsClass($class_ids,$store_id);
         if ($res) {
-            return Base::jsonReturn(200, [], '排序成功');
+            return Base::jsonReturn(200, null, '排序成功');
         } else {
-            return Base::jsonReturn(2000, [], '排序失败');
+            return Base::jsonReturn(2000, null, '排序失败');
         }
     }
 
@@ -142,7 +143,7 @@ class Store extends Base
         $class_id = $request->param('class_id');
         $store_id = $request->param('store_id');
         if (empty($class_id) || empty($store_id)) {
-            return Base::jsonReturn(1000, [], '参数缺失');
+            return Base::jsonReturn(1000, null, '参数缺失');
         }
         $result=array();
         $result['class_id']=StoreModel::getAllStoreClass(['store_id'=>$store_id],['stc_id,stc_name']);
@@ -161,7 +162,7 @@ class Store extends Base
     {
         $store_id = $request->param('store_id');
         if (empty($store_id)) {
-            return Base::jsonReturn(1000, [], '参数缺失');
+            return Base::jsonReturn(1000, null, '参数缺失');
         }
         $data=StoreModel::getStoreData(['a.store_id'=>$store_id], ['a.store_state,a.store_description,a.store_label,a.store_phone,
 a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electronic']);
@@ -179,13 +180,13 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         $store_id = $request->param('store_id');
         $store_state = $request->param('store_state');
         if (empty($store_id) || empty($store_state)) {
-            return Base::jsonReturn(1000, [], '参数缺失');
+            return Base::jsonReturn(1000, null, '参数缺失');
         }
         $res=StoreModel::setWorkState(['store_id'=>$store_id],['store_state'=>$store_state]);
         if ($res) {
-            return Base::jsonReturn(200, [], '设置成功');
+            return Base::jsonReturn(200, null, '设置成功');
         } else {
-            return Base::jsonReturn(2000, [], '设置失败');
+            return Base::jsonReturn(2000, null, '设置失败');
         }
     }
 
@@ -200,13 +201,13 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         $store_id = $request->param('store_id');
         $store_desc = $request->param('store_desc');
         if (empty($store_id) || empty($store_desc)) {
-            return Base::jsonReturn(1000, [], '参数缺失');
+            return Base::jsonReturn(1000, null, '参数缺失');
         }
         $res=StoreModel::setWorkState(['store_id'=>$store_id],['store_description'=>$store_desc]);
         if ($res) {
-            return Base::jsonReturn(200, [], '设置成功');
+            return Base::jsonReturn(200, null, '设置成功');
         } else {
-            return Base::jsonReturn(2000, [], '设置失败');
+            return Base::jsonReturn(2000, null, '设置失败');
         }
     }
 
@@ -221,13 +222,13 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         $store_id = $request->param('store_id');
         $phone_number = $request->param('phone_number');
         if (empty($store_id) || empty($phone_number)) {
-            return Base::jsonReturn(1000, [], '参数缺失');
+            return Base::jsonReturn(1000, null, '参数缺失');
         }
         $res=StoreModel::setWorkState(['store_id'=>$store_id],['store_phone'=>$phone_number]);
         if ($res) {
-            return Base::jsonReturn(200, [], '设置成功');
+            return Base::jsonReturn(200, null, '设置成功');
         } else {
-            return Base::jsonReturn(2000, [], '设置失败');
+            return Base::jsonReturn(2000, null, '设置失败');
         }
     }
 
@@ -243,13 +244,13 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         $work_start_time = $request->param('work_start_time');
         $work_end_time = $request->param('work_end_time');
         if (empty($store_id) || empty($work_start_time) || empty($work_end_time)) {
-            return Base::jsonReturn(1000, [], '参数缺失');
+            return Base::jsonReturn(1000, null, '参数缺失');
         }
         $res=StoreModel::setWorkState(['store_id'=>$store_id],['work_start_time'=>$work_start_time,'work_end_time'=>$work_end_time]);
         if ($res) {
-            return Base::jsonReturn(200, [], '设置成功');
+            return Base::jsonReturn(200, null, '设置成功');
         } else {
-            return Base::jsonReturn(2000, [], '设置失败');
+            return Base::jsonReturn(2000, null, '设置失败');
         }
 
     }
@@ -264,7 +265,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         $content = $request->param('content');
         $type = $request->param('type');// 1 安卓 2 ios
         if (empty($store_id) || empty($content) || empty($type)) {
-            return Base::jsonReturn(1000, [], '参数缺失');
+            return Base::jsonReturn(1000, null, '参数缺失');
         }
         $data=array(
             'store_id'=>$store_id,
@@ -306,11 +307,12 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
     }
     public function editPasswd(Request $request)
     {
+        $member_id = $request->param('member_id');
         $phone_number = $request->param('phone_number');
         $verify_code = $request->param('verify_code');
         $new_passwd = $request->param('new_passwd');
         $con_new_passwd = $request->param('con_new_passwd');
-        if (empty($verify_code) || empty($new_passwd) || empty($con_new_passwd)) {
+        if (empty($member_id) || empty($verify_code) || empty($new_passwd) || empty($con_new_passwd)) {
             return Base::jsonReturn(1000, null ,'参数缺失');
         }
         if($new_passwd !==$con_new_passwd)
@@ -326,7 +328,12 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         {
             return Base::jsonReturn(2003, null, '验证码错误');
         }else{
-
+            $res=MemberModel::editMemberInfo(['member_id'=>$member_id],['member_passwd'=>md5($new_passwd)]);
+            if ($res) {
+                return Base::jsonReturn(200, null, '修改成功');
+            } else {
+                return Base::jsonReturn(2000, null, '修改失败');
+            }
         }
 
     }

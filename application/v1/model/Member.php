@@ -36,5 +36,18 @@ class Member extends Model{
         return $member_info;
     }
 
+    /**
+     * @param $condition
+     * @param $up_data
+     * @return int|string
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    static function editMemberInfo($condition,$up_data)
+    {
+        return Db::name('member')
+            ->where($condition)
+            ->update($up_data);
+    }
 
 }
