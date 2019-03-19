@@ -37,7 +37,7 @@ Route::group('', [
 
     'add_goods'=>'v1/Goods/addGoods',//添加商品
 
-    'del_goods'=>'v1/Goods/delGoods',//添加商品
+    'del_goods'=>'v1/Goods/delGoods',//删除商品
 
     'store_setting'=>'v1/Store/getStoreSetting',//门店设置详情
 
@@ -56,6 +56,8 @@ Route::group('', [
     'edit_passwd'=>'v1/Store/editPasswd',//修改密码
 
     'get_store_com'=>'v1/Store/getStoreCom',//获取店铺评论
+
+    'store_yunying'=>'v1/Store/storeYunYingInfo',//店铺运营
 
 ]);
 

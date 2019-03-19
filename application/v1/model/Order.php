@@ -131,6 +131,11 @@ class Order extends Model{
             ->update($up_data);
     }
 
+    static function getTodayOrderNums($store_id)
+    {
+        return Db::name('order')->where(['order_state'=>20,''])->count();
+    }
+
 
 
 }

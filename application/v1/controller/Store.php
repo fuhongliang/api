@@ -179,7 +179,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
     {
         $store_id = $request->param('store_id');
         $store_state = $request->param('store_state');
-        if (empty($store_id) || empty($store_state)) {
+        if (empty($store_id))) {
             return Base::jsonReturn(1000, null, '参数缺失');
         }
         $res=StoreModel::setWorkState(['store_id'=>$store_id],['store_state'=>$store_state]);
@@ -354,20 +354,29 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
     public function getStoreCom(Request $request)
     {
         $store_id = $request->param('store_id');
-        $type = $request->param('type');// 1 好评  2 中评 3 差评
-        if (empty($store_id) || empty($type)) {
+        $haoping = $request->param('haoping');// 1 好评  2 中评 3 差评
+        if (empty($store_id) || empty($haoping)) {
             return Base::jsonReturn(1000, null ,'参数缺失');
         }
         $result=array();
         $result['haping']=StoreModel::getComNums($store_id);
-        if(!$type)
+        if(!haoping)
         {
             $condition=['store_id'=>$store_id];
         }else{
-            $condition=['store_id'=>$store_id,'haoping'=>$type];
+            $condition=['store_id'=>$store_id,'haoping'=>$haoping];
         }
         $result['com_list']=StoreModel::getStoreComAllData($condition);
         return Base::jsonReturn(200, $result, '获取成功');
+    }
+
+    public function storeYunYingInfo(Request $request)
+    {
+        $store_id = $request->param('store_id');
+        if (empty($store_id)) {
+            return Base::jsonReturn(1000, null ,'参数缺失');
+        }
+
     }
 
 
