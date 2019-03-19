@@ -4,7 +4,7 @@ use app\v1\controller\Base;
 use app\v1\model\Order as OrderModel;
 use app\v1\model\Store as StoreModel;
 use think\Request;
-use app\v1\model\SMS as SMSModel;
+use app\v1\model\Sms as SMSmodel;
 use think\facade\Cache;
 use app\v1\model\Member as MemberModel;
 /**
@@ -179,7 +179,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
     {
         $store_id = $request->param('store_id');
         $store_state = $request->param('store_state');
-        if (empty($store_id))) {
+        if (empty($store_id)) {
             return Base::jsonReturn(1000, null, '参数缺失');
         }
         $res=StoreModel::setWorkState(['store_id'=>$store_id],['store_state'=>$store_state]);
@@ -376,7 +376,14 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         if (empty($store_id)) {
             return Base::jsonReturn(1000, null ,'参数缺失');
         }
-
+        //统计的日期0点
+        $stat_time = strtotime(date('Y-m-d',time())) - 86400;
+        /*
+         * 近30天
+         */
+        $stime = $stat_time - (86400*29);//30天前
+        $etime = $stat_time + 86400 - 1;//昨天23:59
+        echo $stat_time;die;
     }
 
 
