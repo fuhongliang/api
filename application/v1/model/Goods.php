@@ -77,5 +77,8 @@ class Goods extends Model
         });
         return true;
     }
-
+    static function getGoodsCount($condition,$count)
+    {
+        return Db::name('goods')->where($condition)->count($count);
+    }
 }

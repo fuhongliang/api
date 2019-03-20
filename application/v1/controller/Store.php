@@ -7,6 +7,9 @@ use think\Request;
 use app\v1\model\Sms as SMSmodel;
 use think\facade\Cache;
 use app\v1\model\Member as MemberModel;
+use think\Db;
+use app\v1\model\Goods as GoodsModel;
+
 /**
  * Class Order  店铺
  * @package app\v1\controller
@@ -166,7 +169,6 @@ class Store extends Base
         }
         $data=StoreModel::getStoreData(['a.store_id'=>$store_id], ['a.store_state,a.store_description,a.store_label,a.store_phone,
 a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electronic']);
-
         $data['store_zizhi']='http://master.shop.ifhu.cn/data/upload/shop/store/slide/f01.jpg';
         return Base::jsonReturn(200, $data, '获取成功');
     }
@@ -384,6 +386,9 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         if (empty($store_id)) {
             return Base::jsonReturn(1000, null ,'参数缺失');
         }
+        $beginToday=mktime(0,0,0,date('m'),date('d'),date('Y'));
+        $endToday=mktime(0,0,0,date('m'),date('d')+1,date('Y'))-1;
+
         //统计的日期0点
         $stat_time = strtotime(date('Y-m-d',time())) - 86400;
         /*
@@ -391,12 +396,30 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
          */
         $stime = $stat_time - (86400*29);//30天前
         $etime = $stat_time + 86400 - 1;//昨天23:59
-        $where = array();
-        $where['store_id'] = $store_id;
-        $where['order_add_time'] = array('between',array($stime,$etime));
-        $field = ' COUNT(*) as ordernum, SUM(order_amount) as orderamount';
-        $data=OrderModel::getYunYingInfo($where,['COUNT(*) as ordernum, SUM(order_amount) as orderamount']);
-        var_dump($data);
+        $where1 = [
+            'add_time'   => ['between', [$stime,$etime]],
+            'store_id' => $store_id,
+        ];
+        $where2 = [
+            'add_time'   => ['between', [$beginToday,$endToday]],
+            'store_id' => $store_id,
+        ];
+        // 30天 下单量和销售金额
+        $field=['COUNT(*) as ordernum, IFNULL(SUM(order_amount),0) as orderamount'];
+
+        $data=OrderModel::getOrderYunYing($where1,$field);
+        //店铺收藏量 商品数量
+        $store_collect_data= StoreModel::getStoreInfo(['store_id'=>$store_id],['store_collect']);
+        $goods_num=GoodsModel::getGoodsCount(['store_id'=>$store_id],'goods_id');
+        $data2=OrderModel::getOrderYunYing($where2, $field);
+        $result=array();
+        $result['today_ordernum']=$data2['ordernum'];
+        $result['today_orderamount']=$data2['orderamount'];
+        $result['30_ordernum']=$data['ordernum'];
+        $result['30_orderamount']=$data['orderamount'];
+        $result['store_collect']=$store_collect_data['store_collect'];
+        $result['goods_num']=$goods_num;
+        return Base::jsonReturn(200, $result, '获取成功');
     }
 
 

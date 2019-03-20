@@ -4,6 +4,7 @@ use think\Model;
 use think\Db;
 use app\v1\model\Member as MemberModel;
 use app\v1\model\Goods as GoodsModel;
+use think\db\Where;
 /**
  * Class Order 订单模型
  * @package app\v1\model
@@ -152,5 +153,23 @@ class Order extends Model{
     {
         return Db::name('order')->field($field)->where($condition)->find();
     }
+
+    /**
+     * @param $condition
+     * @param string $field
+     * @return array|\PDOStatement|string|Model|null
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    static function getOrderYunYing($condition,$field='*')
+    {
+        return Db::name('order')
+            ->field($field)
+            ->where(new Where($condition))
+            ->find();
+    }
+
+
 
 }
