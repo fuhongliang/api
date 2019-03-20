@@ -30,10 +30,11 @@ class Store extends Model{
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    static function  getStoreAndJoinInfo($field = '*')
+    static function  getStoreAndJoinInfo($condition,$field = '*')
     {
         return Db::name('store')
             ->alias('a')
+            ->where($condition)
             ->join('store_joinin b','a.member_id = b.member_id')
             ->join('member c','a.member_id = c.member_id')
             ->field($field)
