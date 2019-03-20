@@ -172,8 +172,14 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         $data['store_zizhi']='http://master.shop.ifhu.cn/data/upload/shop/store/slide/f01.jpg';
 
         $field= 'a.store_id,a.store_name,IFNULL(a.store_avatar,"") as store_avatar,a.work_start_time,a.work_end_time,c.member_id,IFNULL(c.member_mobile,"") as member_mobile';
-        $data=StoreModel::getStoreAndJoinInfo($field);
-
+        $result=StoreModel::getStoreAndJoinInfo($field);
+        $data['store_id']=$result['store_id'];
+        $data['store_name']=$result['store_name'];
+        $data['store_avatar']=$result['store_avatar'];
+        $data['work_start_time']=$result['work_start_time'];
+        $data['work_end_time']=$result['work_end_time'];
+        $data['member_id']=$result['member_id'];
+        $data['member_mobile']=$result['member_mobile'];
 
         return Base::jsonReturn(200, $data, '获取成功');
     }
