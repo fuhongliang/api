@@ -61,6 +61,8 @@ Route::group('', [
 
     'store_jingying'=>'v1/Store/storeJingYingData',//店铺经营
 
+    'get_echarts'=>'v1/Store/getEcharts',
+
 ]);
 
 
