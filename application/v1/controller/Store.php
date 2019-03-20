@@ -1,20 +1,20 @@
 <?php
 namespace app\v1\controller;
-use app\v1\controller\Base;
 use app\v1\model\Order as OrderModel;
 use app\v1\model\Store as StoreModel;
+use think\Controller;
 use think\Request;
 use app\v1\model\Sms as SMSmodel;
 use think\facade\Cache;
 use app\v1\model\Member as MemberModel;
-use think\Db;
 use app\v1\model\Goods as GoodsModel;
+use app\v1\controller\Base as Base;
 
 /**
  * Class Order  店铺
  * @package app\v1\controller
  */
-class Store extends Base
+class Store extends Controller
 {
     /** 添加或更新分类
      * @param Request $request
@@ -380,6 +380,13 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         return Base::jsonReturn(200, $result, '获取成功');
     }
 
+    /**
+     * @param Request $request
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function storeYunYingInfo(Request $request)
     {
         $store_id = $request->param('store_id');
@@ -422,5 +429,14 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         return Base::jsonReturn(200, $result, '获取成功');
     }
 
+    public function storeJingYingData(Request $request)
+    {
+        $store_id = $request->param('store_id');
+        if (empty($store_id)) {
+            return Base::jsonReturn(1000, null ,'参数缺失');
+        }
+        return $this->fetch();
+
+    }
 
 }

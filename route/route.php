@@ -59,6 +59,8 @@ Route::group('', [
 
     'store_yunying'=>'v1/Store/storeYunYingInfo',//店铺运营
 
+    'store_jingying'=>'v1/Store/storeJingYingData',//店铺经营
+
 ]);
 
 
