@@ -298,7 +298,6 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         }
         $code=rand('100000','999999');
         $res=SMSModel::sendSms($phone_number,'SMS_160861509',$code);
-        var_dump($res);die;
         if ($res->Message == 'OK') {
             Cache::set($phone_number,$code,300);
             return Base::jsonReturn(200, null, '发送成功');
@@ -356,16 +355,22 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
     {
         $store_id = $request->param('store_id');
         $haoping = $request->param('haoping');// 1 好评  2 中评 3 差评
-        if (empty($store_id) || empty($haoping)) {
+        $no_com = $request->param('no_com');
+        if (empty($store_id)) {
             return Base::jsonReturn(1000, null ,'参数缺失');
         }
         $result=array();
-        $result['haping']=StoreModel::getComNums($store_id);
-        if(!haoping)
+        if(!empty($no_com))//未回复
         {
-            $condition=['store_id'=>$store_id];
-        }else{
-            $condition=['store_id'=>$store_id,'haoping'=>$haoping];
+            $condition=['store_id'=>$store_id,'parent_id'=>0,'is_replay'=>0];
+        }else{//全部
+            $result['haping']=StoreModel::getComNums($store_id);
+            if(!$haoping)
+            {
+                $condition=['store_id'=>$store_id];
+            }else{
+                $condition=['store_id'=>$store_id,'haoping'=>$haoping];
+            }
         }
         $result['com_list']=StoreModel::getStoreComAllData($condition);
         return Base::jsonReturn(200, $result, '获取成功');
