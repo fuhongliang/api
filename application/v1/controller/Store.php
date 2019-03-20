@@ -302,7 +302,6 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         }
         $code=rand('1000','9999');
         $res=SMSModel::sendSms($phone_number,'SMS_160861509',$code);
-        var_dump($res);
         if ($res->Message == 'OK') {
             Cache::set($phone_number,$code,300);
             return Base::jsonReturn(200, null, '发送成功');
