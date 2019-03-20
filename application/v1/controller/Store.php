@@ -389,7 +389,12 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
          */
         $stime = $stat_time - (86400*29);//30天前
         $etime = $stat_time + 86400 - 1;//昨天23:59
-        echo $stat_time;die;
+        $where = array();
+        $where['store_id'] = $store_id;
+        $where['order_add_time'] = array('between',array($stime,$etime));
+        $field = ' COUNT(*) as ordernum, SUM(order_amount) as orderamount';
+        $data=OrderModel::getYunYingInfo($where,['COUNT(*) as ordernum, SUM(order_amount) as orderamount']);
+        var_dump($data);
     }
 
 

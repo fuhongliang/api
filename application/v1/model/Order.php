@@ -131,11 +131,26 @@ class Order extends Model{
             ->update($up_data);
     }
 
+    /**
+     * @param $store_id
+     * @return float|string
+     */
     static function getTodayOrderNums($store_id)
     {
         return Db::name('order')->where(['order_state'=>20,''])->count();
     }
 
-
+    /**
+     * @param $condition
+     * @param string $field
+     * @return array|\PDOStatement|string|Model|null
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    static function getYunYingInfo($condition, $field = '*')
+    {
+        return Db::name('order')->field($field)->where($condition)->find();
+    }
 
 }
