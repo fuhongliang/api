@@ -465,8 +465,19 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
         header("Access-Control-Allow-Headers:DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type, Accept-Language, Origin, Accept-Encoding");
 
+        $store_id = 7;
         $store_id = $request->param('store_id');
-        return 99;
+        if (empty($store_id)) {
+            return Base::jsonReturn(1000, null ,'参数缺失');
+        }
+        $date=$array=array();
+        for ($i=0;$i<7;$i++)
+        {
+            $data[$i]['start_time']=mktime(0,0,0,date('m'),date('d'),date('Y'))-$i*3600*24 ;
+            $data[$i]['end_time']=$data[$i]['start_time']+24*3600;
+            array_push($array,date('Y-m-d',$data[$i]['start_time']));
+        }
+        return $array;
     }
 
 }
