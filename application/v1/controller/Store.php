@@ -459,7 +459,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
 
         return $this->fetch();
     }
-    public function getEcharts()
+    public function getEcharts(Request $request)
     {
         header("Access-Control-Allow-Origin:*");
         header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
