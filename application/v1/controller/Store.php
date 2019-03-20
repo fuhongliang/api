@@ -300,8 +300,9 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         {
             return Base::jsonReturn(1000, null, '手机号格式不正确');
         }
-        $code=rand('100000','999999');
+        $code=rand('1000','9999');
         $res=SMSModel::sendSms($phone_number,'SMS_160861509',$code);
+        var_dump($res);
         if ($res->Message == 'OK') {
             Cache::set($phone_number,$code,300);
             return Base::jsonReturn(200, null, '发送成功');
