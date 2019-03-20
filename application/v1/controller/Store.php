@@ -173,7 +173,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
 
         $field= 'a.store_id,a.store_name,IFNULL(a.store_avatar,"") as store_avatar,a.work_start_time,a.work_end_time,c.member_id,IFNULL(c.member_mobile,"") as member_mobile';
         $data=StoreModel::getStoreAndJoinInfo($field);
-        $data['member_name']=$member_name;
+
 
         return Base::jsonReturn(200, $data, '获取成功');
     }
