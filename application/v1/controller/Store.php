@@ -166,6 +166,8 @@ class Store extends Base
         }
         $data=StoreModel::getStoreData(['a.store_id'=>$store_id], ['a.store_state,a.store_description,a.store_label,a.store_phone,
 a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electronic']);
+
+        $data['store_zizhi']='http://master.shop.ifhu.cn/data/upload/shop/store/slide/f01.jpg';
         return Base::jsonReturn(200, $data, '获取成功');
     }
 
