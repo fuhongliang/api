@@ -540,9 +540,9 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         $data['today_ordernum_comp']=$today_ordernum['ordernum']-$yest_ordernum['ordernum'];
         $data['today_change']=$today_change;
         $data['today_change_comp']=$today_change-$yest_change;
-var_dump($data);
-        //$this->assign('data',$data);
-        //return $this->fetch();
+
+        $this->assign('data',$data);
+        return $this->fetch();
     }
 
     /** 7日订单
