@@ -470,6 +470,9 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
     /**
      * @param Request $request
      * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function storeJingYingData(Request $request)
     {
@@ -537,9 +540,9 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         $data['today_ordernum_comp']=$today_ordernum['ordernum']-$yest_ordernum['ordernum'];
         $data['today_change']=$today_change;
         $data['today_change_comp']=$today_change-$yest_change;
-
-        $this->assign('data',$data);
-        return $this->fetch();
+var_dump($data);
+        //$this->assign('data',$data);
+        //return $this->fetch();
     }
 
     /** 7日订单
