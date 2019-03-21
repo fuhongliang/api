@@ -463,6 +463,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         $result['30_orderamount']=$data['orderamount'];
         $result['store_collect']=$store_collect_data['store_collect'];
         $result['goods_num']=$goods_num;
+        $result['jingying_url']='http://develop.api.ifhu.cn/index.php/store_jingying';
         return Base::jsonReturn(200, $result, '获取成功');
     }
 
@@ -472,12 +473,76 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
      */
     public function storeJingYingData(Request $request)
     {
+        $flowstat_tablenum=3;
         $store_id = $request->param('store_id');
         $this->assign('store_id',$store_id);
+        $data=array();
+        $data['datetime']=date('Y-m-d');
+
+
+        //确定统计分表名称
+        $last_num = $store_id % 10; //获取店铺ID的末位数字
+        $tablenum = ($t = intval($flowstat_tablenum)) > 1 ? $t : 1; //处理流量统计记录表数量
+        $flow_tablename = ($t = ($last_num % $tablenum)) > 0 ? "flowstat_$t" : 'flowstat';
+        //今日开始和结束时间
+        $beginToday=mktime(0,0,0,date('m'),date('d'),date('Y'));
+        $endToday=mktime(0,0,0,date('m'),date('d')+1,date('Y'))-1;
+
+        //昨日开始和结束时间
+        $beginYesterday=mktime(0,0,0,date('m'),date('d')-1,date('Y'));
+        $endYesterday=mktime(0,0,0,date('m'),date('d'),date('Y'))-1;
+
+        $where =[
+            'stattime'   => ['between', [$beginToday,$endToday]],
+            'store_id' => $store_id
+        ];
+        $where1 =[
+            'stattime'   => ['between', [$beginYesterday,$endYesterday]],
+            'store_id' => $store_id
+        ];
+        //点击量
+        $today_click=StoreModel::getStoreClickNum($flow_tablename,$where,'clicknum');
+        $yest_click=StoreModel::getStoreClickNum($flow_tablename,$where1,'clicknum');
+        //
+        $field=['COUNT(*) as ordernum'];
+
+        $where3 =[
+            'add_time'   => ['between', [$beginToday,$endToday]],
+            'store_id' => $store_id
+        ];
+        $where4 =[
+            'add_time'   => ['between', [$beginYesterday,$endYesterday]],
+                'store_id' => $store_id
+            ];
+        //订单
+        $today_ordernum=OrderModel::getOrderYunYing($where3,$field);
+        $yest_ordernum=OrderModel::getOrderYunYing($where4,$field);
+        //今日转化率
+        if ($today_click == 0)
+        {
+            $today_change=0;
+        }else{
+            $today_change=$today_ordernum['ordernum']/$today_click;
+        }
+        if ($yest_click == 0)
+        {
+            $yest_change=0;
+        }else{
+            $yest_change=$yest_ordernum['ordernum']/$yest_click;
+        }
+
+        $data['today_click']=$today_click;
+        $data['today_click_comp']=$today_click-$yest_click;
+        $data['today_ordernum']=$today_ordernum['ordernum'];
+        $data['today_ordernum_comp']=$today_ordernum['ordernum']-$yest_ordernum['ordernum'];
+        $data['today_change']=$today_change;
+        $data['today_change_comp']=$today_change-$yest_change;
+
+        $this->assign('data',$data);
         return $this->fetch();
     }
 
-    /**
+    /** 7日订单
      * @param Request $request
      * @return array
      * @throws \think\db\exception\DataNotFoundException
@@ -489,12 +554,12 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         header("Access-Control-Allow-Origin:*");
         header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
         header("Access-Control-Allow-Headers:DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type, Accept-Language, Origin, Accept-Encoding");
-        $store_id = $request->param('store_id');
-        if (empty($store_id)) {
-            return Base::jsonReturn(1000, null ,'参数缺失');
-        }
+        $store_id =7;// $request->param('store_id');
+//        if (empty($store_id)) {
+//            return Base::jsonReturn(1000, null ,'参数缺失');
+//        }
         $data=$xday=$ydata=$result=array();
-        for ($i=0;$i<7;$i++)
+        for ($i=7;$i>0;$i--)
         {
             $data[$i]['start_time']=mktime(0,0,0,date('m'),date('d'),date('Y'))-$i*3600*24 ;
             $data[$i]['end_time']=$data[$i]['start_time']+24*3600;
@@ -517,7 +582,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
 
     }
 
-    /**
+    /** 7日金额
      * @param Request $request
      * @return array
      * @throws \think\db\exception\DataNotFoundException
@@ -529,18 +594,17 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         header("Access-Control-Allow-Origin:*");
         header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
         header("Access-Control-Allow-Headers:DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type, Accept-Language, Origin, Accept-Encoding");
-        $store_id = $request->param('store_id');
-        if (empty($store_id)) {
-            return Base::jsonReturn(1000, null ,'参数缺失');
-        }
+        $store_id = 7;//$request->param('store_id');
+//        if (empty($store_id)) {
+//            return Base::jsonReturn(1000, null ,'参数缺失');
+//        }
         $data=$xday=$ydata=$result=array();
-        for ($i=0;$i<7;$i++)
+        for ($i=7;$i>0;$i--)
         {
             $data[$i]['start_time']=mktime(0,0,0,date('m'),date('d'),date('Y'))-$i*3600*24 ;
             $data[$i]['end_time']=$data[$i]['start_time']+24*3600;
             array_push($xday,date('Y-m-d',$data[$i]['start_time']));
         }
-
         $field=['IFNULL(SUM(order_amount),0) as orderamount'];
         foreach ($data as $v)
         {

@@ -3,6 +3,7 @@ namespace app\v1\model;
 use think\Model;
 use think\DB;
 use app\v1\model\Goods as GoodsModel;
+use think\db\Where;
 /**
  * Class Member
  * @package app\v1\model 商家模型
@@ -387,5 +388,17 @@ class Store extends Model{
         return Db::name('store_com')
             ->where($condition)
             ->update($up_data);
+    }
+
+    /**
+     * @param $tablename
+     * @param $condition
+     * @return float
+     */
+    static function getStoreClickNum($tablename,$condition,$sum)
+    {
+        return Db::name($tablename)
+            ->where(new Where($condition))
+            ->sum($sum);
     }
 }
