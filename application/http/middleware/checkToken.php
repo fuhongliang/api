@@ -9,7 +9,8 @@ class checkToken
 {
     public function handle($request, \Closure $next)
     {
-        $token=$request->param('token');
+
+        $token=$_SERVER['HTTP_TOKEN'];
         if (!$token)
         {
             return Base::jsonReturn(1000, null, 'token缺失');
