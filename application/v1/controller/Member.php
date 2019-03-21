@@ -5,6 +5,7 @@ use app\v1\model\Member as MemberModel;
 use app\v1\model\Seller as SellerModel;
 use app\v1\model\Store  as StoreModel;
 use think\Request;
+use app\v1\model\Token as TokenModel;
 /**
  * Class Member  商家（卖家）
  * @package app\v1\controller
@@ -35,6 +36,14 @@ class Member extends Base
                 $data=StoreModel::getStoreAndJoinInfo(['a.member_id'=>$memberInfo['member_id']],$field);
                 $data['member_name']=$member_name;
                 $data['token']=Base::makeToken($member_name,$member_passwd);
+
+                $token_data=array(
+                    'member_id'=>$memberInfo['member_id'],
+                    'token'=>$data['token'],
+                    'add_time'=>time(),
+                    'expire_time'=>time()+24*5*3600
+                );
+                TokenModel::addToken($token_data);
                 return Base::jsonReturn(200,$data,'获取成功');
             }else{
                 return Base::jsonReturn(1001,null,'账号或密码错误');

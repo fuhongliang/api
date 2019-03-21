@@ -1,6 +1,7 @@
 <?php
 namespace app\v1\controller;
 use think\Controller;
+use think\Request;
 class Base extends Controller
 {
 

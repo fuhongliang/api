@@ -15,7 +15,6 @@
  * 后台接口
 */
 Route::group('', [
-    'member_login'  => 'v1/Member/login',//商家登陆
 
     'get_neworder'  => 'v1/Order/newOrder',//获取新订单
 
@@ -67,11 +66,9 @@ Route::group('', [
 
     'get_echarts_'=>'v1/Store/getEcharts_',
 
-]);
+])->middleware('checkToken');
 
-
-
-
+Route::rule('member_login','v1/Member/login','POST');//商家登陆
 
 
 

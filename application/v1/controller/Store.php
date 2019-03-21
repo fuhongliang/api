@@ -2,7 +2,6 @@
 namespace app\v1\controller;
 use app\v1\model\Order as OrderModel;
 use app\v1\model\Store as StoreModel;
-use think\Controller;
 use think\Request;
 use app\v1\model\Sms as SMSmodel;
 use think\facade\Cache;
@@ -10,11 +9,12 @@ use app\v1\model\Member as MemberModel;
 use app\v1\model\Goods as GoodsModel;
 use app\v1\controller\Base as Base;
 use think\Db;
+
 /**
  * Class Order  店铺
  * @package app\v1\controller
  */
-class Store extends Controller
+class Store extends Base
 {
     /** 添加或更新分类
      * @param Request $request
@@ -25,6 +25,11 @@ class Store extends Controller
      * @throws \think\exception\DbException
      * @throws \think\exception\PDOException
      */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function addStoreGoodsClass(Request $request)
     {
         $class_id = $request->param('class_id');
@@ -478,7 +483,6 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
     {
         $flowstat_tablenum=3;
         $store_id = $request->param('store_id');
-        $this->assign('store_id',$store_id);
         $data=array();
         $data['datetime']=date('Y-m-d');
 
@@ -541,8 +545,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         $data['today_change']=$today_change;
         $data['today_change_comp']=$today_change-$yest_change;
 
-        $this->assign('data',$data);
-        return $this->fetch();
+        return \view('store_jingying',['data'=>$data]);
     }
 
     /** 7日订单
