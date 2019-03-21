@@ -554,10 +554,10 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         header("Access-Control-Allow-Origin:*");
         header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
         header("Access-Control-Allow-Headers:DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type, Accept-Language, Origin, Accept-Encoding");
-        $store_id = $request->param('store_id');
-        if (empty($store_id)) {
-            return Base::jsonReturn(1000, null ,'参数缺失');
-        }
+        $store_id =7;// $request->param('store_id');
+//        if (empty($store_id)) {
+//            return Base::jsonReturn(1000, null ,'参数缺失');
+//        }
         $data=$xday=$ydata=$result=array();
         for ($i=7;$i>0;$i--)
         {
@@ -594,10 +594,10 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         header("Access-Control-Allow-Origin:*");
         header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
         header("Access-Control-Allow-Headers:DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type, Accept-Language, Origin, Accept-Encoding");
-        $store_id = $request->param('store_id');
-        if (empty($store_id)) {
-            return Base::jsonReturn(1000, null ,'参数缺失');
-        }
+        $store_id = 7;//$request->param('store_id');
+//        if (empty($store_id)) {
+//            return Base::jsonReturn(1000, null ,'参数缺失');
+//        }
         $data=$xday=$ydata=$result=array();
         for ($i=7;$i>0;$i--)
         {
