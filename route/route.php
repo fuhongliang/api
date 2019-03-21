@@ -61,17 +61,13 @@ Route::group('', [
 
     'store_yunying'=>'v1/Store/storeYunYingInfo',//店铺运营
 
-    //'store_jingying'=>'v1/Store/storeJingYingData',//店铺经营
-//
-//    'get_echarts'=>'v1/Store/getEcharts',
-//
-//    'get_echarts_'=>'v1/Store/getEcharts_',
+    'store_jingying'=>'v1/Store/storeJingYingData',//店铺经营
+
+    'get_echarts'=>'v1/Store/getEcharts',
+
+    'get_echarts_'=>'v1/Store/getEcharts_',
 
 ]);
-Route::get('store_jingying','v1/Store/storeJingYingData');
-
-Route::get('get_echarts','v1/Store/getEcharts');
-Route::get('get_echarts_','v1/Store/getEcharts_');
 
 
 
