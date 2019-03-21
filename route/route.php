@@ -57,6 +57,8 @@ Route::group('', [
 
     'get_store_com'=>'v1/Store/getStoreCom',//获取店铺评论
 
+    'store_feedback'=>'v1/Store/storeFeedback',//店铺回复
+
     'store_yunying'=>'v1/Store/storeYunYingInfo',//店铺运营
 
     'store_jingying'=>'v1/Store/storeJingYingData',//店铺经营

@@ -9,7 +9,7 @@ use think\facade\Cache;
 use app\v1\model\Member as MemberModel;
 use app\v1\model\Goods as GoodsModel;
 use app\v1\controller\Base as Base;
-
+use think\Db;
 /**
  * Class Order  店铺
  * @package app\v1\controller
@@ -394,6 +394,32 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
     /**
      * @param Request $request
      * @return array
+     */
+    public function storeFeedback(Request $request)
+    {
+        $store_id = $request->param('store_id');
+        $content = $request->param('content');
+        $parent_id = $request->param('parent_id');
+        if (empty($store_id) || empty($content) || empty($parent_id)) {
+            return Base::jsonReturn(1000, null ,'参数缺失');
+        }
+        $ins_data=array(
+            'store_id'=>$store_id,
+            'content'=>$content,
+            'parent_id'=>$parent_id,
+            'add_time'=>time()
+        );
+        Db::transaction(function () use ($ins_data,$parent_id){
+            StoreModel::addStoreCom($ins_data);
+            StoreModel::upStoreCom(['com_id' => $parent_id], ['is_replay'=>1]);
+        });
+        return Base::jsonReturn(200, null, '回复成功');
+    }
+
+
+    /**
+     * @param Request $request
+     * @return array
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
@@ -440,44 +466,55 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         return Base::jsonReturn(200, $result, '获取成功');
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     */
     public function storeJingYingData(Request $request)
     {
-        header("Access-Control-Allow-Origin:*");
-        header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
-        header("Access-Control-Allow-Headers:DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type, Accept-Language, Origin, Accept-Encoding");
-
-//        $store_id = $request->param('store_id');
-//        if (empty($store_id)) {
-//            return Base::jsonReturn(1000, null ,'参数缺失');
-//        }
-//        $date=array();
-//        for ($i=0;$i<7;$i++)
-//        {
-//            $data[$i]['start_time']=mktime(0,0,0,date('m'),date('d'),date('Y'))-$i*3600*24 ;
-//            $data[$i]['end_time']=$data[$i]['start_time']+24*3600;
-//        }
-
+        $store_id = $request->param('store_id');
+        $this->assign('store_id',$store_id);
         return $this->fetch();
     }
+
+    /**
+     * @param Request $request
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function getEcharts(Request $request)
     {
         header("Access-Control-Allow-Origin:*");
         header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
         header("Access-Control-Allow-Headers:DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type, Accept-Language, Origin, Accept-Encoding");
-
-        $store_id = 7;
         $store_id = $request->param('store_id');
         if (empty($store_id)) {
             return Base::jsonReturn(1000, null ,'参数缺失');
         }
-        $date=$array=array();
+        $data=$xday=$ydata=$result=array();
         for ($i=0;$i<7;$i++)
         {
             $data[$i]['start_time']=mktime(0,0,0,date('m'),date('d'),date('Y'))-$i*3600*24 ;
             $data[$i]['end_time']=$data[$i]['start_time']+24*3600;
-            array_push($array,date('Y-m-d',$data[$i]['start_time']));
+            array_push($xday,date('Y-m-d',$data[$i]['start_time']));
         }
-        return $array;
+
+        $field=['COUNT(*) as ordernum'];
+        foreach ($data as $v)
+        {
+            $where =[
+                'add_time'   => ['between', [$v['start_time'],$v['end_time']]],
+                'store_id' => $store_id
+            ];
+            $data=OrderModel::getOrderYunYing($where,$field);
+            array_push($ydata,$data['ordernum']);
+        }
+        $result['xday']=$xday;
+        $result['ydata']=$ydata;
+        return $result;
+
     }
 
 }

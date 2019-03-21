@@ -9,29 +9,48 @@
 <body>
 <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
 <div id="main" style="width: 600px;height:400px;"></div>
-
+<div id="main" style="width: 600px;height:400px;"></div>
+<input type="hidden" name="store_id" value="{$store_id}" id="store_id">
 <script type="text/javascript">
     //第一个图表
     var myChart1 = echarts.init(document.getElementById('main'));
-
+    var store_id = $(" #store_id ").val();
+    alert(store_id);
     var app = {
         xday:[],
         yvalue:[]
     };
-
     // 发送ajax请求，从后台获取json数据
     $(document).ready(function () {
         getData();
     });
-
     function getData() {
         $.ajax({
-            url:'http://develop.api.ifhu.cn/index.php/get_echarts',
-            data:{},
+            url:'http://127.0.0.1:8888/api/public/get_echarts',
+            data:{'store_id':store_id},
             type:'post',
             dataType:'json',
             success:function(result) {
-                alert(result);
+                console.log(result)
+                app.xday=result.xday;
+                app.yvalue = result.ydata;
+                myChart1.setOption({
+                    title: {
+                        text: '7日成交量'
+                    },
+                    tooltip: {},
+                    legend: {
+
+                    },
+                    xAxis: {
+                        data: app.xday
+                    },
+                    yAxis: {},
+                    series: [{
+                        type: 'line',
+                        data: app.yvalue
+                    }]
+                })
             },
             error:function (msg) {
                 console.log(msg);
@@ -39,7 +58,6 @@
             }
         })
     };
-
 </script>
 </body>
 </html>

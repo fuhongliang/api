@@ -366,4 +366,26 @@ class Store extends Model{
         return Db::name('store_com')->where($condition)->count();
     }
 
+    /**
+     * @param $data
+     * @return int|string
+     */
+    static function addStoreCom($data)
+    {
+        return  Db::name('store_com')->insertGetId($data);
+    }
+
+    /**
+     * @param $condition
+     * @param $up_data
+     * @return int|string
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    static function upStoreCom($condition, $up_data)
+    {
+        return Db::name('store_com')
+            ->where($condition)
+            ->update($up_data);
+    }
 }
