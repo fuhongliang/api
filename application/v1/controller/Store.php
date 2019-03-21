@@ -530,7 +530,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         }else{
             $yest_change=$yest_ordernum['ordernum']/$yest_click;
         }
-
+        $data['store_id']=$store_id
         $data['today_click']=$today_click;
         $data['today_click_comp']=$today_click-$yest_click;
         $data['today_ordernum']=$today_ordernum['ordernum'];
