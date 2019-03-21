@@ -470,6 +470,9 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
     /**
      * @param Request $request
      * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function storeJingYingData(Request $request)
     {
@@ -530,16 +533,16 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         }else{
             $yest_change=$yest_ordernum['ordernum']/$yest_click;
         }
-
+        $data['store_id']=$store_id;
         $data['today_click']=$today_click;
         $data['today_click_comp']=$today_click-$yest_click;
         $data['today_ordernum']=$today_ordernum['ordernum'];
         $data['today_ordernum_comp']=$today_ordernum['ordernum']-$yest_ordernum['ordernum'];
         $data['today_change']=$today_change;
         $data['today_change_comp']=$today_change-$yest_change;
-
-        $this->assign('data',$data);
-        return $this->fetch();
+var_dump($data);
+        //$this->assign('data',$data);
+        //return $this->fetch();
     }
 
     /** 7日订单
@@ -554,10 +557,10 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         header("Access-Control-Allow-Origin:*");
         header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
         header("Access-Control-Allow-Headers:DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type, Accept-Language, Origin, Accept-Encoding");
-        $store_id =7;// $request->param('store_id');
-//        if (empty($store_id)) {
-//            return Base::jsonReturn(1000, null ,'参数缺失');
-//        }
+        $store_id =$request->param('store_id');
+        if (empty($store_id)) {
+            return Base::jsonReturn(1000, null ,'参数缺失');
+        }
         $data=$xday=$ydata=$result=array();
         for ($i=7;$i>0;$i--)
         {
@@ -594,10 +597,10 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         header("Access-Control-Allow-Origin:*");
         header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
         header("Access-Control-Allow-Headers:DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type, Accept-Language, Origin, Accept-Encoding");
-        $store_id = 7;//$request->param('store_id');
-//        if (empty($store_id)) {
-//            return Base::jsonReturn(1000, null ,'参数缺失');
-//        }
+        $store_id = $request->param('store_id');
+        if (empty($store_id)) {
+            return Base::jsonReturn(1000, null ,'参数缺失');
+        }
         $data=$xday=$ydata=$result=array();
         for ($i=7;$i>0;$i--)
         {
