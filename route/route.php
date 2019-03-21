@@ -65,6 +65,8 @@ Route::group('', [
 
     'get_echarts'=>'v1/Store/getEcharts',
 
+    'get_echarts_'=>'v1/Store/getEcharts_',
+
 ]);
 
 

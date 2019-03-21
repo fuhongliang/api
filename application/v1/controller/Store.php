@@ -313,7 +313,6 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         }
         $code=rand('1000','9999');
         $res=SMSModel::sendSms($phone_number,'SMS_160861509',$code);
-        var_dump($res);die;
         if ($res->Message == 'OK') {
             Cache::set($phone_number,$code,300);
             return Base::jsonReturn(200, null, '发送成功');
@@ -518,4 +517,43 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
 
     }
 
+    /**
+     * @param Request $request
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getEcharts_(Request $request)
+    {
+        header("Access-Control-Allow-Origin:*");
+        header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
+        header("Access-Control-Allow-Headers:DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type, Accept-Language, Origin, Accept-Encoding");
+        $store_id = $request->param('store_id');
+        if (empty($store_id)) {
+            return Base::jsonReturn(1000, null ,'参数缺失');
+        }
+        $data=$xday=$ydata=$result=array();
+        for ($i=0;$i<7;$i++)
+        {
+            $data[$i]['start_time']=mktime(0,0,0,date('m'),date('d'),date('Y'))-$i*3600*24 ;
+            $data[$i]['end_time']=$data[$i]['start_time']+24*3600;
+            array_push($xday,date('Y-m-d',$data[$i]['start_time']));
+        }
+
+        $field=['IFNULL(SUM(order_amount),0) as orderamount'];
+        foreach ($data as $v)
+        {
+            $where =[
+                'add_time'   => ['between', [$v['start_time'],$v['end_time']]],
+                'store_id' => $store_id
+            ];
+            $data=OrderModel::getOrderYunYing($where,$field);
+            array_push($ydata,$data['orderamount']);
+        }
+        $result['xday']=$xday;
+        $result['ydata']=$ydata;
+        return $result;
+
+    }
 }
