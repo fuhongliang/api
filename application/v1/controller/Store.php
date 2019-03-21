@@ -463,6 +463,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         $result['30_orderamount']=$data['orderamount'];
         $result['store_collect']=$store_collect_data['store_collect'];
         $result['goods_num']=$goods_num;
+        $result['jingying_url']='http://develop.api.ifhu.cn/index.php/store_jingying';
         return Base::jsonReturn(200, $result, '获取成功');
     }
 
