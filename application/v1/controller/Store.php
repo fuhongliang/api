@@ -346,7 +346,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         {
             return Base::jsonReturn(2001, null, '密码不一致');
         }
-        if(strlen(trim($new_passwd))<=6)
+        if(strlen(trim($new_passwd))<6)
         {
             return Base::jsonReturn(2002, null, '密码最少6位');
         }
