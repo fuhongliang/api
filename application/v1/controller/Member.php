@@ -32,9 +32,9 @@ class Member extends Base
         {
             if(md5($member_passwd)==$memberInfo['member_passwd'])
             {
-                $field= 'a.store_id,a.store_name,a.store_phone,IFNULL(a.store_avatar,"") as store_avatar,a.area_info,a.store_address,a.work_start_time,a.work_end_time,a.store_state,a.store_description,a.work_start_time,a.work_end_time,IFNULL(b.business_licence_number_electronic,"") as business_licence_number_electronic,c.member_id,IFNULL(c.member_mobile,"") as member_mobile';
+                $field= 'a.store_id,a.store_name,a.store_phone,IFNULL(a.store_avatar,"") as store_avatar,a.area_info,a.store_address,a.work_start_time,a.work_end_time,a.store_state,a.store_description,a.work_start_time,a.work_end_time,IFNULL(b.business_licence_number_electronic,"") as business_licence_number_electronic,c.member_id,c.member_name,IFNULL(c.member_mobile,"") as member_mobile';
                 $data=StoreModel::getStoreAndJoinInfo(['a.member_id'=>$memberInfo['member_id']],$field);
-                $data['member_name']=$member_name;
+                $data['store_avatar']='http://master.shop.ifhu.cn/data/upload/shop/store/slide/f01.jpg';
                 $data['token']=Base::makeToken($member_name,$member_passwd);
 
                 $token_data=array(
