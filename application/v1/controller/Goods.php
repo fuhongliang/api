@@ -68,7 +68,7 @@ class Goods extends Base
         $common_array['goods_serial']       = 0;
         $common_array['goods_storage_alarm']= 0;
         $common_array['goods_attr']         = '';
-        $common_array['goods_body']         = $goods_desc;
+        $common_array['goods_body']         = empty($goods_desc)? "":$goods_desc;
         $m_body = str_replace('&quot;', '"', $goods_desc);
         $m_body = json_decode($m_body, true);
         $mobile_body = serialize($m_body);
