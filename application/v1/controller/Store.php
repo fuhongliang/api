@@ -158,7 +158,7 @@ class Store extends Base
             $class_id=$ClassStcId['stc_id'];
         }
         $result=array();
-        $result['class_id']=StoreModel::getAllStoreClass(['store_id'=>$store_id],['stc_id,stc_name']);
+        $result['class_list']=StoreModel::getAllStoreClass(['store_id'=>$store_id],['stc_id,stc_name']);
         $result['goods_list']=StoreModel::getStoreGoodsListByStcId($store_id,$class_id);
         return Base::jsonReturn(200, $result, '获取成功');
     }
