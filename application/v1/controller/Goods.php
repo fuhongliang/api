@@ -29,9 +29,23 @@ class Goods extends Base
         $sell_time=$request->param('sell_time'); // 出售时间
         $goods_desc=$request->param('goods_desc');// 描述
 
-        if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price || !$goods_storage || !$sell_time || !$goods_desc)
+        if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price  || !$goods_desc)
         {
             return Base::jsonReturn(1000,null,'参数缺失');
+        }
+        if(!$goods_storage)
+        {
+            $goods_storage=999999999;
+        }
+        if(!$sell_time)
+        {
+            $selltime=array(
+                array(
+                    'start_time'=>'00:00',
+                    'end_time'=>'23:59'
+                )
+            );
+            $sell_time=$sell_time=json_encode($selltime);
         }
         $bind_class=StoreModel::getStoreBindClass(['store_id'=>$store_id], ['class_1,class_2,class_3']);
         $common_array=array();
