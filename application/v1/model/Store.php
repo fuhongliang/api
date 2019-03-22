@@ -97,6 +97,26 @@ class Store extends Model{
             ->order($order)
             ->select();
     }
+
+    /**
+     * @param $condition
+     * @param string $field
+     * @param string $order
+     * @param $limit
+     * @return array|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    static function getStoreClassStcId($condition, $field = '*',$limit,$order ='stc_sort desc')
+    {
+        return Db::name('store_goods_class')
+            ->field($field)
+            ->where($condition)
+            ->order($order)
+            ->limit($limit)
+            ->find();
+    }
     /**
      * @param $condition
      * @param $up_data

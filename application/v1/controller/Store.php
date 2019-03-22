@@ -150,8 +150,12 @@ class Store extends Base
     {
         $class_id = $request->param('class_id');
         $store_id = $request->param('store_id');
-        if (empty($class_id) || empty($store_id)) {
+        if (empty($store_id)) {
             return Base::jsonReturn(1000, null, '参数缺失');
+        }
+        if(empty($class_id)) {
+            $ClassStcId = StoreModel::getStoreClassStcId(['store_id' => $store_id], ['stc_id'], 1);
+            $class_id=$ClassStcId['stc_id'];
         }
         $result=array();
         $result['class_id']=StoreModel::getAllStoreClass(['store_id'=>$store_id],['stc_id,stc_name']);
