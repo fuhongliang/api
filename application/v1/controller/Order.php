@@ -88,7 +88,7 @@ class Order extends Base
         //order_state  20新订单  30已发货  40 已收货   0已取消
         $order_state=$request->param('order_state');
         $store_id=$request->param('store_id');
-        if(!$order_state || !$store_id)
+        if(!$store_id)
         {
             return Base::jsonReturn(1000,null,'参数缺失');
         }
