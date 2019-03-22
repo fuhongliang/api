@@ -29,7 +29,7 @@ class Goods extends Base
         $sell_time=$request->param('sell_time'); // 出售时间
         $goods_desc=$request->param('goods_desc');// 描述
 
-        if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price  || !$goods_desc)
+        if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price)
         {
             return Base::jsonReturn(1000,null,'参数缺失');
         }
