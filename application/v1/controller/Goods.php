@@ -76,7 +76,6 @@ class Goods extends Base
         $common_array['goods_commend']      = 0;
         $common_array['goods_state']        = 1;            // 店铺关闭时，商品下架
         $common_array['goods_addtime']      = time();
-        $common_array['goods_selltime']     = time();
         $common_array['goods_verify']       = 1;
         $common_array['store_id']           = $store_id;
         $common_array['store_name']         = '';
@@ -109,8 +108,8 @@ class Goods extends Base
         {
             $goods_sell_time[$k][intval($val['start_time'])]=$val['end_time'];
         }
-        $common_array['goods_sell_time']        = serialize($goods_sell_time);
-
+        //$common_array['goods_sell_time']        = serialize($goods_sell_time);
+        $common_array['goods_selltime']    = serialize($goods_sell_time);
         $common_id=GoodsModel::addGoodsCommon($common_array);
 /////  商品信息
         $goods = array();
