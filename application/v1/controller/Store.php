@@ -34,7 +34,7 @@ class Store extends Base
     {
         $class_id = $request->param('class_id');
         $store_id = $request->param('store_id');
-        $class_name = $rmsgFeedBackequest->param('class_name');
+        $class_name = $request->param('class_name');
         if (empty($store_id) || empty($class_name)) {
             return Base::jsonReturn(1000, null, '参数缺失');
         }
