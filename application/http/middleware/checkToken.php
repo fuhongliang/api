@@ -13,17 +13,17 @@ class checkToken
         $token=$_SERVER['HTTP_TOKEN'];
         if (!$token)
         {
-            return Base::jsonReturn(1000, null, 'token缺失');
+            return Base::jsonReturn(3000, null, 'token缺失');
         }else{
             $token=Token::getTokenField(['token'=>$token],['expire_time']);
             if (empty($token))
             {
-                return Base::jsonReturn(1000, null, 'token错误');
+                return Base::jsonReturn(3001, null, 'token伪造');
             }else{
                 $time=time();
                 if($time>$token['expire_time'])
                 {
-                    return Base::jsonReturn(1000, null, 'token已过期');
+                    return Base::jsonReturn(3002, null, 'token已过期');
                 }
             }
         }
