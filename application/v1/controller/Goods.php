@@ -109,7 +109,7 @@ class Goods extends Base
             $goods_sell_time[$k][intval($val['start_time'])]=$val['end_time'];
         }
         $common_array['goods_sale_time']        = serialize($goods_sell_time);
-        $common_array['goods_selltime']    = serialize($goods_sell_time);
+        $common_array['goods_selltime']    = time();
         $common_id=GoodsModel::addGoodsCommon($common_array);
 /////  商品信息
         $goods = array();
