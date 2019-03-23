@@ -34,7 +34,7 @@ class Store extends Base
     {
         $class_id = $request->param('class_id');
         $store_id = $request->param('store_id');
-        $class_name = $request->param('class_name');
+        $class_name = $rmsgFeedBackequest->param('class_name');
         if (empty($store_id) || empty($class_name)) {
             return Base::jsonReturn(1000, null, '参数缺失');
         }
@@ -291,11 +291,14 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         if (empty($store_id) || empty($content) || empty($type)) {
             return Base::jsonReturn(1000, null, '参数缺失');
         }
+        $memdata=StoreModel::getStoreMemInfo(['store_id'=>$store_id],['c.member_id,c.member_name']);
         $data=array(
+            'member_id'=>$memdata['member_id'],
+            'member_name'=>$memdata['member_name'],
             'store_id'=>$store_id,
             'content'=>$content,
             'ftime'=>time(),
-            'type'=>$type
+            'type'=>$type == 1? 3:4
         );
         $res=StoreModel::addAppFeedBack($data);
         if ($res) {

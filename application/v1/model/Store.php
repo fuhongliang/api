@@ -43,6 +43,23 @@ class Store extends Model{
     }
 
     /**
+     * @param $condition
+     * @param string $field
+     * @return array|\PDOStatement|string|Model|null
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    static function  getStoreMemInfo($condition,$field = '*')
+    {
+        return Db::name('store')
+            ->alias('a')
+            ->where($condition)
+            ->join('member c','a.member_id = c.member_id')
+            ->field($field)
+            ->find();
+    }
+    /**
      * @param $ins_data
      * @return int|string
      */
@@ -301,7 +318,7 @@ class Store extends Model{
      */
     static function addAppFeedBack($data)
     {
-        return  Db::name('app_feedback')->insertGetId($data);
+        return  Db::name('mb_feedback')->insertGetId($data);
     }
 
     /**
