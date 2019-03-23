@@ -19,7 +19,7 @@ return [
     // 应用地址
     'app_host'               => '',
     // 文件地址
-    'data_host'               => 'http://master.shop.ifhu.cn/data/',
+    'data_host'               => 'http://47.111.27.189/data/',
     // 应用调试模式
     'app_debug'              => true,
     // 应用Trace

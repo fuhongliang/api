@@ -43,14 +43,14 @@ class Order extends Model{
             }
             foreach ($order_goods_list as $v)
             {
-                $total_price += $v['goods_price']*$v['goods_num'];
-                $commis_price +=$v['goods_price']*$v['goods_num']*$v['commis_rate'];
-                $goods_pay_price +=$v['goods_pay_price'];
+                $total_price += $v['goods_pay_price']*$v['goods_num'];
+                $commis_price +=$v['goods_pay_price']*$v['goods_num']*($v['commis_rate']/100);
+                //$goods_pay_price +=$v['goods_pay_price'];
             }
             $data['add_time']=date('Y-m-d H:i:s',$data['add_time']);
             $data['total_price']=$total_price;
             $data['commis_price']=$commis_price;
-            $data['goods_pay_price']=$goods_pay_price;
+            $data['goods_pay_price']=$total_price-$commis_price;
             unset($data);
         }
         return $order_info;
