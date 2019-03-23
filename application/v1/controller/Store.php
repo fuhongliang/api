@@ -178,22 +178,9 @@ class Store extends Base
         }
         $data=StoreModel::getStoreData(['a.store_id'=>$store_id], ['a.store_state,a.store_description,a.store_label,a.store_phone,
 a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electronic']);
-<<<<<<< HEAD
-<<<<<<< HEAD
-        $data['store_zizhi']=config('data_host').'upload/shop/store_joinin/'.$data['store_zizhi'];
-=======
-        var_dump($data);die;
-        $data['store_zizhi']='http://master.shop.ifhu.cn/data/upload/shop/store/slide/f01.jpg';
-
->>>>>>> develop
-        $field= 'a.store_id,a.store_name,IFNULL(a.store_avatar,"") as store_avatar,a.work_start_time,a.work_end_time,c.member_id,IFNULL(c.member_mobile,"") as member_mobile';
-        $result=StoreModel::getStoreAndJoinInfo(['a.store_id'=>$store_id],$field);
-
-=======
         $data['store_zizhi']=config('data_host').'upload/shop/store_joinin/'.$data['store_zizhi'];
         $field= 'a.store_id,a.store_name,IFNULL(a.store_avatar,"") as store_avatar,a.work_start_time,a.work_end_time,c.member_id,IFNULL(c.member_mobile,"") as member_mobile';
         $result=StoreModel::getStoreAndJoinInfo(['a.store_id'=>$store_id],$field);
->>>>>>> develop
         $data['store_id']=$result['store_id'];
         $data['store_name']=$result['store_name'];
         $data['store_avatar']=$result['store_avatar'];
