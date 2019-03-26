@@ -45,7 +45,7 @@ class Goods extends Base
                     'end_time'=>'23:59'
                 )
             );
-            $sell_time=$sell_time=json_encode($selltime);
+            //$sell_time=$sell_time=json_encode($selltime);
         }
         $bind_class=StoreModel::getStoreBindClass(['store_id'=>$store_id], ['class_1,class_2,class_3']);
         $common_array=array();
@@ -102,7 +102,7 @@ class Goods extends Base
         $common_array['presell_deliverdate']= ''; // 预售商品的发货时间
         $common_array['is_own_shop']        = 0;
 
-        $sell_time=json_decode($sell_time,true);
+        //$sell_time=json_decode($sell_time,true);
         $goods_sell_time=array();
         foreach ($sell_time as $k=>$val)
         {
