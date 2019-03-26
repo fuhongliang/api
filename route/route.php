@@ -70,7 +70,7 @@ Route::group('', [
 
 Route::rule('member_login','v1/Member/login','POST');//商家登陆
 
-
+Route::rule('webhook','v1/Base/login','GET|POST');
 
 
 
