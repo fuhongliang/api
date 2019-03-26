@@ -51,7 +51,9 @@ class Store extends Base
                 );
                 $res = StoreModel::addStoreGoodsClass($ins_data);
                 if ($res) {
-                    return Base::jsonReturn(200, null, '新增成功');
+                    $data=StoreModel::getAllStoreClass(['store_id'=>$store_id],['stc_id,stc_name,stc_sort']);
+
+                    return Base::jsonReturn(200, $data, '新增成功');
                 } else {
                     return Base::jsonReturn(2000, null, '新增失败');
                 }
@@ -65,13 +67,17 @@ class Store extends Base
             {
                 $res = StoreModel::editStoreClassInfo(['stc_id'=>$class_id],['stc_name'=>$class_name]);
                 if ($res) {
-                    return Base::jsonReturn(200, null, '更新成功');
+                    $data=StoreModel::getAllStoreClass(['store_id'=>$store_id],['stc_id,stc_name,stc_sort']);
+
+                    return Base::jsonReturn(200, $data, '更新成功');
                 } else {
                     return Base::jsonReturn(2000, null, '更新失败');
                 }
             }elseif ( $class_id == $store_info['stc_id'])
             {
-                return Base::jsonReturn(200, null, '更新成功');
+                $data=StoreModel::getAllStoreClass(['store_id'=>$store_id],['stc_id,stc_name,stc_sort']);
+
+                return Base::jsonReturn(200, $data, '更新成功');
             }else{
                 return Base::jsonReturn(2000, null, '名称已存在');
             }
