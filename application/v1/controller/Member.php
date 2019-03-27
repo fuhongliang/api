@@ -27,14 +27,18 @@ class Member extends Base
         {
             return Base::jsonReturn(1000,null,'参数缺失');
         }
-        $memberInfo=MemberModel::getMemberInfo(['member_name'=>$member_name]);
-        if($memberInfo)
+        $storeInfo=StoreModel::getStoreInfo(['member_name'=>$member_name]);
+        if($storeInfo)
         {
+            $memberInfo=MemberModel::getMemberInfo(['member_name'=>$member_name]);
             if(md5($member_passwd)==$memberInfo['member_passwd'])
             {
                 $field= 'a.store_id,a.store_name,a.store_phone,IFNULL(a.store_avatar,"") as store_avatar,a.area_info,a.store_address,a.work_start_time,a.work_end_time,a.store_state,a.store_description,a.work_start_time,a.work_end_time,IFNULL(b.business_licence_number_electronic,"") as business_licence_number_electronic,c.member_id,c.member_name,IFNULL(c.member_mobile,"") as member_mobile';
                 $data=StoreModel::getStoreAndJoinInfo(['a.member_id'=>$memberInfo['member_id']],$field);
-                $data['store_avatar']=config('data_host').'upload/shop/store/'.$data['store_avatar'];
+                if(!empty($data['store_avatar']))
+                {
+                    $data['store_avatar']=config('data_host').'upload/shop/store/'.$data['store_avatar'];
+                }
                 $data['business_licence_number_electronic']=config('data_host').'upload/shop/store_joinin/'.$data['business_licence_number_electronic'];
                 $data['token']=Base::makeToken($member_name,$member_passwd);
 

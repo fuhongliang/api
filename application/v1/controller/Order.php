@@ -66,7 +66,7 @@ class Order extends Base
         {
             return Base::jsonReturn(1000,null,'参数缺失');
         }
-        $res=OrderModel::editOrder(['order_id'=>$order_id],['order_state'=>30]);
+        $res=OrderModel::editOrder(['order_id'=>$order_id],['order_state'=>25]);
         if($res)
         {
             return Base::jsonReturn(200,null,'接单成功');
@@ -98,3 +98,4 @@ class Order extends Base
     }
 
 }
+

@@ -10,65 +10,78 @@
 // +----------------------------------------------------------------------
 
 
-
+Route::rule('hook','v1/Base/hook','GET|POST');//自动部署
 /**
  * 后台接口
 */
-Route::group('', [
 
-    'get_neworder'  => 'v1/Order/newOrder',//获取新订单
+Route::group('v1/', [
+    'member_login'=>'/Member/login'//商家登陆
+])->prefix('v1');
 
-    'refuse_order'  => 'v1/Order/refuseOrder',    //拒单
 
-    'receive_order'=>'v1/Order/receiveOrder',    //接单
+Route::group('v1/', [
+    'get_neworder'  => '/Order/newOrder',//获取新订单
 
-    'order_list'  => 'v1/Order/getOrderList',//根据状态获取订单列表
+    'refuse_order'  => '/Order/refuseOrder',    //拒单
 
-    'add_goods_class'  => 'v1/Store/addStoreGoodsClass',//店铺添加商品分类
+    'receive_order'=>'/Order/receiveOrder',    //接单
 
-    'del_goods_class'  => 'v1/Store/delStoreGoodsClass',//店铺删除商品分类
+    'order_list'  => '/Order/getOrderList',//根据状态获取订单列表
 
-    'goods_class_list'  => 'v1/Store/storeGoodsClassList',//店铺商品分类列表
+    'add_goods_class'  => '/Store/addStoreGoodsClass',//店铺添加商品分类
 
-    'sort_goods_class'  => 'v1/Store/sortStoreGoodsClass',//店铺商品分类排序
+    'del_goods_class'  => '/Store/delStoreGoodsClass',//店铺删除商品分类
 
-    'goods_list'  => 'v1/Store/storeGoodsList',//店铺商品列表
+    'goods_class_list'  => '/Store/storeGoodsClassList',//店铺商品分类列表
 
-    'add_goods'=>'v1/Goods/addGoods',//添加商品
+    'sort_goods_class'  => '/Store/sortStoreGoodsClass',//店铺商品分类排序
 
-    'del_goods'=>'v1/Goods/delGoods',//删除商品
+    'goods_list'  => '/Store/storeGoodsList',//店铺商品列表
 
-    'store_setting'=>'v1/Store/getStoreSetting',//门店设置详情
+    'add_goods'=>'/Goods/addGoods',//添加商品
 
-    'store_set_workstate'=>'v1/Store/setWorkState',//门店设置营业状态
+    'del_goods'=>'/Goods/delGoods',//删除商品
 
-    'store_set_desc'=>'v1/Store/setStoreDesc',//门店设置公告
+    'store_setting'=>'/Store/getStoreSetting',//门店设置详情
 
-    'store_set_phone'=>'v1/Store/setStorePhone',//门店设置电话
+    'store_set_workstate'=>'/Store/setWorkState',//门店设置营业状态
 
-    'store_set_worktime'=>'v1/Store/setStoreWorkTime',//门店设置营业时间
+    'store_set_desc'=>'/Store/setStoreDesc',//门店设置公告
 
-    'store_msg_feedback'=>'v1/Store/msgFeedBack',//意见反馈
+    'store_set_phone'=>'/Store/setStorePhone',//门店设置电话
 
-    'get_sms'=>'v1/Store/getSMS',//获取验证码
+    'store_set_worktime'=>'/Store/setStoreWorkTime',//门店设置营业时间
 
-    'edit_passwd'=>'v1/Store/editPasswd',//修改密码
+    'store_msg_feedback'=>'/Store/msgFeedBack',//意见反馈
 
-    'get_store_com'=>'v1/Store/getStoreCom',//获取店铺评论
+    'get_sms'=>'/Store/getSMS',//获取验证码
 
-    'store_feedback'=>'v1/Store/storeFeedback',//店铺回复
+    'edit_passwd'=>'/Store/editPasswd',//修改密码
 
-    'store_yunying'=>'v1/Store/storeYunYingInfo',//店铺运营
+    'get_store_com'=>'/Store/getStoreCom',//获取店铺评论
 
-    'store_jingying'=>'v1/Store/storeJingYingData',//店铺经营
+    'store_feedback'=>'/Store/storeFeedback',//店铺回复
 
-    'get_echarts'=>'v1/Store/getEcharts',
+    'store_yunying'=>'/Store/storeYunYingInfo',//店铺运营
 
-    'get_echarts_'=>'v1/Store/getEcharts_',
+    'store_jingying'=>'/Store/storeJingYingData',//店铺经营
 
-])->middleware('checkToken');
+    'get_echarts'=>'/Store/getEcharts',
 
-Route::rule('member_login','v1/Member/login','POST');//商家登陆
+    'get_echarts_'=>'/Store/getEcharts_',
+
+])->middleware('checkToken')->prefix('v1');
+
+
+
+
+
+Route::group('v2/', [
+    'goods_list'  => '/Store/storeGoodsList',//店铺商品列表
+
+])->middleware('checkToken')->prefix('v2');
+
 
 
 

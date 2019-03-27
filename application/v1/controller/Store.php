@@ -139,7 +139,8 @@ class Store extends Base
         }
         $res=StoreModel::sortStoreGoodsClass($class_ids,$store_id);
         if ($res) {
-            return Base::jsonReturn(200, null, '排序成功');
+            $data=StoreModel::getAllStoreClass(['store_id'=>$store_id],['stc_id,stc_name,stc_sort']);
+            return Base::jsonReturn(200, $data, '排序成功');
         } else {
             return Base::jsonReturn(2000, null, '排序失败');
         }
@@ -396,7 +397,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         {
             $condition=['store_id'=>$store_id,'parent_id'=>0,'is_replay'=>0];
         }else{//全部
-            $result['haping']=StoreModel::getComNums($store_id);
+            $result['haoping']=StoreModel::getComNums($store_id);
             if(!$haoping)
             {
                 $condition=['store_id'=>$store_id];
@@ -480,7 +481,7 @@ a.area_info,a.store_address,a.store_workingtime,b.business_licence_number_electr
         $result['30_orderamount']=$data['orderamount'];
         $result['store_collect']=$store_collect_data['store_collect'];
         $result['goods_num']=$goods_num;
-        $result['jingying_url']='http://develop.api.ifhu.cn/index.php/store_jingying';
+        $result['jingying_url']='https://api.shennongmall.com/store_jingying/'.$store_id;
         return Base::jsonReturn(200, $result, '获取成功');
     }
 

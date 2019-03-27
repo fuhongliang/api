@@ -106,7 +106,7 @@ class Store extends Model{
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    static function getAllStoreClass($condition, $field = '*',$order ='stc_sort desc')
+    static function getAllStoreClass($condition, $field = '*',$order ='stc_sort asc')
     {
         return Db::name('store_goods_class')
             ->field($field)
@@ -215,14 +215,11 @@ class Store extends Model{
         {
             foreach ($class_ids as $k=>$id)
             {
-                $res=self::upStoreGoodsClassSort(['stc_id'=>$id,'store_id'=>$store_id],['stc_sort'=>$k]);
-                if(!$res)
-                {
-                    return false;
-                }
+                self::upStoreGoodsClassSort(['stc_id'=>$id,'store_id'=>$store_id],['stc_sort'=>$k]);
             }
             return true;
         }
+        return false;
     }
 
     /**

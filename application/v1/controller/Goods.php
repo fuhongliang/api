@@ -37,16 +37,8 @@ class Goods extends Base
         {
             $goods_storage=999999999;
         }
-        if(!$sell_time)
-        {
-            $selltime=array(
-                array(
-                    'start_time'=>'00:00',
-                    'end_time'=>'23:59'
-                )
-            );
-            //$sell_time=$sell_time=json_encode($selltime);
-        }
+
+
         $bind_class=StoreModel::getStoreBindClass(['store_id'=>$store_id], ['class_1,class_2,class_3']);
         $common_array=array();
         //商品common信息
@@ -102,13 +94,19 @@ class Goods extends Base
         $common_array['presell_deliverdate']= ''; // 预售商品的发货时间
         $common_array['is_own_shop']        = 0;
 
-        //$sell_time=json_decode($sell_time,true);
-        $goods_sell_time=array();
-        foreach ($sell_time as $k=>$val)
-        {
-            $goods_sell_time[$k][intval($val['start_time'])]=$val['end_time'];
-        }
-        $common_array['goods_sale_time']        = serialize($goods_sell_time);
+        $selltime=array(
+            array(
+                'start_time'=>'00:00',
+                'end_time'=>'23:59'
+            )
+        );
+
+//        foreach ($sell_time as $k=>$val)
+//        {
+//
+//            $goods_sell_time[$k][intval($val['start_time'])]=$val['end_time'];
+//        }
+        $common_array['goods_sale_time']        = serialize($selltime);
         $common_array['goods_selltime']    = time();
         $common_id=GoodsModel::addGoodsCommon($common_array);
 /////  商品信息
