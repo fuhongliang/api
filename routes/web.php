@@ -72,3 +72,17 @@ Route::group(['namespace'=>'V1','prefix'=>'v1','middleware'=>['checktoken']],fun
 
 
 });
+
+Route::group(['namespace'=>'V1','prefix'=>'v2'],function(){
+
+    Route::any('goods_list','V2Controller@storeGoodsList');//店铺商品列表
+
+    Route::any('chGoodsState','V2Controller@changeGoodsState');//店铺上下架
+
+    Route::any('addGoods','V2Controller@addGoods');//新建商品
+
+    Route::any('editGoods','V2Controller@editGoods');//编辑商品
+
+
+
+});

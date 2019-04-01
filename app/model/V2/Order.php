@@ -1,6 +1,6 @@
 <?php
 
-namespace App\model\V1;
+namespace App\model\V2;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -35,10 +35,8 @@ class Order extends Model
             $data->delivery['name']="三爷";
             $data->delivery['phone']="13124154747";
             $data->order_state="配送中";
-            if($data->order_state == 0)
-            {
-                $data->order_state="已取消";
-            }
+
+
             $data->add_time=date('Y-m-d H:i:s',$data->add_time);
             $data->total_price=$total_price;
             $data->commis_price=$commis_price;
