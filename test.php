@@ -1,6 +1,6 @@
 <?php
 
-$cmd = "cd /data/wwwroot/default/api &&sudo git pull ";
+$cmd = "ls -la ";
 $res = shell_exec($cmd);
 var_dump($res);
 exit;
