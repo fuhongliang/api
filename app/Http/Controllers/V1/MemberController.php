@@ -6,6 +6,7 @@ use App\Http\Controllers\BaseController as Base;
 use App\Http\Controllers\BaseController;
 use App\model\V1\Member;
 use App\model\V1\Store;
+use App\model\V1\Token;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -31,6 +32,7 @@ class MemberController extends Base
                     'b.business_licence_number_electronic',
                     'c.member_id','c.member_name','c.member_mobile'];
                 $data=Store::getStoreAndJoinInfo(['a.member_id'=>$memberInfo->member_id],$field);
+
                 if(!empty($data->store_avatar))
                {
                     $data['store_avatar']=config('data_host').'upload/shop/store/'.$data->store_avatar;
@@ -43,6 +45,7 @@ class MemberController extends Base
                     'add_time'=>time(),
                     'expire_time'=>time()+24*5*3600
                 );
+                Token::addToken($token_data);
                 Base::makeToken($member_name,$member_passwd);
                 return Base::jsonReturn(200,'获取成功',$data);
             }else{
