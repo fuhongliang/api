@@ -17,7 +17,7 @@ Route::get('/', function () {
 
 Route::any('v1/member_login','V1\MemberController@login');
 Route::any('test','BaseController@getSMS');
-Route::group(['namespace'=>'V1','prefix'=>'v1'],function(){
+Route::group(['namespace'=>'V1','prefix'=>'v1','middleware'=>['checktoken']],function(){
 
     Route::any('get_neworder','OrderController@getNewOrder');//获取新订单
 

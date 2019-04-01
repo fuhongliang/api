@@ -43,6 +43,9 @@ class Order extends Model
             $data->goods_pay_price=$total_price-$commis_price;
             unset($data);
         }
+        if ($order_info->isEmpty()) { 
+            return null;
+        }
         return $order_info;
     }
     static function getOrderCommonInfo($condition , $fields = ['*']) {

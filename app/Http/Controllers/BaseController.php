@@ -18,7 +18,7 @@ class BaseController extends Controller
     {
         return response()->json([
             'code'=>$code,
-            'data'=>$data,
+            'data'=>empty($data)|| !isset($data)? null :$data,
             'msg'=>$msg
         ]);
     }

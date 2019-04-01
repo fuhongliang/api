@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\BaseController as Base;
+use App\Http\Controllers\SMSController;
 use App\Http\Controllers\BaseController;
 use App\model\V1\Goods;
 use App\model\V1\Member;
@@ -291,7 +292,7 @@ class StoreController extends Base
         $store_id = $request->input('store_id');
         $content = $request->input('content');
         $parent_id = $request->input('parent_id');
-        if (empty($store_id) || empty($content) || empty($parent_id)) {
+        if (empty($store_id) || empty($content)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
         $ins_data=array(
@@ -355,7 +356,7 @@ class StoreController extends Base
         $result['30_orderamount']=$data->orderamount;
         $result['store_collect']=$store_collect_data->store_collect;
         $result['goods_num']=$goods_num;
-        $result['jingying_url']='https://api.shennongmall.com/v1/store_jingying/'.$store_id;
+        $result['jingying_url']='http://47.111.27.189/laravel/public/index.php/v1/store_jingying/'.$store_id;
         return Base::jsonReturn(200, '获取成功', $result);
     }
     public function storeJingYingData(Request $request)
@@ -435,14 +436,13 @@ class StoreController extends Base
             $yest_change=$yest_ordernum->ordernum/$yest_click;
         }
         $data['store_id']=$store_id;
-        $data['today_click']=$today_click;
+        $data['today_click']=$today_click->clicknum;
         $data['today_click_comp']=$today_click->clicknum-$yest_click->clicknum;
         $data['today_ordernum']=$today_ordernum->ordernum;
         $data['today_ordernum_comp']=$today_ordernum->ordernum-$yest_ordernum->ordernum;
         $data['today_change']=$today_change;
         $data['today_change_comp']=$today_change-$yest_change;
-
-
+        return view('store.store_jingying', ['data'=>$data]);
     }
     public function getEcharts(Request $request)
     {
@@ -525,36 +525,9 @@ class StoreController extends Base
             return Base::jsonReturn(1000, '手机号格式不正确');
         }
         $code=rand('1000','9999');
-        $config = [
-            // HTTP 请求的超时时间（秒）
-            'timeout' => 5.0,
-            // 默认发送配置
-            'default' => [
-                // 网关调用策略，默认：顺序调用
-                'strategy' => \Overtrue\EasySms\Strategies\OrderStrategy::class,
-                // 默认可用的发送网关
-                'gateways' => [
-                    'aliyun',
-                ],
-            ],
-            // 可用的网关配置
-            'gateways' => [
-                'aliyun' => [
-                    'access_key_id' => 'LTAIjIeeU8SLOKYf',
-                    'access_key_secret' => 'JTm6JTKfhMt4CPuCF4T2OeP2ueao1l',
-                    'sign_name' => '邻邻发',
-                ],
-            ],
-        ];
+        $res=SMSController::sendSms($phone_number,$code);
 
-        $easySms = new EasySms($config);
-        $res=$easySms->send($phone_number, [
-            'template' => 'SMS_160861509',
-            'data' => [
-                'code' => $code
-            ],
-        ]);
-        if ($res['aliyun']['status'] == 'success') {
+        if ($res->Code == 'OK') {
             Cache::put($phone_number,$code,300);
             return Base::jsonReturn(200,  '发送成功');
         } else {
