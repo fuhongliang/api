@@ -11,7 +11,7 @@
 </head>
 <body>
 <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
-    <legend>卡片面板</legend>
+    <legend>经营数据</legend>
 </fieldset>
 
 <div style="padding: 20px; background-color: #F2F2F2;">
