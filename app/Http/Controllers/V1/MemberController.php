@@ -37,7 +37,7 @@ class MemberController extends Base
                {
                     $data['store_avatar']=getenv('WEB_URL').'upload/shop/store/'.$data->store_avatar;
                 }
-                $data->business_licence_number_electronic=getenv('WEB_URL').'upload/shop/store_joinin/'.$data->business_licence_number_electronic;
+                $data->business_licence_number_electronic=getenv('WEB_URL').'upload/shop/store_joinin/06075408577995264.png';
                 $data->token=Base::makeToken($member_name,$member_passwd);
                 $token_data=array(
                     'member_id'=>$memberInfo->member_id,
