@@ -89,11 +89,15 @@ class Store extends Model
     }
     static function getStoreClassStcId($condition, $field =['*'])
     {
-        return DB::table('store_goods_class')
+        $res= DB::table('store_goods_class')
             ->where($condition)
             ->orderBy('stc_sort','desc')
-            ->get($field)
-            ->first();
+            ->get($field);
+        if($res ->first())
+        {
+            return false;
+        }
+        return $res;
     }
     static function getStoreGoodsListByStcId($store_id,$class_id)
     {

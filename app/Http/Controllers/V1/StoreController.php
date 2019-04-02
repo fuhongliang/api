@@ -116,7 +116,7 @@ class StoreController extends Base
         }
         if(empty($class_id)) {
             $stcId = Store::getStoreClassStcId(['store_id' => $store_id], ['stc_id']);
-            if($stcId ->isEmpty($stcId))
+            if(!$stcId)
             {
                 return Base::jsonReturn(200,  '获取成功');
             }
