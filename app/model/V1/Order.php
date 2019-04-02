@@ -54,7 +54,7 @@ class Order extends Model
                 ->where($condition)
                 ->where(function($query){
                     $query->where('order_state',30)
-                        ->orWhere('is_receive',1);
+                        ->where('is_receive',1);
                 })
                 ->get($fields);
         }else{
