@@ -47,7 +47,7 @@ class Store extends Model
     {
         return DB::table('store_goods_class')
             ->where($condition)
-            ->orderBy('stc_sort','desc')
+            ->orderBy('stc_sort','asc')
             ->get($field);
     }
     static function getStoreClassInfo($condition, $field = ['*'])
@@ -91,7 +91,7 @@ class Store extends Model
     {
         $res= DB::table('store_goods_class')
             ->where($condition)
-            ->orderBy('stc_sort','desc')
+            ->orderBy('stc_sort','asc')
             ->get($field)
             ->first();
         return $res;
