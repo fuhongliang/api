@@ -35,9 +35,9 @@ class MemberController extends Base
 
                 if(!empty($data->store_avatar))
                {
-                    $data['store_avatar']=config('data_host').'upload/shop/store/'.$data->store_avatar;
+                    $data['store_avatar']=getenv('WEB_URL').'upload/shop/store/'.$data->store_avatar;
                 }
-                $data->business_licence_number_electronic=config('data_host').'upload/shop/store_joinin/'.$data->business_licence_number_electronic;
+                $data->business_licence_number_electronic=getenv('WEB_URL').'upload/shop/store_joinin/'.$data->business_licence_number_electronic;
                 $data->token=Base::makeToken($member_name,$member_passwd);
                 $token_data=array(
                     'member_id'=>$memberInfo->member_id,
