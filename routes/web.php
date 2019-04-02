@@ -16,7 +16,9 @@ Route::get('/', function () {
 });
 
 Route::any('v1/member_login','V1\MemberController@login');
-Route::any('test','BaseController@getSMS');
+Route::any('v1/store_jingying','V1\StoreController@storeJingYingData');//店铺经营
+Route::any('v1/get_echarts','V1\StoreController@getEcharts');
+Route::any('v1/get_echarts_','V1\StoreController@getEcharts_');
 Route::group(['namespace'=>'V1','prefix'=>'v1','middleware'=>['checktoken']],function(){
 
     Route::any('get_neworder','OrderController@getNewOrder');//获取新订单
@@ -63,11 +65,7 @@ Route::group(['namespace'=>'V1','prefix'=>'v1','middleware'=>['checktoken']],fun
 
     Route::any('store_yunying','StoreController@storeYunYingInfo');//店铺运营
 
-    Route::any('store_jingying','StoreController@storeJingYingData');//店铺经营
 
-    Route::any('get_echarts','StoreController@getEcharts');
-
-    Route::any('get_echarts_','StoreController@getEcharts_');
 
 
 
