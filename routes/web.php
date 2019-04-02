@@ -66,9 +66,6 @@ Route::group(['namespace'=>'V1','prefix'=>'v1','middleware'=>['checktoken']],fun
     Route::any('store_yunying','StoreController@storeYunYingInfo');//店铺运营
 
 
-
-
-
 });
 
 Route::group(['namespace'=>'V1','prefix'=>'v2'],function(){

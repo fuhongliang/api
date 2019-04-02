@@ -320,7 +320,6 @@ class StoreController extends Base
         }
         $beginToday=mktime(0,0,0,date('m'),date('d'),date('Y'));
         $endToday=mktime(0,0,0,date('m'),date('d')+1,date('Y'))-1;
-
         //统计的日期0点
         $stat_time = strtotime(date('Y-m-d',time())) - 86400;
         /*
@@ -328,26 +327,27 @@ class StoreController extends Base
          */
         $stime = $stat_time - (86400*29);//30天前
         $etime = $stat_time + 86400 - 1;//昨天23:59
-        $where1 = [
-            'add_time'   => ['between', [$stime,$etime]],
-            'store_id' => $store_id,
-        ];
-        $where2 = [
-            'add_time'   => ['between', [$beginToday,$endToday]],
-            'store_id' => $store_id,
-        ];
+
+
         // 30天 下单量和销售金额
 
-        $data=DB::table('order')->where($where1)->first(
+        $data=DB::table('order')
+            ->where('store_id',$store_id)
+            ->whereBetween('add_time',[$stime,$etime])
+            ->first(
             array(
                 DB::raw('COUNT(*) as ordernum'),
                 DB::raw('IFNULL(SUM(order_amount),0) as orderamount')
             )
         );
+
         //店铺收藏量 商品数量
         $store_collect_data= Store::getStoreInfo(['store_id'=>$store_id],['store_collect']);
         $goods_num=Goods::getGoodsCount(['store_id'=>$store_id]);
-        $data2 =DB::table('order')->where($where2)->first(
+        $data2 =DB::table('order')
+            ->where('store_id',$store_id)
+            ->whereBetween('add_time',[$beginToday,$endToday])
+            ->first(
         array(
             DB::raw('COUNT(*) as ordernum'),
             DB::raw('IFNULL(SUM(order_amount),0) as orderamount')
@@ -384,43 +384,40 @@ class StoreController extends Base
         $beginYesterday=mktime(0,0,0,date('m'),date('d')-1,date('Y'));
         $endYesterday=mktime(0,0,0,date('m'),date('d'),date('Y'))-1;
 
-        $where =[
-            'stattime'   => ['between', [$beginToday,$endToday]],
-            'store_id' => $store_id
-        ];
-        $where1 =[
-            'stattime'   => ['between', [$beginYesterday,$endYesterday]],
-            'store_id' => $store_id
-        ];
+
         //点击量
-        $today_click =DB::table($flow_tablename)->where($where)->first(
+        $today_click =DB::table($flow_tablename)
+            ->where('store_id',$store_id)
+            ->whereBetween('add_time',[$beginToday,$endToday])
+            ->first(
             array(
                 DB::raw('IFNULL(SUM(clicknum),0) as clicknum')
             )
         );
-        $yest_click =DB::table($flow_tablename)->where($where1)->first(
+        $yest_click =DB::table($flow_tablename)
+            ->where('store_id',$store_id)
+            ->whereBetween('add_time',[$beginYesterday,$endYesterday])
+            ->first(
             array(
                 DB::raw('IFNULL(SUM(clicknum),0) as clicknum')
             )
         );
         $field=['COUNT(*) as ordernum'];
 
-        $where3 =[
-            'add_time'   => ['between', [$beginToday,$endToday]],
-            'store_id' => $store_id
-        ];
-        $where4 =[
-            'add_time'   => ['between', [$beginYesterday,$endYesterday]],
-            'store_id' => $store_id
-        ];
         //订单
-        $today_ordernum=DB::table('order')->where($where3)->first(
+        $today_ordernum=DB::table('order')
+            ->where('store_id',$store_id)
+            ->whereBetween('add_time',[$beginToday,$endToday])
+            ->first(
             array(
                 DB::raw('COUNT(*) as ordernum'),
                 DB::raw('IFNULL(SUM(order_amount),0) as orderamount')
             )
         );
-        $yest_ordernum=DB::table('order')->where($where4)->first(
+        $yest_ordernum=DB::table('order')
+            ->where('store_id',$store_id)
+            ->whereBetween('add_time',[$beginYesterday,$endYesterday])
+            ->first(
             array(
                 DB::raw('COUNT(*) as ordernum'),
                 DB::raw('IFNULL(SUM(order_amount),0) as orderamount')
@@ -470,11 +467,10 @@ class StoreController extends Base
         $field=['COUNT(*) as ordernum'];
         foreach ($data as $v)
         {
-            $where =[
-                'add_time'   => ['between', [$v['start_time'],$v['end_time']]],
-                'store_id' => $store_id
-            ];
-            $data=DB::table('order')->where($where)->first(
+            $data=DB::table('order')
+                ->where('store_id',$store_id)
+                ->whereBetween('add_time',[$v['start_time'],$v['end_time']])
+                ->first(
                 array(
                     DB::raw('COUNT(*) as ordernum'),
                 )
@@ -505,11 +501,10 @@ class StoreController extends Base
 
         foreach ($data as $v)
         {
-            $where =[
-                'add_time'   => ['between', [$v['start_time'],$v['end_time']]],
-                'store_id' => $store_id
-            ];
-            $data=DB::table('order')->where($where)->first(
+            $data=DB::table('order')
+                ->where('store_id',$store_id)
+                ->whereBetween('add_time',[$v['start_time'],$v['end_time']])
+                ->first(
                 array(
                     DB::raw('IFNULL(SUM(order_amount),0) as orderamount'),
                 )
