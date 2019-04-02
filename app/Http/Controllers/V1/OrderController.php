@@ -21,7 +21,7 @@ class OrderController extends Base
             return Base::jsonReturn(1000,'参数缺失');
         }
         $fileds=['order_id','order_sn','buyer_id','add_time'];
-        $info=Order::getNewOrder(['store_id'=>$store_id,'order_state'=>20],$fileds);
+        $info=Order::getNewOrder(['store_id'=>$store_id,'order_state'=>20],$fileds,20);
         return Base::jsonReturn(200,'获取成功',$info);
 
     }
