@@ -47,8 +47,23 @@ class Order extends Model
         }
         return $order_info;
     }
-    static function getOrderList($condition, $fields =['*'],$order_state) {
-        $order_info = DB::table('order')->where($condition)->get($fields);
+    static function getOrderList($condition,$fields =['*'],$order_state) {
+        if($order_state == 25)
+        {
+            $order_info = DB::table('order')
+                ->where($condition)
+                ->where(function($query){
+                    $query->where('order_state',30)
+                        ->orWhere('is_receive',1);
+                })
+                ->get($fields);
+        }else{
+            $order_info = DB::table('order')
+                ->where($condition)
+                ->where('order_state',$order_state)
+                ->get($fields);
+        }
+
         if (empty($order_info)) {
             return array();
         }
