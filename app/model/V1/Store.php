@@ -60,9 +60,14 @@ class Store extends Model
             ->where($condition)
             ->update($up_data);
     }
-    static function delStoreClassInfo($condition)
+    static function delStoreClassInfo($class_id,$store_id)
     {
-        return DB::table('store_goods_class')->where($condition)->delete();
+        DB::transaction(function () use ($class_id,$store_id){
+            DB::table('store_goods_class')->where(['stc_id'=>$class_id,'store_id'=>$store_id])->delete();
+            DB::table('goods')->where('goods_stcid',$class_id)->delete();
+            DB::table('goods_common')->where('goods_stcid',$class_id)->delete();
+        });
+        return true;
     }
     static function sortStoreGoodsClass($class_ids,$store_id)
     {

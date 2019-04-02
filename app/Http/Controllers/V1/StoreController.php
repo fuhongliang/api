@@ -76,7 +76,7 @@ class StoreController extends Base
         if (empty($class_id) || empty($store_id)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        $res=Store::delStoreClassInfo(['stc_id'=>$class_id,'store_id'=>$store_id]);
+        $res=Store::delStoreClassInfo($class_id,$store_id);
         if ($res) {
             return Base::jsonReturn(200, '删除成功');
         } else {

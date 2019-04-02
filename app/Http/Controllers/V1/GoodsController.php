@@ -74,6 +74,7 @@ class GoodsController extends Base
         $common_array['transport_title']    = 0;
         $common_array['goods_freight']      = 0;
         $common_array['goods_stcids'] = ','.$class_id.',';// 首尾需要加,
+        $common_array['goods_stcid'] = $class_id;// 新,
         $common_array['plateid_top']        =  1;
         $common_array['plateid_bottom']     =  1;
         $common_array['is_virtual']         = 0;
@@ -132,6 +133,7 @@ class GoodsController extends Base
         $goods['goods_vat']         = $common_array['goods_vat'];
         $goods['goods_commend']     = $common_array['goods_commend'];
         $goods['goods_stcids']      = $common_array['goods_stcids'];
+        $goods['goods_stcid']      = $common_array['goods_stcid'];
         $goods['is_virtual']        = $common_array['is_virtual'];
         $goods['virtual_indate']    = $common_array['virtual_indate'];
         $goods['virtual_limit']     = $common_array['virtual_limit'];
