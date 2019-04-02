@@ -69,14 +69,14 @@
 <div style="padding: 20px; background-color: #F2F2F2;">
     <div class="layui-row">
         <div class="layui-col-xs12">
-            <div id="ordernum" style="width: 100%;height:400px;"></div>
+            <div id="ordernum" style="width: 100%;height:300px;"></div>
         </div>
     </div>
 </div>
 <div style="padding: 20px; background-color: #F2F2F2;">
     <div class="layui-row">
         <div class="layui-col-xs12">
-            <div id="orderamont" style="width: 100%;height:400px;"></div>
+            <div id="orderamont" style="width: 100%;height:300px;"></div>
         </div>
     </div>
 </div>
