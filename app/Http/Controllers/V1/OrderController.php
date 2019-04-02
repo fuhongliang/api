@@ -21,9 +21,8 @@ class OrderController extends Base
             return Base::jsonReturn(1000,'参数缺失');
         }
         $fileds=['order_id','order_sn','buyer_id','add_time'];
-        $info=Order::getNewOrder(['store_id'=>$store_id,'order_state'=>20],$fileds,20);
+        $info=Order::getNewOrder(['store_id'=>$store_id,'order_state'=>20,'is_receive'=>0],$fileds);
         return Base::jsonReturn(200,'获取成功',$info);
-
     }
     public function refuseOrder(Request $request)
     {
@@ -48,7 +47,7 @@ class OrderController extends Base
         {
             return Base::jsonReturn(1000,'参数缺失');
         }
-        $res=Order::editOrder(['order_id'=>$order_id],['order_state'=>25]);
+        $res=Order::editOrder(['order_id'=>$order_id],['is_receive'=>1]);
         if($res)
         {
             return Base::jsonReturn(200,'接单成功');
@@ -67,7 +66,7 @@ class OrderController extends Base
             return Base::jsonReturn(1000,'参数缺失');
         }
         $fileds=['order_id','order_sn','buyer_id','add_time'];
-        $info=Order::getNewOrder(['store_id'=>$store_id,'order_state'=>$order_state],$fileds,$order_state);
+        $info=Order::getOrderList(['store_id'=>$store_id,'order_state'=>$order_state],$fileds,$order_state);
         return Base::jsonReturn(200,'获取成功',$info);
     }
 }
