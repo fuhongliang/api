@@ -118,7 +118,9 @@ class StoreController extends Base
             $stcId = Store::getStoreClassStcId(['store_id' => $store_id], ['stc_id']);
             if(!$stcId)
             {
-                return Base::jsonReturn(200,  '获取成功');
+                $result['class_list']=null;
+                $result['goods_list']=null;
+                return Base::jsonReturn(200,  '获取成功',$result);
             }
             $class_id=$stcId->stc_id;
         }
