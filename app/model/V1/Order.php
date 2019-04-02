@@ -53,7 +53,7 @@ class Order extends Model
             $order_info = DB::table('order')
                 ->where($condition)
                 ->where(function($query){
-                    $query->where('order_state',30)
+                    $query->whereIn('order_state',[20,30])
                         ->where('is_receive',1);
                 })
                 ->get($fields);
