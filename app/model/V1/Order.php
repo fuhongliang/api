@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
-    static function getNewOrder($condition, $fields =['*']) {
+    static function getNewOrder($condition, $fields =['*'],$order_state) {
         $order_info = DB::table('order')->where($condition)->get($fields);
         if (empty($order_info)) {
             return array();
@@ -25,7 +25,6 @@ class Order extends Model
             $params=['goods_name','goods_price','goods_num','commis_rate','goods_pay_price'];
             $order_goods_list = self::getOrderGoodsList(array('order_id' => $data->order_id),$params);
             $data->extend_order_goods = $order_goods_list;
-
             foreach ($order_goods_list as $v)
             {
                 $total_price += $v->goods_pay_price*$v->goods_num;
@@ -35,13 +34,17 @@ class Order extends Model
             $data->delivery['name']="三爷";
             $data->delivery['phone']="13124154747";
             $data->order_state="配送中";
-            if($data->order_state == 0)
+            if($order_state == 0)
             {
                 $data->order_state="已取消";
             }
+            if($order_state == 40)
+            {
+                $data->order_state="已完成";
+            }
             $data->add_time=date('Y-m-d H:i:s',$data->add_time);
             $data->total_price=$total_price;
-            $data->commis_price=$commis_price;
+            $data->commis_price=ROUND($commis_price,2);
             $data->goods_pay_price=$total_price-$commis_price;
             unset($data);
         }
