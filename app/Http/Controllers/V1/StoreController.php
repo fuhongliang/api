@@ -362,7 +362,7 @@ class StoreController extends Base
     public function storeJingYingData(Request $request)
     {
         $flowstat_tablenum=3;
-        $store_id = $request->input('store_id');
+        $store_id = $request->route('store_id');
         if (empty($store_id)) {
             return Base::jsonReturn(1000, '参数缺失');
         }

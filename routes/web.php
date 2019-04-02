@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 
 Route::any('v1/member_login','V1\MemberController@login');
-Route::any('v1/store_jingying','V1\StoreController@storeJingYingData');//店铺经营
+Route::any('v1/store_jingying/{store_id}','V1\StoreController@storeJingYingData');//店铺经营
 Route::any('v1/get_echarts','V1\StoreController@getEcharts');
 Route::any('v1/get_echarts_','V1\StoreController@getEcharts_');
 Route::group(['namespace'=>'V1','prefix'=>'v1','middleware'=>['checktoken']],function(){
