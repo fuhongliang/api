@@ -388,7 +388,7 @@ class StoreController extends Base
         //点击量
         $today_click =DB::table($flow_tablename)
             ->where('store_id',$store_id)
-            ->whereBetween('add_time',[$beginToday,$endToday])
+            ->whereBetween('stattime',[$beginToday,$endToday])
             ->first(
             array(
                 DB::raw('IFNULL(SUM(clicknum),0) as clicknum')
@@ -396,7 +396,7 @@ class StoreController extends Base
         );
         $yest_click =DB::table($flow_tablename)
             ->where('store_id',$store_id)
-            ->whereBetween('add_time',[$beginYesterday,$endYesterday])
+            ->whereBetween('stattime',[$beginYesterday,$endYesterday])
             ->first(
             array(
                 DB::raw('IFNULL(SUM(clicknum),0) as clicknum')
@@ -435,7 +435,7 @@ class StoreController extends Base
         {
             $yest_change=0;
         }else{
-            $yest_change=$yest_ordernum->ordernum/$yest_click;
+            $yest_change=$yest_ordernum->ordernum/$yest_click->clicknum;
         }
         $data['store_id']=$store_id;
         $data['today_click']=$today_click->clicknum;
@@ -444,7 +444,6 @@ class StoreController extends Base
         $data['today_ordernum_comp']=$today_ordernum->ordernum-$yest_ordernum->ordernum;
         $data['today_change']=$today_change;
         $data['today_change_comp']=$today_change-$yest_change;
-
         return view('store.jingying', ['data'=>$data]);
     }
     public function getEcharts(Request $request)
