@@ -363,10 +363,11 @@ class StoreController extends Base
     {
         $flowstat_tablenum=3;
         $store_id = $request->input('store_id');
+        if (empty($store_id)) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
         $data=array();
         $data['datetime']=date('Y-m-d');
-
-
         //确定统计分表名称
         $last_num = $store_id % 10; //获取店铺ID的末位数字
         $tablenum = ($t = intval($flowstat_tablenum)) > 1 ? $t : 1; //处理流量统计记录表数量
