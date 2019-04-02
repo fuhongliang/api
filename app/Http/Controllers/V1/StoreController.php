@@ -443,7 +443,8 @@ class StoreController extends Base
         $data['today_ordernum_comp']=$today_ordernum->ordernum-$yest_ordernum->ordernum;
         $data['today_change']=$today_change;
         $data['today_change_comp']=$today_change-$yest_change;
-        return view('store.store_jingying', ['data'=>$data]);
+
+        return view('store.jingying', ['data'=>$data]);
     }
     public function getEcharts(Request $request)
     {

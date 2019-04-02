@@ -85,6 +85,12 @@
 <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.js"></script>
 <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 <script src="//layui.hcwl520.com.cn/layui/layui.js?v=201811010202" charset="utf-8"></script>
+<script>
+    $(document).ready(function () {
+        getData();
+        getData_();
+    });
+</script>
 <script type="text/javascript">
     //第一个图表
     var myChart1 = echarts.init(document.getElementById('ordernum'));
@@ -93,13 +99,9 @@
         xday:[],
         yvalue:[]
     };
-    // 发送ajax请求，从后台获取json数据
-    $(document).ready(function () {
-        getData();
-    });
     function getData() {
         $.ajax({
-            url:'http://47.111.27.189/laravel/public/index.php/v1/get_echarts',
+            url:'http://47.111.27.189/api/public/index.php/v1/get_echarts',
             data:{'store_id':store_id},
             type:'post',
             dataType:'json',
@@ -140,12 +142,10 @@
         yvalue_:[]
     };
     // 发送ajax请求，从后台获取json数据
-    $(document).ready(function () {
-        getData_();
-    });
+
     function getData_() {
         $.ajax({
-            url:'http://47.111.27.189/laravel/public/index.php/v1/get_echarts_',
+            url:'http://47.111.27.189/api/public/index.php/v1/get_echarts_',
             data:{'store_id':store_id},
             type:'post',
             dataType:'json',
