@@ -21,7 +21,7 @@ class OrderController extends Base
             return Base::jsonReturn(1000,'参数缺失');
         }
         $fileds=['order_id','order_sn','buyer_id','add_time'];
-        $info=Order::getNewOrder(['store_id'=>$store_id,'order_state'=>20,'is_receive'=>0],$fileds);
+        $info=Order::getNewOrder(['store_id'=>$store_id,'order_state'=>20],$fileds);
         return Base::jsonReturn(200,'获取成功',$info);
     }
     public function refuseOrder(Request $request)
@@ -47,7 +47,7 @@ class OrderController extends Base
         {
             return Base::jsonReturn(1000,'参数缺失');
         }
-        $res=Order::editOrder(['order_id'=>$order_id],['is_receive'=>1]);
+        $res=Order::editOrder(['order_id'=>$order_id],['order_state'=>25]);
         if($res)
         {
             return Base::jsonReturn(200,'接单成功');
@@ -58,7 +58,7 @@ class OrderController extends Base
     }
     public function getOrderList(Request $request)
     {
-        //order_state 25进行中 接单+发货   40 已收货   0已取消
+        //order_state 订单状态：0(已取消)10(默认):未付款;20:已付款;25:商家已接单;30:已发货;35骑手已接单40:已收货;
         $order_state=$request->input('order_state');
         $store_id=$request->input('store_id');
         if(!$store_id)

@@ -52,10 +52,7 @@ class Order extends Model
         {
             $order_info = DB::table('order')
                 ->where($condition)
-                ->where(function($query){
-                    $query->whereIn('order_state',[20,30])
-                        ->where('is_receive',1);
-                })
+                ->whereIn('order_state',[25,30,35])
                 ->get($fields);
         }else{
             $order_info = DB::table('order')
@@ -88,7 +85,13 @@ class Order extends Model
 
             $data->delivery['name']="三爷";
             $data->delivery['phone']="13124154747";
-            $data->order_state="配送中";
+
+            if($data->order_state == 35)
+            {
+                $data->order_state="待配送";
+            }else{
+                $data->order_state="配送中";
+            }
             if($order_state == 0)
             {
                 $data->order_state="已取消";
