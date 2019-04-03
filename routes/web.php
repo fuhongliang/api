@@ -14,7 +14,7 @@
 Route::get('/', function () {
     return view('welcome');
 });
-
+Route::any('test','testController@test');
 Route::any('v1/member_login','V1\MemberController@login');
 Route::any('v1/store_jingying/{store_id}','V1\StoreController@storeJingYingData');//店铺经营
 Route::any('v1/get_echarts','V1\StoreController@getEcharts');
