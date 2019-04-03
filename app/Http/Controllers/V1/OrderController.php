@@ -65,7 +65,7 @@ class OrderController extends Base
         {
             return Base::jsonReturn(1000,'参数缺失');
         }
-        $fileds=['order_id','order_sn','buyer_id','add_time'];
+        $fileds=['order_id','order_sn','buyer_id','add_time','order_state'];
 
         $info=Order::getOrderList(['store_id'=>$store_id],$fileds,$order_state);
         return Base::jsonReturn(200,'获取成功',$info);
