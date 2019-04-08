@@ -1,15 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\V1;
+namespace App\Http\Controllers\V2;
 
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\BaseController as Base;
 
 use App\model\V2\Goods;
 use App\model\V2\Store;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use App\model\V2\Voucher;
 
-class V2Controller extends Base
+
+class VoucherController extends Base
 {
     /** 商品列表  第二版
      * @param Request $request
@@ -51,6 +53,11 @@ class V2Controller extends Base
         }
 
     }
+
+    /** 添加商品
+     * @param \App\Http\Controllers\V2\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function addGoods(Request $request)
     {
         $store_id=$request->input('store_id');
@@ -194,6 +201,69 @@ class V2Controller extends Base
 
     }
 
+    /**  添加代金券
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function voucherAdd(Request $request){
+        $store_id=$request->input('store_id');
+        $voucher_t_title=$request->input('title');
+        $voucher_t_price=$request->input('mianzhi');
+        $limit=$request->input('limit_price');
+        $describe=$request->input('describe');
+        $enddate=$request->input('end_time');
+        $total=$request->input('total_nums');
+        $eachlimit=$request->input('each_limit');
+        if(!$store_id || !$voucher_t_title || !$voucher_t_price || !$limit || !$describe || !$enddate || !$total || !$eachlimit)
+        {
+            return Base::jsonReturn(1000,'参数缺失');
+        }
+        $where=[
+            ['quota_storeid', '=', $store_id],
+            ['quota_endtime', '>', time()],
+        ];
+        $quotainfo=Voucher::getVoucherQuotaInfo($where);
+        if(empty($quotainfo)){
+            return Base::jsonReturn(2000,  '你还没有购买代金券套餐');
+        }
+
+        $count=Voucher::getVoucherTemplateCount(['voucher_t_quotaid'=>$quotainfo->quota_id,'voucher_t_state'=>1]);
+        if ($count >= getenv('PROMOTION_VOUCHER_STORETIMES_LIMIT')){
+            return Base::jsonReturn(2000,  '代金券数量超过最多限制');
+        }
+        $pricelist=Voucher::getVoucherPriceList();
+        if($pricelist->isEmpty())
+        {
+            return Base::jsonReturn(2000,  '没有可用面额');
+        }
+        $insert_arr['voucher_t_title'] = $voucher_t_title;
+        $insert_arr['voucher_t_price'] = $voucher_t_price;
+        $insert_arr['voucher_t_limit'] = $limit;
+        $insert_arr['voucher_t_desc'] = $describe;
+        $insert_arr['voucher_t_start_date'] = time();
+        if ($enddate > $quotainfo->quota_endtime){
+            $enddate = $quotainfo->quota_endtime;
+        }
+        $insert_arr['voucher_t_end_date'] = $enddate;
+        $insert_arr['voucher_t_store_id'] = $store_id;
+        $insert_arr['voucher_t_storename'] = $quotainfo->quota_storename;
+        $insert_arr['voucher_t_sc_id'] = Store::getStoreField(['store_id'=>$store_id],'sc_id');
+        $insert_arr['voucher_t_creator_id'] = $quotainfo->quota_memberid;
+        $insert_arr['voucher_t_state'] = 1;
+        $insert_arr['voucher_t_total'] = $total;
+        $insert_arr['voucher_t_giveout'] = 0;
+        $insert_arr['voucher_t_used'] = 0;
+        $insert_arr['voucher_t_add_date'] = time();
+        $insert_arr['voucher_t_quotaid'] = $quotainfo->quota_id ? $quotainfo->quota_id : 0;
+        $insert_arr['voucher_t_points'] = 0;
+        $insert_arr['voucher_t_eachlimit'] = $eachlimit;
+        $res=Voucher::addVoucherTemplate($insert_arr);
+        if ($res) {
+            return Base::jsonReturn(200, '添加成功');
+        } else {
+            return Base::jsonReturn(2000,  '添加失败');
+        }
+    }
 
 
 

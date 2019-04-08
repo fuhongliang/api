@@ -47,7 +47,7 @@ class Store extends Model
     {
         return DB::table('store_goods_class')
             ->where($condition)
-            ->orderBy('stc_sort','desc')
+            ->orderBy('stc_sort','asc')
             ->get($field);
     }
     static function getStoreClassInfo($condition, $field = ['*'])
@@ -60,9 +60,14 @@ class Store extends Model
             ->where($condition)
             ->update($up_data);
     }
-    static function delStoreClassInfo($condition)
+    static function delStoreClassInfo($class_id,$store_id)
     {
-        return DB::table('store_goods_class')->where($condition)->delete();
+        DB::transaction(function () use ($class_id,$store_id){
+            DB::table('store_goods_class')->where(['stc_id'=>$class_id,'store_id'=>$store_id])->delete();
+            DB::table('goods')->where('goods_stcid',$class_id)->delete();
+            DB::table('goods_common')->where('goods_stcid',$class_id)->delete();
+        });
+        return true;
     }
     static function sortStoreGoodsClass($class_ids,$store_id)
     {
@@ -84,11 +89,12 @@ class Store extends Model
     }
     static function getStoreClassStcId($condition, $field =['*'])
     {
-        return DB::table('store_goods_class')
+        $res= DB::table('store_goods_class')
             ->where($condition)
-            ->orderBy('stc_sort','desc')
+            ->orderBy('stc_sort','asc')
             ->get($field)
             ->first();
+        return $res;
     }
     static function getStoreGoodsListByStcId($store_id,$class_id)
     {
@@ -116,7 +122,7 @@ class Store extends Model
             {
                 foreach ($ids as $k=>$goods_id)
                 {
-                    $fields=['goods_id','goods_name','goods_price','goods_marketprice','goods_salenum','goods_storage','goods_state'];
+                    $fields=['goods_id','goods_name','goods_price','goods_marketprice','goods_salenum','goods_storage'];
                     $goods_info[$k]=Goods::getGoodsInfo(['goods_id'=>$goods_id],$fields);
                 }
             }
@@ -244,5 +250,10 @@ class Store extends Model
             ->where($condition)
             ->update($up_data);
     }
-
+    static function getStoreField($condition,$field)
+    {
+        return DB::table('store')
+            ->where($condition)
+            ->value($field);
+    }
 }
