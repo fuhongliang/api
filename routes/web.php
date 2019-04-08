@@ -121,6 +121,6 @@ Route::group(['namespace'=>'V2','prefix'=>'v2'],function(){
 
     Route::any('voucher_add','VoucherController@voucherAdd');//添加代金券------------
 
-
+    Route::any('voucher_list','VoucherController@voucherList');//代金券列表------------
 
 });

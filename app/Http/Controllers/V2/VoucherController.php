@@ -264,7 +264,15 @@ class VoucherController extends Base
             return Base::jsonReturn(2000,  '添加失败');
         }
     }
+    public function voucherList(Request $request){
+        $store_id=$request->input('store_id');
+        if(!$store_id)
+        {
+            return Base::jsonReturn(1000,'参数缺失');
+        }
 
+
+    }
 
 
 
