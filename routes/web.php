@@ -123,4 +123,24 @@ Route::group(['namespace'=>'V2','prefix'=>'v2'],function(){
 
     Route::any('voucher_list','VoucherController@voucherList');//代金券列表------------
 
+    Route::any('voucher_del','VoucherController@voucherDel');//代金券删除------------
+
+    Route::any('bundling_add','VoucherController@bundlingAdd');//添加优惠套装------------
+
+    Route::any('bundling_list','VoucherController@bundlingList');//优惠套装列表------------
+
+    Route::any('bundling_del','VoucherController@bundlingDel');//优惠套装删除------------
+
+    Route::any('mamsong_add','VoucherController@mamsongAdd');//添加满送------------
+
+    Route::any('mamsong_list','VoucherController@mamsongList');//满送列表------------
+
+    Route::any('mamsong_del','VoucherController@mansongDel');//满送删除------------
+
+    Route::any('xianshi_add','VoucherController@xianshiAdd');//添加折扣------------
+
+    Route::any('xianshi_list','VoucherController@xianshiList');//折扣列表------------
+
+    Route::any('xianshi_del','VoucherController@xianshiDel');//折扣删除------------
+
 });
