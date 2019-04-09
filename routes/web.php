@@ -91,7 +91,7 @@ Route::group(['namespace'=>'V2','prefix'=>'v2'],function(){
 
     Route::any('chgoods_state','VoucherController@changeGoodsState');//商品上下架
 
-    Route::any('add_goods','VoucherController@addGoods');//新建商品-----
+    Route::any('add_goods','GoodsController@addGoods');//新建商品-----
 
     Route::any('del_goods','GoodsController@delGoods');//删除商品-----
 
@@ -117,7 +117,9 @@ Route::group(['namespace'=>'V2','prefix'=>'v2'],function(){
 
     Route::any('store_yunying','StoreController@storeYunYingInfo');//店铺运营
 
-    Route::any('edit_goods','VoucherController@editGoods');//编辑商品-------------
+    Route::any('edit_goods','GoodsController@editGoods');//编辑商品-------------
+
+    Route::any('goods_info','GoodsController@getGoodsInfo');//商品详情-------------
 
     Route::any('voucher_add','VoucherController@voucherAdd');//添加代金券------------
 

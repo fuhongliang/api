@@ -12,6 +12,10 @@ class Goods extends Model
     {
         return DB::table('goods')->where($condition)->get($field)->first();
     }
+    static function getGoodsCommonInfo($condition, $field = ['*'])
+    {
+        return DB::table('goods_common')->where($condition)->get($field)->first();
+    }
     static function addGoodsCommon($data)
     {
         return  DB::table('goods_common')->insertGetId($data);
@@ -68,5 +72,17 @@ class Goods extends Model
     static function getGoodsField($condition,$value)
     {
         return DB::table('goods')->where($condition)->value($value);
+    }
+    static function getGoodsCommonField($condition,$value)
+    {
+        return DB::table('goods_common')->where($condition)->value($value);
+    }
+    static function upGoodsField($condition,$update)
+    {
+        return DB::table('goods')->where($condition)->update($update);
+    }
+    static function upGoodsCommonField($condition,$update)
+    {
+        return DB::table('goods_common')->where($condition)->update($update);
     }
 }

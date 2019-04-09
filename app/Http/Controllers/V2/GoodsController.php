@@ -7,9 +7,15 @@ use App\model\V2\Goods;
 use App\model\V2\Store;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class GoodsController extends Base
 {
+    /** 添加商品
+     * @param \App\Http\Controllers\V2\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function addGoods(Request $request)
     {
         $store_id=$request->input('store_id');
@@ -20,8 +26,9 @@ class GoodsController extends Base
         $goods_storage=$request->input('goods_storage');//库存
         $sell_time=$request->input('sell_time'); // 出售时间
         $goods_desc=$request->input('goods_desc');// 描述
+        $goods_image=$request->file('goods_image');// 描述
 
-        if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price)
+        if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price || !$goods_image)
         {
             return Base::jsonReturn(1000,'参数缺失');
         }
@@ -30,6 +37,12 @@ class GoodsController extends Base
             $goods_storage=999999999;
         }
 
+        $save_path = '/shop/store/goods' . '/' . $store_id  . Base::getSysSetPath();
+        $entension = $goods_image -> getClientOriginalExtension();
+        $file_name=md5(microtime()).'.'.$entension;
+        $image_path = $request->file('goods_image')->storeAs(
+            $save_path,$file_name
+        );
 
         $bind_class=Store::getStoreBindClass(['store_id'=>$store_id], ['class_1','class_2','class_3']);
 
@@ -45,7 +58,7 @@ class GoodsController extends Base
         $common_array['brand_id']           = 1;
         $common_array['brand_name']         = '';
         $common_array['type_id']            = 0;
-        $common_array['goods_image']        = '';
+        $common_array['goods_image']        =  $file_name;
         $common_array['goods_price']        = floatval($goods_price);
         $common_array['goods_marketprice']  = floatval($origin_price);
         $common_array['goods_costprice']    = floatval($goods_price);
@@ -74,7 +87,6 @@ class GoodsController extends Base
         $common_array['transport_title']    = 0;
         $common_array['goods_freight']      = 0;
         $common_array['goods_stcids'] = ','.$class_id.',';// 首尾需要加,
-        $common_array['goods_stcid'] = $class_id;// 新,
         $common_array['plateid_top']        =  1;
         $common_array['plateid_bottom']     =  1;
         $common_array['is_virtual']         = 0;
@@ -87,18 +99,22 @@ class GoodsController extends Base
         $common_array['is_presell']         = 0;     // 只有出售中的商品可以预售
         $common_array['presell_deliverdate']= time(); // 预售商品的发货时间
         $common_array['is_own_shop']        = 0;
+        $common_array['goods_stcid']        = $class_id;
 
-        $selltime=array(
-            array(
-                'start_time'=>'00:00',
-                'end_time'=>'23:59'
-            )
-        );
-        foreach ($selltime as $k=>$val)
+        if(!$sell_time)
+        {
+            $sell_time=array(
+                array(
+                    'start_time'=>'00:00',
+                    'end_time'=>'23:59'
+                )
+            );
+        }
+        foreach ($sell_time as $k=>$val)
         {
             $goods_sell_time[$k][intval($val['start_time'])]=$val['end_time'];
         }
-        $common_array['goods_sale_time']        = serialize($selltime);
+        $common_array['goods_sale_time']        = serialize($goods_sell_time);
         $common_array['goods_selltime']    = time();
         $common_id=Goods::addGoodsCommon($common_array);
 /////  商品信息
@@ -133,7 +149,6 @@ class GoodsController extends Base
         $goods['goods_vat']         = $common_array['goods_vat'];
         $goods['goods_commend']     = $common_array['goods_commend'];
         $goods['goods_stcids']      = $common_array['goods_stcids'];
-        $goods['goods_stcid']      = $common_array['goods_stcid'];
         $goods['is_virtual']        = $common_array['is_virtual'];
         $goods['virtual_indate']    = $common_array['virtual_indate'];
         $goods['virtual_limit']     = $common_array['virtual_limit'];
@@ -142,6 +157,7 @@ class GoodsController extends Base
         $goods['is_appoint']        = $common_array['is_appoint'];
         $goods['is_presell']        = $common_array['is_presell'];
         $goods['is_own_shop']       = $common_array['is_own_shop'];
+        $goods['goods_stcid']        = $class_id;
         $goods_id = Goods::addGoods($goods);
         if($goods_id)
         {
@@ -151,6 +167,7 @@ class GoodsController extends Base
         }
 
     }
+
     public function delGoods(Request $request)
     {
         $store_id=$request->input('store_id');
@@ -167,5 +184,100 @@ class GoodsController extends Base
             return Base::jsonReturn(2000,'删除失败');
         }
     }
+    public function getGoodsInfo(Request $request)
+    {
+        $store_id=$request->input('store_id');
+        $goods_id=$request->input('goods_id');//
+        if(!$store_id || !$goods_id)
+        {
+            return Base::jsonReturn(1000,'参数缺失');
+        }
+        $field=['goods_id','goods_commonid','goods_image','goods_name','goods_stcid','goods_marketprice','goods_price','goods_storage'];
+        $goods_info=Goods::getGoodsInfo(['store_id'=>$store_id,'goods_id'=>$goods_id],$field);
+        $goods_com=Goods::getGoodsCommonInfo(['goods_commonid'=>$goods_info->goods_commonid],['goods_sale_time','goods_body']);
+        $goods_info->goods_body=$goods_com->goods_body;
+        $goods_info->sell_time=unserialize($goods_com->goods_sale_time);
+        if($goods_info)
+        {
+            return Base::jsonReturn(200,'获取成功',$goods_info);
+        }else{
+            return Base::jsonReturn(2000,'获取失败');
+        }
+    }
 
+    public function editGoods(Request $request)
+    {
+        $store_id=$request->input('store_id');
+        $goods_id=$request->input('goods_id');
+        $class_id=$request->input('class_id');//分类
+        $goods_name=$request->input('goods_name');//名称
+        $goods_price=$request->input('goods_price');//价格
+        $origin_price=$request->input('origin_price');//原价
+        $goods_storage=$request->input('goods_storage');//库存
+        $sell_time=$request->input('sell_time'); // 出售时间
+        $goods_desc=$request->input('goods_desc');// 描述
+        $goods_image=$request->file('goods_image');// 描述
+        if(!$goods_id || !$store_id)
+        {
+        return Base::jsonReturn(1000,'参数缺失');
+        }
+        $goods_array=$goods_comm=array();
+        if($class_id)
+        {
+            $goods_array['goods_stcid']=$class_id;
+            $goods_array['goods_stcids']=','.$class_id.',';
+        }
+        if($goods_name)
+        {
+            $goods_array['goods_name']=$goods_name;
+            $goods_comm['goods_name']=$goods_name;
+        }
+        if($goods_price)
+        {
+            $goods_array['goods_price']=$goods_price;
+            $goods_comm['goods_price']=$goods_price;
+        }
+        if($origin_price)
+        {
+            $goods_array['goods_marketprice']=$origin_price;
+            $goods_comm['goods_marketprice']=$origin_price;
+        }
+        if($goods_storage)
+        {
+            $goods_array['goods_storage']=$goods_storage;
+        }
+        if($sell_time)
+        {
+            $goods_comm['goods_sale_time']=serialize($sell_time);
+        }
+        if($goods_desc)
+        {
+            $goods_comm['goods_body']=$goods_desc;
+        }
+        if($goods_image)
+        {
+            $save_path = '/shop/store/goods' . '/' . $store_id  . Base::getSysSetPath();
+            $entension = $goods_image -> getClientOriginalExtension();
+            $file_name=md5(microtime()).'.'.$entension;
+            $image_path = $request->file('goods_image')->storeAs(
+                $save_path,$file_name
+            );
+            $goods_array['goods_image']=$file_name;
+            $goods_comm['goods_image']=$file_name;
+        }
+        $field=Goods::getGoodsInfo(['goods_id'=>$goods_id],['goods_commonid','goods_image']);
+        if(!empty($field->goods_image))
+        {
+            $file_name=$field->goods_image;
+            $img_path = '/shop/store/goods' . '/' . $store_id  .'/'. $file_name;
+            Storage::disk('public')->delete($img_path);
+        }
+        DB::transaction(function () use ($field,$goods_id,$goods_array,$goods_comm){
+            Goods::upGoodsField(['goods_id'=>$goods_id],$goods_array);
+            Goods::upGoodsCommonField(['goods_commonid'=>$field->goods_commonid],$goods_comm);
+        });
+
+        return Base::jsonReturn(200,'编辑成功');
+
+    }
 }
