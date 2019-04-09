@@ -89,7 +89,7 @@ Route::group(['namespace'=>'V2','prefix'=>'v2'],function(){
 
     Route::any('goods_list','VoucherController@storeGoodsList');//店铺商品列表-----
 
-    Route::any('chGoodsState','VoucherController@changeGoodsState');//店铺上下架
+    Route::any('chgoods_state','VoucherController@changeGoodsState');//商品上下架
 
     Route::any('add_goods','VoucherController@addGoods');//新建商品-----
 

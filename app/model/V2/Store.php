@@ -122,7 +122,7 @@ class Store extends Model
             {
                 foreach ($ids as $k=>$goods_id)
                 {
-                    $fields=['goods_id','goods_name','goods_price','goods_marketprice','goods_salenum','goods_storage'];
+                    $fields=['goods_id','goods_name','goods_price','goods_marketprice','goods_state','goods_storage'];
                     $goods_info[$k]=Goods::getGoodsInfo(['goods_id'=>$goods_id],$fields);
                 }
             }

@@ -47,9 +47,9 @@ class VoucherController extends Base
         }
         $res=Goods::changeGoodsState($goods_id,$store_id);
         if ($res) {
-            return Base::jsonReturn(200,  '设置成功');
+            return Base::jsonReturn(200,  '上下架成功');
         } else {
-            return Base::jsonReturn(2000,  '设置失败');
+            return Base::jsonReturn(2000,  '上下架失败');
         }
 
     }
@@ -70,8 +70,7 @@ class VoucherController extends Base
         $goods_desc=$request->input('goods_desc');// 描述
         $goods_image=$request->file('goods_image');// 描述
 
-
-        if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price)
+        if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price || !$goods_image)
         {
             return Base::jsonReturn(1000,'参数缺失');
         }
@@ -79,9 +78,14 @@ class VoucherController extends Base
         {
             $goods_storage=999999999;
         }
-        $file_name=Base::getSysSetPath();
-        $save_path = '/shop/store/goods' . '/' . $store_id . '/' . $file_name;
-        $image_path = $request->file('goods_image')->store($save_path);
+
+        $save_path = '/shop/store/goods' . '/' . $store_id  . Base::getSysSetPath();
+        $entension = $goods_image -> getClientOriginalExtension();
+        $file_name=md5(microtime()).'.'.$entension;
+        $image_path = $request->file('goods_image')->storeAs(
+            $save_path,$file_name
+        );
+
         $bind_class=Store::getStoreBindClass(['store_id'=>$store_id], ['class_1','class_2','class_3']);
 
         $common_array=array();
@@ -137,18 +141,22 @@ class VoucherController extends Base
         $common_array['is_presell']         = 0;     // 只有出售中的商品可以预售
         $common_array['presell_deliverdate']= time(); // 预售商品的发货时间
         $common_array['is_own_shop']        = 0;
+        $common_array['goods_stcid']        = $class_id;
 
-        $selltime=array(
-            array(
-                'start_time'=>'00:00',
-                'end_time'=>'23:59'
-            )
-        );
-        foreach ($selltime as $k=>$val)
+        if(!$sell_time)
+        {
+            $sell_time=array(
+                array(
+                    'start_time'=>'00:00',
+                    'end_time'=>'23:59'
+                )
+            );
+        }
+        foreach ($sell_time as $k=>$val)
         {
             $goods_sell_time[$k][intval($val['start_time'])]=$val['end_time'];
         }
-        $common_array['goods_sale_time']        = serialize($selltime);
+        $common_array['goods_sale_time']        = serialize($goods_sell_time);
         $common_array['goods_selltime']    = time();
         $common_id=Goods::addGoodsCommon($common_array);
 /////  商品信息
@@ -191,6 +199,7 @@ class VoucherController extends Base
         $goods['is_appoint']        = $common_array['is_appoint'];
         $goods['is_presell']        = $common_array['is_presell'];
         $goods['is_own_shop']       = $common_array['is_own_shop'];
+        $goods['goods_stcid']        = $class_id;
         $goods_id = Goods::addGoods($goods);
         if($goods_id)
         {
