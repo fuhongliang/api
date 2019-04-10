@@ -123,7 +123,7 @@ Route::group(['namespace'=>'V2','prefix'=>'v2'],function(){
 
     Route::any('mianzhi_list','VoucherController@mianzhiList');//面值列表------------
 
-    Route::any('voucher_add','VoucherController@voucherAdd');//添加代金券------------
+    Route::any('voucher_edit','VoucherController@voucherEdit');//添加/删除代金券------------
 
     Route::any('voucher_list','VoucherController@voucherList');//代金券列表------------
 
@@ -131,7 +131,7 @@ Route::group(['namespace'=>'V2','prefix'=>'v2'],function(){
 
     Route::any('voucher_del','VoucherController@voucherDel');//代金券删除------------
 
-    Route::any('bundling_add','VoucherController@bundlingAdd');//添加优惠套装------------
+    Route::any('bundling_edit','VoucherController@bundlingEdit');//添/编辑优惠套装------------
 
     Route::any('bundling_list','VoucherController@bundlingList');//优惠套装列表------------
 

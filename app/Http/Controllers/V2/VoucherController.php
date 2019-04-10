@@ -55,12 +55,13 @@ class VoucherController extends Base
     }
 
 
-    /**  添加代金券
+    /**  添加/编辑代金券
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function voucherAdd(Request $request){
+    public function voucherEdit(Request $request){
         $store_id=$request->input('store_id');
+        $voucher_id=$request->input('voucher_id');
         $voucher_t_title=$request->input('title');
         $voucher_t_price=$request->input('mianzhi');
         $limit=$request->input('limit_price');
@@ -80,7 +81,6 @@ class VoucherController extends Base
         if(empty($quotainfo)){
             return Base::jsonReturn(2000,  '你还没有购买代金券套餐');
         }
-
         $count=Voucher::getVoucherTemplateCount(['voucher_t_quotaid'=>$quotainfo->quota_id,'voucher_t_state'=>1]);
         if ($count >= getenv('PROMOTION_VOUCHER_STORETIMES_LIMIT')){
             return Base::jsonReturn(2000,  '代金券数量超过最多限制');
@@ -111,11 +111,16 @@ class VoucherController extends Base
         $insert_arr['voucher_t_quotaid'] = $quotainfo->quota_id ? $quotainfo->quota_id : 0;
         $insert_arr['voucher_t_points'] = 0;
         $insert_arr['voucher_t_eachlimit'] = $eachlimit;
-        $res=Voucher::addVoucherTemplate($insert_arr);
+        if($voucher_id)
+        {
+            $res=Voucher::upVoucherTemplate(['voucher_t_id'=>$voucher_id],$insert_arr);
+        }else{
+            $res=Voucher::addVoucherTemplate($insert_arr);
+        }
         if ($res) {
-            return Base::jsonReturn(200, '添加成功');
+            return Base::jsonReturn(200, '操作成功');
         } else {
-            return Base::jsonReturn(2000,  '添加失败');
+            return Base::jsonReturn(2000,  '操作失败');
         }
     }
 
@@ -125,8 +130,11 @@ class VoucherController extends Base
         {
             return Base::jsonReturn(1000,'参数缺失');
         }
-        $field=['voucher_t_id','voucher_t_title','voucher_t_price','voucher_t_limit','voucher_t_end_date','voucher_t_total','voucher_t_eachlimit','voucher_t_desc'];
+        $field=['voucher_t_id as voucher_id','voucher_t_title as voucher_title','voucher_t_price as voucher_price',
+            'voucher_t_limit as voucher_limit','voucher_t_end_date as voucher_end_date',
+            'voucher_t_total as voucher_total','voucher_t_eachlimit as voucher_eachlimit','voucher_t_desc as voucher_desc'];
         $info=Voucher::addVoucherInfo(['voucher_t_id'=>$voucher_id],$field);
+        $info->voucher_end_date=date('Y-m-d H:i:s',$info->voucher_end_date);
         return Base::jsonReturn(200, '获取成功',$info);
     }
     public function voucherList(Request $request){
@@ -192,13 +200,17 @@ class VoucherController extends Base
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function bundlingAdd(Request $request)
+    public function bundlingEdit(Request $request)
     {
         $store_id = $request->input('store_id');
         $bundling_name = $request->input('bundling_name');
         $bl_discount_price = $request->input('discount_price');
+        $goods_list = $request->input('goods_list');
+        $bundling_id = $request->input('bundling_id');
 
-
+        if (!$store_id || !$bundling_name || !$bl_discount_price || !$goods_list) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
         $data=array(
             'store_id'=>$store_id,
             'bl_name'=>$bundling_name,
@@ -208,7 +220,14 @@ class VoucherController extends Base
             'bl_freight'=>0,
 
         );
-        $bundling_id=Voucher::addBundlingData($data);
+        if($bundling_id)
+        {
+            Voucher::upBundlingData(['bl_id'=>$bundling_id],$data);
+
+        }else{
+            $bundling_id=Voucher::addBundlingData($data);
+        }
+
         $goods_list=array(
             array(
                 'goods_id'=>100058,

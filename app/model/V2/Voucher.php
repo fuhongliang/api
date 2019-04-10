@@ -24,6 +24,12 @@ class Voucher extends Model
             ->where($condition)
             ->first($field);
     }
+    static function upVoucherTemplate($condition,$data)
+    {
+        return DB::table('voucher_template')
+            ->where($condition)
+            ->update($data);
+    }
     static function getVoucherTemplateCount($condition)
     {
        return  DB::table('voucher_template')
@@ -50,6 +56,12 @@ class Voucher extends Model
     static function addBundlingGoodsData($data)
     {
         return  DB::table('p_bundling_goods')->insertGetId($data);
+    }
+    static function upBundlingData($condition,$data)
+    {
+        return DB::table('p_bundling')
+            ->where($condition)
+            ->update($data);
     }
     static function getBundlingData($condition,$field=['*'])
     {
