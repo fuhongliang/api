@@ -118,6 +118,17 @@ class VoucherController extends Base
             return Base::jsonReturn(2000,  '添加失败');
         }
     }
+
+    public function voucherInfo(Request $request){
+        $voucher_id=$request->input('voucher_id');
+        if(!$voucher_id)
+        {
+            return Base::jsonReturn(1000,'参数缺失');
+        }
+        $field=['voucher_t_id','voucher_t_title','voucher_t_price','voucher_t_limit','voucher_t_end_date','voucher_t_total','voucher_t_eachlimit','voucher_t_desc'];
+        $info=Voucher::addVoucherInfo(['voucher_t_id'=>$voucher_id],$field);
+        return Base::jsonReturn(200, '获取成功',$info);
+    }
     public function voucherList(Request $request){
         $store_id=$request->input('store_id');
         if(!$store_id)

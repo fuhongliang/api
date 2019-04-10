@@ -127,6 +127,8 @@ Route::group(['namespace'=>'V2','prefix'=>'v2'],function(){
 
     Route::any('voucher_list','VoucherController@voucherList');//代金券列表------------
 
+    Route::any('voucher_info','VoucherController@voucherInfo');//代金券详情------------
+
     Route::any('voucher_del','VoucherController@voucherDel');//代金券删除------------
 
     Route::any('bundling_add','VoucherController@bundlingAdd');//添加优惠套装------------

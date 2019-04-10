@@ -18,6 +18,12 @@ class Voucher extends Model
             ->where($condition)
             ->first();
     }
+    static function addVoucherInfo($condition,$field=['*'])
+    {
+        return DB::table('voucher_template')
+            ->where($condition)
+            ->first($field);
+    }
     static function getVoucherTemplateCount($condition)
     {
        return  DB::table('voucher_template')
