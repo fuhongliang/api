@@ -151,4 +151,10 @@ class Voucher extends Model
         });
         return true;
     }
+    static function getMianzhiList($field)
+    {
+        return DB::table('voucher_price')
+            ->get($field);
+    }
+
 }

@@ -121,6 +121,8 @@ Route::group(['namespace'=>'V2','prefix'=>'v2'],function(){
 
     Route::any('goods_info','GoodsController@getGoodsInfo');//商品详情-------------
 
+    Route::any('mianzhi_list','VoucherController@mianzhiList');//面值列表------------
+
     Route::any('voucher_add','VoucherController@voucherAdd');//添加代金券------------
 
     Route::any('voucher_list','VoucherController@voucherList');//代金券列表------------

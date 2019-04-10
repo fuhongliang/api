@@ -65,7 +65,7 @@ class VoucherController extends Base
         $voucher_t_price=$request->input('mianzhi');
         $limit=$request->input('limit_price');
         $describe=$request->input('describe');
-        $enddate=$request->input('end_time');
+        $enddate=strtotime($request->input('end_time'));
         $total=$request->input('total_nums');
         $eachlimit=$request->input('each_limit');
         if(!$store_id || !$voucher_t_title || !$voucher_t_price || !$limit || !$describe || !$enddate || !$total || !$eachlimit)
@@ -444,6 +444,15 @@ class VoucherController extends Base
         }
     }
 
+    public function mianzhiList(Request $request)
+    {
+        $res=Voucher::getMianzhiList(['voucher_price_id','voucher_price']);
+        if ($res) {
+            return Base::jsonReturn(200, '获取成功',$res);
+        } else {
+            return Base::jsonReturn(2000,  '获取失败');
+        }
+    }
 
 
 }
