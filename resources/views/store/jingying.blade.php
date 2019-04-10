@@ -101,7 +101,7 @@
     };
     function getData() {
         $.ajax({
-            url:'http://47.111.27.189/api/public/index.php/v1/get_echarts',
+            url:'http://47.92.244.60:88/v1/get_echarts',
             data:{'store_id':store_id},
             type:'post',
             dataType:'json',
@@ -145,7 +145,7 @@
 
     function getData_() {
         $.ajax({
-            url:'http://47.111.27.189/api/public/index.php/v1/get_echarts_',
+            url:'http://47.92.244.60:88/v1/get_echarts_',
             data:{'store_id':store_id},
             type:'post',
             dataType:'json',
