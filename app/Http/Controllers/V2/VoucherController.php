@@ -9,6 +9,7 @@ use App\Http\Controllers\BaseController as Base;
 use App\model\V2\Goods;
 use App\model\V2\Store;
 use App\model\V2\Voucher;
+use Illuminate\Support\Facades\DB;
 
 
 class VoucherController extends Base
@@ -207,7 +208,16 @@ class VoucherController extends Base
         $bl_discount_price = $request->input('discount_price');
         $goods_list = $request->input('goods_list');
         $bundling_id = $request->input('bundling_id');
-
+        $goods_list=array(
+            array(
+                'goods_id'=>100058,
+                'goods_price'=>333
+            ),
+            array(
+                'goods_id'=>100066,
+                'goods_price'=>200
+            ),
+        );
         if (!$store_id || !$bundling_name || !$bl_discount_price || !$goods_list) {
             return Base::jsonReturn(1000, '参数缺失');
         }
@@ -223,33 +233,25 @@ class VoucherController extends Base
         if($bundling_id)
         {
             Voucher::upBundlingData(['bl_id'=>$bundling_id],$data);
-
+            DB::table('p_bundling_goods')
+                ->where('bl_id',$bundling_id)
+                ->delete();
         }else{
             $bundling_id=Voucher::addBundlingData($data);
         }
 
-        $goods_list=array(
-            array(
-                'goods_id'=>100058,
-                'goods_price'=>333
-            ),
-            array(
-                'goods_id'=>100066,
-                'goods_price'=>200
-            ),
-        );
         foreach ($goods_list as $key => $val){
             $goods_info = Goods::getGoodsInfo(['goods_id'=>$val['goods_id']],['goods_id','goods_name','goods_image','store_id']);
             $array = array();
             $array['bl_id'] = $bundling_id;
             $array['goods_id'] = $val['goods_id'];
-            $array['goods_name'] = $goods_info->goods_name;
-            $array['goods_image'] = $goods_info->goods_image;
+            $array['goods_name'] = empty($goods_info->goods_name) ? "":$goods_info->goods_name;
+            $array['goods_image'] =empty( $goods_info->goods_image)? "": $goods_info->goods_image;
             $array['bl_goods_price'] = Base::ncPriceFormat($val['goods_price']);
             $array['bl_appoint'] = 1;
             Voucher::addBundlingGoodsData($array);
         }
-        return Base::jsonReturn(200, '添加成功');
+        return Base::jsonReturn(200, '操作成功');
 
     }
     public function bundlingList(Request $request)
@@ -295,14 +297,36 @@ class VoucherController extends Base
             return Base::jsonReturn(2000,  '删除失败');
         }
     }
-    public function mamsongAdd(Request $request)
+    public function bundlingInfo(Request $request)
+    {
+        $bundling_id = $request->input('bundling_id');
+        $store_id = $request->input('store_id');
+        if (!$bundling_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        $res=Voucher::getBundlingInfo($bundling_id);
+        if ($res) {
+            return Base::jsonReturn(200, '获取成功',$res);
+        } else {
+            return Base::jsonReturn(2000,  '获取失败');
+        }
+    }
+
+    public function mamsongEdit(Request $request)
     {
         $store_id = $request->input('store_id');
+        $mansong_id = $request->input('mansong_id');
         $mansong_name = $request->input('mansong_name');
         $start_time = $request->input('start_time');
         $end_time = $request->input('end_time');
         $remark = $request->input('remark');
-        if (!$store_id) {
+        $rules = $request->input('rules');//{['price'=>100058,'discount'=>333,'mansong_goods_name'=>333],['price'=>100058,'discount'=>333,'mansong_goods_name'=>333]}
+        $rules=array(array(
+            'price'=>100058,
+            'discount'=>333,
+            'mansong_goods_name'=>333
+        ));
+        if (!$store_id || !$mansong_name || !$start_time || !$end_time || !$remark ||!$rules) {
             return Base::jsonReturn(1000, '参数缺失');
         }
         $mansong_quota_list=Voucher::getManSongInfo(['store_id'=>$store_id],['quota_id']);
@@ -312,9 +336,10 @@ class VoucherController extends Base
         }
         $storeInfo=Store::getStoreInfo(['store_id'=>$store_id]);
         $data=array(
+            'store_id'=>$store_id,
             'mansong_name'=>$mansong_name,
-            'start_time'=>$start_time,
-            'end_time'=>$end_time,
+            'start_time'=>strtotime($start_time),
+            'end_time'=>strtotime($end_time),
             'quota_id'=>$mansong_quota_list->quota_id,
             'member_id'=>$storeInfo->member_id,
             'member_name'=>$storeInfo->member_name,
@@ -322,20 +347,22 @@ class VoucherController extends Base
             'state'=>2,
             'remark'=>$remark
         );
-        $mansong_id=Voucher::addManSongData($data);
-        $rules=array(
-            array(
-               'price'=>100,
-               'discount' =>10,
-                'mansong_goods_name'=>''
-            )
-        );
+        if($mansong_id)
+        {
+            Voucher::addManSongData($data);
+            DB::table('p_mansong_rule')
+                ->where('mansong_id',$mansong_id)
+                ->delete();
+        }else{
+            $mansong_id=Voucher::addManSongData($data);
+        }
         foreach($rules as $v)
         {
             $arr=array(
+                'mansong_id'=>$mansong_id,
                 'price'=>$v['price'],
                 'discount' =>$v['discount'],
-                'mansong_goods_name'=>''
+                'mansong_goods_name'=>$v['mansong_goods_name']
             );
             Voucher::addManSongRuleData($arr);
         }
@@ -378,16 +405,24 @@ class VoucherController extends Base
             return Base::jsonReturn(2000,  '删除失败');
         }
     }
-    public function xianshiAdd(Request $request)
+    public function xianshiEdit(Request $request)
     {
         $store_id = $request->input('store_id');
+        $xianshi_id = $request->input('xianshi_id');
         $xianshi_name = $request->input('xianshi_name');
         $xianshi_title = $request->input('xianshi_title');
         $xianshi_explain = $request->input('xianshi_explain');
         $start_time = $request->input('start_time');
         $end_time = $request->input('end_time');
         $lower_limit= $request->input('lower_limit');
-        if (!$store_id) {
+        $goods_list= $request->input('goods_list');
+        $goods_list=array(
+            array(
+                'goods_id'=>100058,
+                'xianshi_price'=>666
+            )
+        );
+        if (!$store_id || !$xianshi_name || !$xianshi_title || !$xianshi_explain || !$start_time ||!$end_time || !$lower_limit || !$goods_list) {
             return Base::jsonReturn(1000, '参数缺失');
         }
         $xianshi_quota_list=Voucher::getXianShiInfo(['store_id'=>$store_id]);
@@ -397,27 +432,31 @@ class VoucherController extends Base
         }
         $storeInfo=Store::getStoreInfo(['store_id'=>$store_id]);
         $data=array(
+            'store_id'=>$store_id,
             'xianshi_name'=>$xianshi_name,
             'xianshi_title'=>$xianshi_title,
             'xianshi_explain'=>$xianshi_explain,
-            'start_time'=>$start_time,
-            'end_time'=>$end_time,
+            'start_time'=>strtotime($start_time),
+            'end_time'=>strtotime($end_time),
             'lower_limit'=>$lower_limit,
             'quota_id'=>$xianshi_quota_list->quota_id,
             'member_id'=>$storeInfo->member_id,
             'member_name'=>$storeInfo->member_name,
             'store_name'=>$storeInfo->store_name,
         );
-        $xianshi_id=Voucher::addXianShiData($data);
-        $array=array(
-            array(
-                'goods_id'=>100058,
-                'xianshi_price'=>666
-            )
-        );
-        foreach($array as $v)
+        if($xianshi_id)
         {
-            $goods_info=Goods::getGoodsInfo(['goods_id'=>$goods_id]);
+            Voucher::upXianShiData(['xianshi_id'=>$xianshi_id],$data);
+            DB::table('p_xianshi_goods')
+                ->where('xianshi_id',$xianshi_id)
+                ->delete();
+        }else{
+            $xianshi_id=Voucher::addXianShiData($data);
+
+        }
+        foreach($goods_list as $v)
+        {
+            $goods_info=Goods::getGoodsInfo(['goods_id'=>$v['goods_id']]);
             $ins_data=array(
                 'xianshi_id'=>$xianshi_id,
                 'xianshi_name'=>$xianshi_name,
@@ -431,6 +470,7 @@ class VoucherController extends Base
                 'start_time'=>$start_time,
                 'end_time'=>$end_time,
                 'lower_limit'=>$lower_limit,
+                'xianshi_price'=>$v['xianshi_price']
             );
             Voucher::addXianShiGoodsData($ins_data);
         }
@@ -443,7 +483,6 @@ class VoucherController extends Base
             return Base::jsonReturn(1000, '参数缺失');
         }
         $list=Voucher::getXianshiList(['store_id'=>$store_id]);
-        dd($list);
         if(!empty($list))
         {
             $result=array();
@@ -483,6 +522,21 @@ class VoucherController extends Base
             return Base::jsonReturn(2000,  '获取失败');
         }
     }
+    public function xianshiInfo(Request $request)
+    {
+        $xianshi_id = $request->input('xianshi_id');
+        $store_id = $request->input('store_id');
+        if (!$xianshi_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        $res=Voucher::getXianshiInfoData($xianshi_id);
+        if ($res) {
+            return Base::jsonReturn(200, '获取成功',$res);
+        } else {
+            return Base::jsonReturn(2000,  '获取失败');
+        }
+    }
+
 
 
 }

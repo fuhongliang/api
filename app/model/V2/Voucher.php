@@ -49,6 +49,7 @@ class Voucher extends Model
             ->where($condition)
             ->get($field);
     }
+
     static function addBundlingData($data)
     {
         return  DB::table('p_bundling')->insertGetId($data);
@@ -69,6 +70,12 @@ class Voucher extends Model
             ->where($condition)
             ->get($field);
     }
+    static function  getBundling($condition,$field=['*'])
+    {
+        return DB::table('p_bundling')
+            ->where($condition)
+            ->first($field);
+    }
     static function getBundlingGoodsTotalPrice($condition)
     {
         return DB::table('p_bundling_goods')
@@ -79,16 +86,29 @@ class Voucher extends Model
             )
         );
     }
+    static function getBundlingGoods($condition,$field=['*'])
+    {
+        return DB::table('p_bundling_goods')
+            ->where($condition)
+            ->get($field);
+    }
     static function delVoucher($condition)
     {
         return DB::table('voucher_template')
             ->where($condition)
             ->delete();
     }
+    static function getBundlingInfo($bundling_id)
+    {
+        $data=self::getBundling(['bl_id'=>$bundling_id],['bl_id','bl_name','bl_discount_price as bl_price','bl_state']);
+        $data->goods_list=self::getBundlingGoods(['bl_id'=>$bundling_id],['goods_id','goods_name','goods_image','bl_goods_price as goods_price']);
+        return $data;
+    }
+
     static function delBundling($condition)
     {
-        DB::transaction(function () {
-            DB::table('voucher_template')
+        DB::transaction(function () use($condition){
+            DB::table('p_bundling')
                 ->where($condition)
                 ->delete();
             DB::table('p_bundling_goods')
@@ -126,7 +146,7 @@ class Voucher extends Model
     }
     static function delMansong($condition)
     {
-        DB::transaction(function () {
+        DB::transaction(function ()use ($condition) {
             DB::table('p_mansong')
                 ->where($condition)
                 ->delete();
@@ -147,6 +167,12 @@ class Voucher extends Model
     {
         return  DB::table('p_xianshi')->insertGetId($data);;
     }
+    static function upXianShiData($condition,$data)
+    {
+        return DB::table('p_xianshi')
+            ->where($condition)
+            ->update($data);
+    }
     static function addXianShiGoodsData($data)
     {
         return  DB::table('p_xianshi_goods')->insertGetId($data);;
@@ -159,7 +185,7 @@ class Voucher extends Model
     }
     static function delXianshi($condition)
     {
-        DB::transaction(function () {
+        DB::transaction(function () use($condition) {
             DB::table('p_xianshi')
                 ->where($condition)
                 ->delete();
@@ -174,5 +200,24 @@ class Voucher extends Model
         return DB::table('voucher_price')
             ->get($field);
     }
+    static function getXianshiData($condition,$field=['*'])
+    {
+        return  DB::table('p_xianshi')
+        ->where($condition)
+        ->first($field);
+    }
+    static function getXianshiGoodsData($condition,$field=['*'])
+    {
+        return DB::table('p_xianshi_goods')
+            ->where($condition)
+            ->get($field);
+    }
+    static function getXianshiInfoData($xianshi_id)
+    {
+        $data=self::getXianshiData(['xianshi_id'=>$xianshi_id],['xianshi_id','xianshi_name','xianshi_title','xianshi_explain','start_time','end_time','lower_limit']);
+        $data->goods_list=self::getXianshiGoodsData(['xianshi_id'=>$xianshi_id],['goods_id','goods_name','goods_image','xianshi_price']);
+        return $data;
+    }
+
 
 }

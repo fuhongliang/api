@@ -137,16 +137,20 @@ Route::group(['namespace'=>'V2','prefix'=>'v2'],function(){
 
     Route::any('bundling_del','VoucherController@bundlingDel');//优惠套装删除------------
 
-    Route::any('mamsong_add','VoucherController@mamsongAdd');//添加满送------------
+    Route::any('bundling_info','VoucherController@bundlingInfo');//优惠套装详情------------
+
+    Route::any('mamsong_edit','VoucherController@mamsongEdit');//添加/编辑满送------------
 
     Route::any('mamsong_list','VoucherController@mamsongList');//满送列表------------
 
     Route::any('mamsong_del','VoucherController@mansongDel');//满送删除------------
 
-    Route::any('xianshi_add','VoucherController@xianshiAdd');//添加折扣------------
+    Route::any('xianshi_edit','VoucherController@xianshiEdit');//添加/编辑折扣------------
 
     Route::any('xianshi_list','VoucherController@xianshiList');//折扣列表------------
 
     Route::any('xianshi_del','VoucherController@xianshiDel');//折扣删除------------
+
+    Route::any('xianshi_info','VoucherController@xianshiInfo');//折扣详情------------
 
 });
