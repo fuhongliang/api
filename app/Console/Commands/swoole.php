@@ -55,11 +55,27 @@ class swoole extends Command
         }
     }
    static function start(){
-        $server = new \swoole_websocket_server("0.0.0.0", 2346);
-        $handler = new SwooleController();
-        $server->on('connect', [$handler, 'onConnect']);
-        $server->on('message', [$handler, 'onMessage']);
-        $server->on('close', [$handler, 'onClose']);
-        $server->start();
+       $server = new \swoole_websocket_server("0.0.0.0", 2346);
+
+       $server->on('open', function (Swoole\WebSocket\Server $server, $request) {
+           echo "server: handshake success with fd{$request->fd}\n";
+       });
+
+       $server->on('message', function (Swoole\WebSocket\Server $server, $frame) {
+           echo "receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}\n";
+           $server->push($frame->fd, "this is server");
+       });
+
+       $server->on('close', function ($ser, $fd) {
+           echo "client {$fd} closed\n";
+       });
+
+       $server->start();
+//        $server = new \swoole_websocket_server("0.0.0.0", 2346);
+//        $handler = new SwooleController();
+//        $server->on('connect', [$handler, 'onConnect']);
+//        $server->on('message', [$handler, 'onMessage']);
+//        $server->on('close', [$handler, 'onClose']);
+//        $server->start();
     }
 }
