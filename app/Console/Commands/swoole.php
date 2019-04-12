@@ -57,7 +57,6 @@ class swoole extends Command
    static function start(){
         $server = new \swoole_websocket_server("0.0.0.0", 2346);
         $handler = new SwooleController();
-        dd($server);
         $server->on('connect', [$handler, 'onConnect']);
         $server->on('message', [$handler, 'onMessage']);
         $server->on('close', [$handler, 'onClose']);
