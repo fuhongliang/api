@@ -283,7 +283,7 @@ class GoodsController extends Base
                 $save_path,$file_name
             );
         }
-        return Base::jsonReturn(200,'获取成功',$file_name);
+        return Base::jsonReturn(200,'获取成功',getenv('GOODS_IMAGE').$store_id.'/'.$file_name);
     }
 
 }
