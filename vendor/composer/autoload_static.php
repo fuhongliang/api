@@ -8,9 +8,9 @@ class ComposerStaticInit7f69e2e8817818ae449452c01cd56b34
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
+        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
-        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
@@ -55,9 +55,11 @@ class ComposerStaticInit7f69e2e8817818ae449452c01cd56b34
             'Symfony\\Component\\HttpFoundation\\' => 33,
             'Symfony\\Component\\Finder\\' => 25,
             'Symfony\\Component\\EventDispatcher\\' => 34,
+            'Symfony\\Component\\DomCrawler\\' => 29,
             'Symfony\\Component\\Debug\\' => 24,
             'Symfony\\Component\\CssSelector\\' => 30,
             'Symfony\\Component\\Console\\' => 26,
+            'Spatie\\Pjax\\' => 12,
         ),
         'R' => 
         array (
@@ -203,6 +205,10 @@ class ComposerStaticInit7f69e2e8817818ae449452c01cd56b34
         array (
             0 => __DIR__ . '/..' . '/symfony/event-dispatcher',
         ),
+        'Symfony\\Component\\DomCrawler\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/dom-crawler',
+        ),
         'Symfony\\Component\\Debug\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/debug',
@@ -214,6 +220,10 @@ class ComposerStaticInit7f69e2e8817818ae449452c01cd56b34
         'Symfony\\Component\\Console\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/console',
+        ),
+        'Spatie\\Pjax\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/spatie/laravel-pjax/src',
         ),
         'Ramsey\\Uuid\\' => 
         array (
@@ -344,7 +354,20 @@ class ComposerStaticInit7f69e2e8817818ae449452c01cd56b34
         'App\\Http\\Controllers\\Auth\\LoginController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/LoginController.php',
         'App\\Http\\Controllers\\Auth\\RegisterController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/RegisterController.php',
         'App\\Http\\Controllers\\Auth\\ResetPasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ResetPasswordController.php',
+        'App\\Http\\Controllers\\BaseController' => __DIR__ . '/../..' . '/app/Http/Controllers/BaseController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
+        'App\\Http\\Controllers\\SMSController' => __DIR__ . '/../..' . '/app/Http/Controllers/SMSController.php',
+        'App\\Http\\Controllers\\Socket\\IndexController' => __DIR__ . '/../..' . '/app/Http/Controllers/Socket/IndexController.php',
+        'App\\Http\\Controllers\\SwooleController' => __DIR__ . '/../..' . '/app/Http/Controllers/SwooleController.php',
+        'App\\Http\\Controllers\\V1\\GoodsController' => __DIR__ . '/../..' . '/app/Http/Controllers/V1/GoodsController.php',
+        'App\\Http\\Controllers\\V1\\MemberController' => __DIR__ . '/../..' . '/app/Http/Controllers/V1/MemberController.php',
+        'App\\Http\\Controllers\\V1\\OrderController' => __DIR__ . '/../..' . '/app/Http/Controllers/V1/OrderController.php',
+        'App\\Http\\Controllers\\V1\\StoreController' => __DIR__ . '/../..' . '/app/Http/Controllers/V1/StoreController.php',
+        'App\\Http\\Controllers\\V2\\GoodsController' => __DIR__ . '/../..' . '/app/Http/Controllers/V2/GoodsController.php',
+        'App\\Http\\Controllers\\V2\\MemberController' => __DIR__ . '/../..' . '/app/Http/Controllers/V2/MemberController.php',
+        'App\\Http\\Controllers\\V2\\OrderController' => __DIR__ . '/../..' . '/app/Http/Controllers/V2/OrderController.php',
+        'App\\Http\\Controllers\\V2\\StoreController' => __DIR__ . '/../..' . '/app/Http/Controllers/V2/StoreController.php',
+        'App\\Http\\Controllers\\V2\\VoucherController' => __DIR__ . '/../..' . '/app/Http/Controllers/V2/VoucherController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
         'App\\Http\\Middleware\\CheckForMaintenanceMode' => __DIR__ . '/../..' . '/app/Http/Middleware/CheckForMaintenanceMode.php',
         'App\\Http\\Middleware\\EncryptCookies' => __DIR__ . '/../..' . '/app/Http/Middleware/EncryptCookies.php',
@@ -352,12 +375,24 @@ class ComposerStaticInit7f69e2e8817818ae449452c01cd56b34
         'App\\Http\\Middleware\\TrimStrings' => __DIR__ . '/../..' . '/app/Http/Middleware/TrimStrings.php',
         'App\\Http\\Middleware\\TrustProxies' => __DIR__ . '/../..' . '/app/Http/Middleware/TrustProxies.php',
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',
+        'App\\Http\\Middleware\\checkToken' => __DIR__ . '/../..' . '/app/Http/Middleware/checkToken.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
         'App\\Providers\\BroadcastServiceProvider' => __DIR__ . '/../..' . '/app/Providers/BroadcastServiceProvider.php',
         'App\\Providers\\EventServiceProvider' => __DIR__ . '/../..' . '/app/Providers/EventServiceProvider.php',
         'App\\Providers\\RouteServiceProvider' => __DIR__ . '/../..' . '/app/Providers/RouteServiceProvider.php',
         'App\\User' => __DIR__ . '/../..' . '/app/User.php',
+        'App\\model\\V1\\Goods' => __DIR__ . '/../..' . '/app/model/V1/Goods.php',
+        'App\\model\\V1\\Member' => __DIR__ . '/../..' . '/app/model/V1/Member.php',
+        'App\\model\\V1\\Order' => __DIR__ . '/../..' . '/app/model/V1/Order.php',
+        'App\\model\\V1\\Store' => __DIR__ . '/../..' . '/app/model/V1/Store.php',
+        'App\\model\\V1\\Token' => __DIR__ . '/../..' . '/app/model/V1/Token.php',
+        'App\\model\\V2\\Goods' => __DIR__ . '/../..' . '/app/model/V2/Goods.php',
+        'App\\model\\V2\\Member' => __DIR__ . '/../..' . '/app/model/V2/Member.php',
+        'App\\model\\V2\\Order' => __DIR__ . '/../..' . '/app/model/V2/Order.php',
+        'App\\model\\V2\\Store' => __DIR__ . '/../..' . '/app/model/V2/Store.php',
+        'App\\model\\V2\\Token' => __DIR__ . '/../..' . '/app/model/V2/Token.php',
+        'App\\model\\V2\\Voucher' => __DIR__ . '/../..' . '/app/model/V2/Voucher.php',
         'Carbon\\Carbon' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Carbon.php',
         'Carbon\\CarbonInterval' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/CarbonInterval.php',
         'Carbon\\Exceptions\\InvalidDateException' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Exceptions/InvalidDateException.php',
@@ -3066,6 +3101,7 @@ class ComposerStaticInit7f69e2e8817818ae449452c01cd56b34
         'SebastianBergmann\\Timer\\RuntimeException' => __DIR__ . '/..' . '/phpunit/php-timer/src/RuntimeException.php',
         'SebastianBergmann\\Timer\\Timer' => __DIR__ . '/..' . '/phpunit/php-timer/src/Timer.php',
         'SebastianBergmann\\Version' => __DIR__ . '/..' . '/sebastian/version/src/Version.php',
+        'Spatie\\Pjax\\Middleware\\FilterIfPjax' => __DIR__ . '/..' . '/spatie/laravel-pjax/src/Middleware/FilterIfPjax.php',
         'Symfony\\Component\\Console\\Application' => __DIR__ . '/..' . '/symfony/console/Application.php',
         'Symfony\\Component\\Console\\CommandLoader\\CommandLoaderInterface' => __DIR__ . '/..' . '/symfony/console/CommandLoader/CommandLoaderInterface.php',
         'Symfony\\Component\\Console\\CommandLoader\\ContainerCommandLoader' => __DIR__ . '/..' . '/symfony/console/CommandLoader/ContainerCommandLoader.php',
@@ -3212,6 +3248,17 @@ class ComposerStaticInit7f69e2e8817818ae449452c01cd56b34
         'Symfony\\Component\\Debug\\FatalErrorHandler\\FatalErrorHandlerInterface' => __DIR__ . '/..' . '/symfony/debug/FatalErrorHandler/FatalErrorHandlerInterface.php',
         'Symfony\\Component\\Debug\\FatalErrorHandler\\UndefinedFunctionFatalErrorHandler' => __DIR__ . '/..' . '/symfony/debug/FatalErrorHandler/UndefinedFunctionFatalErrorHandler.php',
         'Symfony\\Component\\Debug\\FatalErrorHandler\\UndefinedMethodFatalErrorHandler' => __DIR__ . '/..' . '/symfony/debug/FatalErrorHandler/UndefinedMethodFatalErrorHandler.php',
+        'Symfony\\Component\\DomCrawler\\AbstractUriElement' => __DIR__ . '/..' . '/symfony/dom-crawler/AbstractUriElement.php',
+        'Symfony\\Component\\DomCrawler\\Crawler' => __DIR__ . '/..' . '/symfony/dom-crawler/Crawler.php',
+        'Symfony\\Component\\DomCrawler\\Field\\ChoiceFormField' => __DIR__ . '/..' . '/symfony/dom-crawler/Field/ChoiceFormField.php',
+        'Symfony\\Component\\DomCrawler\\Field\\FileFormField' => __DIR__ . '/..' . '/symfony/dom-crawler/Field/FileFormField.php',
+        'Symfony\\Component\\DomCrawler\\Field\\FormField' => __DIR__ . '/..' . '/symfony/dom-crawler/Field/FormField.php',
+        'Symfony\\Component\\DomCrawler\\Field\\InputFormField' => __DIR__ . '/..' . '/symfony/dom-crawler/Field/InputFormField.php',
+        'Symfony\\Component\\DomCrawler\\Field\\TextareaFormField' => __DIR__ . '/..' . '/symfony/dom-crawler/Field/TextareaFormField.php',
+        'Symfony\\Component\\DomCrawler\\Form' => __DIR__ . '/..' . '/symfony/dom-crawler/Form.php',
+        'Symfony\\Component\\DomCrawler\\FormFieldRegistry' => __DIR__ . '/..' . '/symfony/dom-crawler/FormFieldRegistry.php',
+        'Symfony\\Component\\DomCrawler\\Image' => __DIR__ . '/..' . '/symfony/dom-crawler/Image.php',
+        'Symfony\\Component\\DomCrawler\\Link' => __DIR__ . '/..' . '/symfony/dom-crawler/Link.php',
         'Symfony\\Component\\EventDispatcher\\Debug\\TraceableEventDispatcher' => __DIR__ . '/..' . '/symfony/event-dispatcher/Debug/TraceableEventDispatcher.php',
         'Symfony\\Component\\EventDispatcher\\Debug\\TraceableEventDispatcherInterface' => __DIR__ . '/..' . '/symfony/event-dispatcher/Debug/TraceableEventDispatcherInterface.php',
         'Symfony\\Component\\EventDispatcher\\Debug\\WrappedListener' => __DIR__ . '/..' . '/symfony/event-dispatcher/Debug/WrappedListener.php',
