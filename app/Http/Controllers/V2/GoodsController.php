@@ -282,8 +282,12 @@ class GoodsController extends Base
             $image_path = $goods_image->storeAs(
                 $save_path,$file_name
             );
+            $data=array(
+                'img_name'=>$file_name,
+                'img_path'=>getenv('GOODS_IMAGE').$store_id.'/'.$file_name,
+            );
         }
-        return Base::jsonReturn(200,'获取成功',getenv('GOODS_IMAGE').$store_id.'/'.$file_name);
+        return Base::jsonReturn(200,'获取成功',$data);
     }
 
 }
