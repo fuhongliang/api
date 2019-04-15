@@ -264,17 +264,15 @@ class GoodsController extends Base
         });
         return Base::jsonReturn(200,'编辑成功');
     }
-    function  upImage(Request $request)
+    function  upImage(Request $request, $type)
     {
-        $type=$request->input('type');//1 商品图片
-        $goods_image=$request->file('file');// 描述
-        $store_id=$request->input('store_id');
-        if(!$type)
+        $goods_image=$request->file('file');
+        if(!$goods_image)
         {
             return Base::jsonReturn(1000,'参数缺失');
         }
         $file_name="";
-        if($type == 1)
+        if($type == 'goods_img')
         {
             $save_path = '/shop/store/goods' . '/' . $store_id  . Base::getSysSetPath();
             $entension = $goods_image -> getClientOriginalExtension();
@@ -286,8 +284,11 @@ class GoodsController extends Base
                 'img_name'=>$file_name,
                 'img_path'=>getenv('GOODS_IMAGE').$store_id.'/'.$file_name,
             );
+            return Base::jsonReturn(200,'获取成功',$data);
+        }else{
+            return Base::jsonReturn(2000,'上传失败');
         }
-        return Base::jsonReturn(200,'获取成功',$data);
+
     }
 
 }

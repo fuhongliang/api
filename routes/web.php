@@ -22,14 +22,13 @@ Route::group(['namespace'=>'Socket','prefix'=>'admin','middleware' => 'web'],fun
 
 
 });
-//////////////
+//////////////第一版
 Route::any('test','testController@test');
 Route::any('v1/member_login','V1\MemberController@login');
 Route::any('v1/store_jingying/{store_id}','V1\StoreController@storeJingYingData');//店铺经营
 Route::any('v1/get_echarts','V1\StoreController@getEcharts');
 Route::any('v1/get_echarts_','V1\StoreController@getEcharts_');
-///////////
-
+//
 Route::group(['namespace'=>'V1','prefix'=>'v1','middleware'=>['checktoken']],function(){
 
     Route::any('get_neworder','OrderController@getNewOrder');//获取新订单
@@ -79,7 +78,13 @@ Route::group(['namespace'=>'V1','prefix'=>'v1','middleware'=>['checktoken']],fun
 
 });
 
-Route::group(['namespace'=>'V2','prefix'=>'v2'],function(){
+
+/////////////////第二版
+Route::any('v2/member_login','V2\MemberController@login');
+Route::any('v2/store_jingying/{store_id}','V2\StoreController@storeJingYingData');//店铺经营
+Route::any('v2/get_echarts','V2\StoreController@getEcharts');
+Route::any('v2/get_echarts_','V2\StoreController@getEcharts_');
+Route::group(['namespace'=>'V2','prefix'=>'v2','middleware'=>['checktoken']],function(){
     Route::any('get_neworder','OrderController@getNewOrder');//获取新订单
 
     Route::any('refuse_order','OrderController@refuseOrder');//拒单
@@ -162,6 +167,6 @@ Route::group(['namespace'=>'V2','prefix'=>'v2'],function(){
 
     Route::any('xianshi_info','VoucherController@xianshiInfo');//折扣详情------------
 
-    Route::any('image_upload','GoodsController@upImage');//文件上传------------
+    Route::any('image_upload/{type}','GoodsController@upImage');//文件上传------------
 
 });

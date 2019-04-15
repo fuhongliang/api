@@ -38,15 +38,15 @@ class MemberController extends Base
                     $data['store_avatar']=getenv('WEB_URL').'upload/shop/store/'.$data->store_avatar;
                 }
                 $data->business_licence_number_electronic=getenv('WEB_URL').'upload/shop/store_joinin/06075408577995264.png';
-                $data->token=Base::makeToken($member_name,$member_passwd);
+                $data->token=Base::makeToken($data->store_id,$member_name);
                 $token_data=array(
                     'member_id'=>$memberInfo->member_id,
                     'token'=>$data->token,
                     'add_time'=>time(),
-                    'expire_time'=>time()+24*5*3600
+                    'expire_time'=>time()+24*5*3600,
+                    'store_id'=> $data->store_id
                 );
                 Token::addToken($token_data);
-                Base::makeToken($member_name,$member_passwd);
                 return Base::jsonReturn(200,'获取成功',$data);
             }else{
                 return Base::jsonReturn(1001,'账号或密码错误');

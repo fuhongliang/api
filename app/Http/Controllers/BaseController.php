@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Overtrue\EasySms\EasySms;
 class BaseController extends Controller
@@ -26,10 +27,9 @@ class BaseController extends Controller
         $price_format   = number_format($price,2,'.','');
         return $price_format;
     }
-    static function makeToken($member_name,$member_pwd)
+    static function makeToken($store_id,$member_name)
     {
-        $secret_key=md5(date('y-m-d h:i:s',time()).microtime());
-        return md5($member_name.$member_pwd.$secret_key);
+        return Crypt::encryptString(serialize($store_id));
     }
     static function getSysSetPath(){
         switch(getenv('IMAGE_DIR_TYPE')){
@@ -64,9 +64,8 @@ class BaseController extends Controller
                 $subpath = date("Y",time()) . "/" . date("m",time()) . "/" . date("d",time()) . "/";
 
         }
-
         return $subpath;
-
     }
+
 
 }
