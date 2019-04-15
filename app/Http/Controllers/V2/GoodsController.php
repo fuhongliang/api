@@ -279,12 +279,11 @@ class GoodsController extends Base
             $save_path = '/shop/store/goods' . '/' . $store_id  . Base::getSysSetPath();
             $entension = $goods_image -> getClientOriginalExtension();
             $file_name=md5(microtime()).'.'.$entension;
-            $image_path = $request->file('goods_image')->storeAs(
+            $image_path = $goods_image->storeAs(
                 $save_path,$file_name
             );
         }
         return Base::jsonReturn(200,'获取成功',$file_name);
-
     }
 
 }
