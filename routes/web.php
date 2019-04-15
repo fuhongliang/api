@@ -18,6 +18,7 @@ Route::get('/', function () {
 Route::group(['namespace'=>'Socket','prefix'=>'admin','middleware' => 'web'],function(){
     Route::any('/','IndexController@index');
     Route::any('store_list','IndexController@store_list');
+    Route::any('store_chat','IndexController@store_chat');
 
 
 });

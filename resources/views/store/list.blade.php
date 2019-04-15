@@ -25,7 +25,7 @@
                                 <td>{{ $data->member_name }}</td>
                                 <td>{{ $data->seller_name }}</td>
                                 <td>
-                                    <i class="fa fa-comments"></i>
+                                    <a href="{{URL('admin/store_chat')}}"><i class="fa fa-comments"></i></a>
                                 </td>
                             </tr>
                             @endforeach

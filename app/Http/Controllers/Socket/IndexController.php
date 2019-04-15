@@ -17,4 +17,8 @@ class IndexController extends Controller
         $list=DB::table('store')->paginate(10);
         return view('store.list',compact('list'));
     }
+    function store_chat()
+    {
+        return view('store.chat');
+    }
 }
