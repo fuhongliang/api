@@ -22,6 +22,10 @@ class BaseController extends Controller
             'msg'=>$msg
         ]);
     }
+    static function ncPriceFormat($price) {
+        $price_format   = number_format($price,2,'.','');
+        return $price_format;
+    }
     static function makeToken($member_name,$member_pwd)
     {
         $secret_key=md5(date('y-m-d h:i:s',time()).microtime());
