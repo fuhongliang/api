@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class SwooleController
 {
-    public function onConnect($server, $fd){
+    public function onOpen($server, $fd){
         echo "建立连接通道ID：$fd\n";
     }
     
