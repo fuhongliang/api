@@ -42,7 +42,7 @@ class SwooleServer extends Command
         switch ($action){
             case 'start':
                 $this->info("swoole observer started");
-                self::start();
+                $this->start();
                 break;
             case 'stop':
                 $this->info("stoped");
@@ -54,13 +54,13 @@ class SwooleServer extends Command
                 $this->error("unknown command");
         }
     }
-    static function start(){
+    function start(){
         $server = new \swoole_server("0.0.0.0", 9501);
         $handler = new SwooleController();
-        $server->on('open', [$handler, 'onOpen']);
-        $server->on('message', [$handler, 'onMessage']);
-        $server->on('request', [$handler, 'onRequest']);
-        $server->on('close', [$handler, 'onClose']);
+        $server->on('open', array($handler,'onConnect'));
+        $server->on('message', array($handler, 'onMessage'));
+        $server->on('request', array($handler, 'onRequest'));
+        $server->on('close', array($handler, 'onClose'));
         $server->start();
     }
 }
