@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Controllers\SwooleController;
 use Illuminate\Console\Command;
 
 class SwooleServer extends Command
