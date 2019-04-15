@@ -161,4 +161,6 @@ Route::group(['namespace'=>'V2','prefix'=>'v2'],function(){
 
     Route::any('xianshi_info','VoucherController@xianshiInfo');//折扣详情------------
 
+    Route::any('image_upload','GoodsController@upImage');//文件上传------------
+
 });

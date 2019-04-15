@@ -26,9 +26,9 @@ class GoodsController extends Base
         $goods_storage=$request->input('goods_storage');//库存
         $sell_time=$request->input('sell_time'); // 出售时间
         $goods_desc=$request->input('goods_desc');// 描述
-        $goods_image=$request->file('goods_image');// 描述
+        $file_name=$request->input('image_path');// 描述
 
-        if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price || !$goods_image)
+        if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price)
         {
             return Base::jsonReturn(1000,'参数缺失');
         }
@@ -36,14 +36,6 @@ class GoodsController extends Base
         {
             $goods_storage=999999999;
         }
-
-        $save_path = '/shop/store/goods' . '/' . $store_id  . Base::getSysSetPath();
-        $entension = $goods_image -> getClientOriginalExtension();
-        $file_name=md5(microtime()).'.'.$entension;
-        $image_path = $request->file('goods_image')->storeAs(
-            $save_path,$file_name
-        );
-
         $bind_class=Store::getStoreBindClass(['store_id'=>$store_id], ['class_1','class_2','class_3']);
 
         $common_array=array();
@@ -216,7 +208,7 @@ class GoodsController extends Base
         $goods_storage=$request->input('goods_storage');//库存
         $sell_time=$request->input('sell_time'); // 出售时间
         $goods_desc=$request->input('goods_desc');// 描述
-        $goods_image=$request->file('goods_image');// 描述
+        $file_name=$request->input('image_path');// 描述
         if(!$goods_id || !$store_id)
         {
         return Base::jsonReturn(1000,'参数缺失');
@@ -254,14 +246,8 @@ class GoodsController extends Base
         {
             $goods_comm['goods_body']=$goods_desc;
         }
-        if($goods_image)
+        if($file_name)
         {
-            $save_path = '/shop/store/goods' . '/' . $store_id  . Base::getSysSetPath();
-            $entension = $goods_image -> getClientOriginalExtension();
-            $file_name=md5(microtime()).'.'.$entension;
-            $image_path = $request->file('goods_image')->storeAs(
-                $save_path,$file_name
-            );
             $goods_array['goods_image']=$file_name;
             $goods_comm['goods_image']=$file_name;
         }
@@ -276,8 +262,29 @@ class GoodsController extends Base
             Goods::upGoodsField(['goods_id'=>$goods_id],$goods_array);
             Goods::upGoodsCommonField(['goods_commonid'=>$field->goods_commonid],$goods_comm);
         });
-
         return Base::jsonReturn(200,'编辑成功');
+    }
+    function  upImage(Request $request)
+    {
+        $type=$request->input('type');//1 商品图片
+        $goods_image=$request->file('file');// 描述
+        $store_id=$request->input('store_id');
+        if(!$type)
+        {
+            return Base::jsonReturn(1000,'参数缺失');
+        }
+        $file_name="";
+        if($type == 1)
+        {
+            $save_path = '/shop/store/goods' . '/' . $store_id  . Base::getSysSetPath();
+            $entension = $goods_image -> getClientOriginalExtension();
+            $file_name=md5(microtime()).'.'.$entension;
+            $image_path = $request->file('goods_image')->storeAs(
+                $save_path,$file_name
+            );
+        }
+        return Base::jsonReturn(200,'获取成功',$file_name);
 
     }
+
 }
