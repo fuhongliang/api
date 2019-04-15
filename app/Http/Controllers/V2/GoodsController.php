@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V2;
 use App\Http\Controllers\BaseController as Base;
 use App\model\V2\Goods;
 use App\model\V2\Store;
+use App\model\V2\Token;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -267,6 +268,7 @@ class GoodsController extends Base
     function  upImage(Request $request, $type)
     {
         $goods_image=$request->file('file');
+        $token=$request->header('token');
         if(!$goods_image)
         {
             return Base::jsonReturn(1000,'参数缺失');
@@ -274,7 +276,8 @@ class GoodsController extends Base
         $file_name="";
         if($type == 'goods_img')
         {
-            $save_path = '/shop/store/goods' . '/' . $store_id  . Base::getSysSetPath();
+            $tokenInfo=Token::getTokenField(['token'=>$token],['store_id'])
+            $save_path = '/shop/store/goods' . '/' . $tokenInfo->store_id  . Base::getSysSetPath();
             $entension = $goods_image -> getClientOriginalExtension();
             $file_name=md5(microtime()).'.'.$entension;
             $image_path = $goods_image->storeAs(
