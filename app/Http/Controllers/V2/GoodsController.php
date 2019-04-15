@@ -26,7 +26,7 @@ class GoodsController extends Base
         $goods_storage=$request->input('goods_storage');//库存
         $sell_time=$request->input('sell_time'); // 出售时间
         $goods_desc=$request->input('goods_desc');// 描述
-        $file_name=$request->input('image_path');// 描述
+        $file_name=$request->input('img_name');// 描述
 
         if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price)
         {
