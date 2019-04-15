@@ -20,4 +20,8 @@ class SwooleController
     public function onMessage($server, $frame){
         $server->push($frame->fd, "this is server");
     }
+    public function onRequest($request, $response){
+
+    }
+
 }

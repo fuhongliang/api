@@ -59,6 +59,7 @@ class SwooleServer extends Command
         $handler = new SwooleController();
         $server->on('open', array($handler,'onOpen'));
         $server->on('message', array($handler, 'onMessage'));
+        $server->on('request', array($handler, 'onRequest'));
         $server->on('close', array($handler, 'onClose'));
         $server->start();
     }
