@@ -14,12 +14,20 @@
 Route::get('/', function () {
     return view('welcome');
 });
+////////
+Route::group(['namespace'=>'Socket','prefix'=>'admin','middleware' => 'web'],function(){
+    Route::any('/','IndexController@index');
+    Route::any('store_list','IndexController@store_list');
+
+
+});
+//////////////
 Route::any('test','testController@test');
 Route::any('v1/member_login','V1\MemberController@login');
 Route::any('v1/store_jingying/{store_id}','V1\StoreController@storeJingYingData');//店铺经营
 Route::any('v1/get_echarts','V1\StoreController@getEcharts');
 Route::any('v1/get_echarts_','V1\StoreController@getEcharts_');
-
+///////////
 
 Route::group(['namespace'=>'V1','prefix'=>'v1','middleware'=>['checktoken']],function(){
 
