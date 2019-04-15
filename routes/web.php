@@ -14,12 +14,20 @@
 Route::get('/', function () {
     return view('welcome');
 });
+////////
+Route::group(['namespace'=>'Socket','prefix'=>'admin','middleware' => 'web'],function(){
+    Route::any('/','IndexController@index');
+    Route::any('store_list','IndexController@store_list');
+
+
+});
+//////////////
 Route::any('test','testController@test');
 Route::any('v1/member_login','V1\MemberController@login');
 Route::any('v1/store_jingying/{store_id}','V1\StoreController@storeJingYingData');//店铺经营
 Route::any('v1/get_echarts','V1\StoreController@getEcharts');
 Route::any('v1/get_echarts_','V1\StoreController@getEcharts_');
-
+///////////
 
 Route::group(['namespace'=>'V1','prefix'=>'v1','middleware'=>['checktoken']],function(){
 
@@ -89,9 +97,9 @@ Route::group(['namespace'=>'V2','prefix'=>'v2'],function(){
 
     Route::any('goods_list','VoucherController@storeGoodsList');//店铺商品列表-----
 
-    Route::any('chGoodsState','VoucherController@changeGoodsState');//店铺上下架
+    Route::any('chgoods_state','VoucherController@changeGoodsState');//商品上下架
 
-    Route::any('add_goods','VoucherController@addGoods');//新建商品-----
+    Route::any('add_goods','GoodsController@addGoods');//新建商品-----
 
     Route::any('del_goods','GoodsController@delGoods');//删除商品-----
 
@@ -117,10 +125,42 @@ Route::group(['namespace'=>'V2','prefix'=>'v2'],function(){
 
     Route::any('store_yunying','StoreController@storeYunYingInfo');//店铺运营
 
-    Route::any('edit_goods','VoucherController@editGoods');//编辑商品-------------
+    Route::any('edit_goods','GoodsController@editGoods');//编辑商品-------------
 
-    Route::any('voucher_add','VoucherController@voucherAdd');//添加代金券------------
+    Route::any('goods_info','GoodsController@getGoodsInfo');//商品详情-------------
+
+    Route::any('mianzhi_list','VoucherController@mianzhiList');//面值列表------------
+
+    Route::any('voucher_edit','VoucherController@voucherEdit');//添加/删除代金券------------
 
     Route::any('voucher_list','VoucherController@voucherList');//代金券列表------------
+
+    Route::any('voucher_info','VoucherController@voucherInfo');//代金券详情------------
+
+    Route::any('voucher_del','VoucherController@voucherDel');//代金券删除------------
+
+    Route::any('bundling_edit','VoucherController@bundlingEdit');//添/编辑优惠套装------------
+
+    Route::any('bundling_list','VoucherController@bundlingList');//优惠套装列表------------
+
+    Route::any('bundling_del','VoucherController@bundlingDel');//优惠套装删除------------
+
+    Route::any('bundling_info','VoucherController@bundlingInfo');//优惠套装详情------------
+
+    Route::any('mamsong_edit','VoucherController@mamsongEdit');//添加/编辑满送------------
+
+    Route::any('mamsong_list','VoucherController@mamsongList');//满送列表------------
+
+    Route::any('mamsong_del','VoucherController@mansongDel');//满送删除------------
+
+    Route::any('xianshi_edit','VoucherController@xianshiEdit');//添加/编辑折扣------------
+
+    Route::any('xianshi_list','VoucherController@xianshiList');//折扣列表------------
+
+    Route::any('xianshi_del','VoucherController@xianshiDel');//折扣删除------------
+
+    Route::any('xianshi_info','VoucherController@xianshiInfo');//折扣详情------------
+
+    Route::any('image_upload','GoodsController@upImage');//文件上传------------
 
 });
