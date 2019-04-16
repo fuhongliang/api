@@ -46,11 +46,15 @@ class SwooleController
     }
 
     public function onMessage($server, $frame){
+        global $online;
         $data=json_decode($frame->data);
         if($data->type == 1)//对个人
         {
-            $result=self::pushMsg($data->msg,1001);
-            $server->push($data->target, json_encode($result));
+            if(in_array($data->target,$online))
+            {
+                $result=self::pushMsg($data->msg,1001);
+                $server->push($data->target, json_encode($result));
+            }
         }
     }
     public function onRequest($request, $response){
