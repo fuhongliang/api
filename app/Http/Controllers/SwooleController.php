@@ -43,7 +43,7 @@ class SwooleController
 
     public function onMessage($server, $frame){
         echo $frame->fd;
-        var_dump($server->data);
+        var_dump($frame->data);
     }
     public function onRequest($request, $response){
         echo "这是request";
