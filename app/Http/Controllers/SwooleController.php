@@ -18,7 +18,6 @@ class SwooleController
         if(!self::checkToken($token))
         {
             $this->onClose($server,$request->fd);
-            exit;
         }else{
             echo "已连接上";
         }
