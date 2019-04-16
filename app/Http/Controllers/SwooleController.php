@@ -22,7 +22,7 @@ class SwooleController
         }else{
             global $online;
             $online[$request->fd]=['fd'=>$request->fd,'uuid'=>time()];//记录所有登录的信息
-            $push_data=self::oMsg('users','zhangsan',1);
+            $push_data=self::onlineMsg('users','zhangsan');
             foreach ($online as $val) {
                 if($val['fd'] != $request->fd) {
                     $server->push($val['fd'], json_encode($push_data));
@@ -34,7 +34,7 @@ class SwooleController
     public function onClose($server, $fd){
         global $online;
         unset($online[$fd]);
-        $push_data=self::oMsg('users','zhangsan',2);
+        $push_data=self::oflineMsg('users','zhangsan');
         foreach($online as $fds)
         {
             $server->send($fds, json_encode($push_data));
@@ -45,7 +45,8 @@ class SwooleController
         $data=json_decode($frame->data);
         if($data->type == 1)//对个人
         {
-            $server->push($data->target, 666);
+            $data=self::pushMsg($data->msg,1001);
+            $server->push($data->target, json_encode($data));
         }
     }
     public function onRequest($request, $response){
@@ -53,15 +54,33 @@ class SwooleController
     }
 
     //////
-    static function oMsg($target_type,$username,$type)
+    static function onlineMsg($target_type,$username)
     {
         return array(
             'username'=>$username,
-            'msg'=>$type==1?"上线":"下线",
+            'msg'=>"上线",
             'type'=>1,//1 发送给个人  2 全体
             'target'=>'',
             'from'=>'admin'
             );
     }
-
+    static function oflineMsg($target_type,$username)
+    {
+        return array(
+            'username'=>$username,
+            'msg'=>"下线",
+            'type'=>1,//1 发送给个人  2 全体
+            'target'=>'',
+            'from'=>'admin'
+        );
+    }
+    static function pushMsg($msg,$type)
+    {
+        return array(
+            'msg'=>$msg,
+            'type'=>$type,//1000 系统消息  ， 10001 聊天消息
+            'target'=>'',
+            'from'=>'admin'
+        );
+    }
 }

@@ -105,9 +105,9 @@
                 console.log("关闭成功");
             };
             websocket.onmessage = function (evt) {
-                console.log(evt.data);
                 var jsonData = eval("("+evt.data+")");
-                $('#tooltip').html(jsonData.username+jsonData.msg);
+                console.log(jsonData);
+                //$('#tooltip').html(jsonData.username+jsonData.msg);
 
             };
             websocket.onerror = function (evt, e) {
@@ -117,7 +117,7 @@
                 var json = {
                     'target':$('input[name="store_id"]').val(),
                     'msg':$('input[name="message"]').val(),
-                    'type':1,
+                    'type':1,//1对个人
                     'from':'admin',
                 };
                 websocket.send(JSON.stringify(json));
