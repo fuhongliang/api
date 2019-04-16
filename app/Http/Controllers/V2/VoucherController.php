@@ -47,10 +47,12 @@ class VoucherController extends Base
             return Base::jsonReturn(1000,  '参数缺失');
         }
         $res=Goods::changeGoodsState($goods_id,$store_id);
-        if ($res) {
-            return Base::jsonReturn(200,  '上下架成功');
-        } else {
-            return Base::jsonReturn(2000,  '上下架失败');
+        if ($res == 1) {
+            return Base::jsonReturn(200,  '上架成功');
+        } elseif($res == 0) {
+            return Base::jsonReturn(200,  '下架成功');
+        }else{
+            return Base::jsonReturn(2000,  '操作失败');
         }
 
     }

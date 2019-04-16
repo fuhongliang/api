@@ -67,7 +67,7 @@ class Goods extends Model
         DB::transaction(function () use ($goods_id,$store_id,$goods_state){
             DB::table('goods')->where(['goods_id'=>$goods_id,'store_id'=>$store_id])->update(['goods_state' => $goods_state]);
         });
-        return true;
+        return $goods_state;
     }
     static function getGoodsField($condition,$value)
     {
