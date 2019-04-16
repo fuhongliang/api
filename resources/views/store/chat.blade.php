@@ -116,8 +116,10 @@
                 console.log('错误: ' + evt.data);
             };
             $("#send").click(function(){
-                var message=$('input[name="message"]').val();
-                websocket.send(message);
+                var data=new Array()
+                data['message']=$('input[name="message"]').val();
+                data['from']='admin';
+                websocket.send(data);
             });
         });
     </script>
