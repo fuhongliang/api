@@ -10,11 +10,11 @@ class SwooleController
 {
     static function checkToken($token)
     {
-        echo $token;
+        return true;
     }
 
     public function onOpen($server, $request){
-        $token=$request->get;//获取请求的参数
+        $token=$request->get;//获取请求的参数 数组格式
         if(!self::checkToken($token))
         {
             $this->onClose($server,$request->fd);
