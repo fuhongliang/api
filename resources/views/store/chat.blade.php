@@ -107,7 +107,7 @@
             websocket.onmessage = function (evt) {
                 var jsonData = eval("("+evt.data+")");
                 console.log(jsonData);
-                $('#admin').html(jsonData.msg);
+                $('#admin').append('<div class="direct-chat-text">'+jsonData.msg+'</div>');
 
             };
             websocket.onerror = function (evt, e) {

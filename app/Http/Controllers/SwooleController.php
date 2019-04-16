@@ -33,12 +33,16 @@ class SwooleController
     
     public function onClose($server, $fd){
         global $online;
-        unset($online[$fd]);
-        $push_data=self::oflineMsg('users','zhangsan');
-        foreach($online as $fds)
+        if(!empty($online))
         {
-            $server->send($fds, json_encode($push_data));
+            unset($online[$fd]);
+            $push_data=self::oflineMsg('users','zhangsan');
+            foreach($online as $fds)
+            {
+                $server->send($fds, json_encode($push_data));
+            }
         }
+
     }
 
     public function onMessage($server, $frame){
