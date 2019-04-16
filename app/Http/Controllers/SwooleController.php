@@ -14,7 +14,7 @@ class SwooleController
     }
 
     public function onOpen($server, $request){
-        dd($request->get());
+        dd($request->get);
     }
     
     public function onClose($server, $fd){
