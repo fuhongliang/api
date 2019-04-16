@@ -55,34 +55,12 @@ class SwooleServer extends Command
         }
     }
     function start(){
-        $serv = new \swoole_websocket_server("0.0.0.0", 9501);
-
-//监听WebSocket连接打开事件
-        $serv->on('open', function($server, $req) {
-            global $users;
-            global $reqs;
-            $reqs[]=$req->fd;
-            $users[]=array('qq'=>time(),'fd'=>$req->fd);//记录qq号
-            echo "客户端: ".$req->fd."上线\n";
-
-            foreach($reqs as $fd){
-                $server->push($fd, $users);
-            }
-
-        });
-
-        $serv->on('message', function($server, $frame) {
-            global $reqs;
-            echo "客户端".$frame->fd."说: ".$frame->data."\n";
-            foreach($reqs as $fd){
-                $server->push($fd, $frame->data);
-            }
-        });
-
-        $serv->on('close', function($server, $fd) {
-            echo "connection close: ".$fd."\n";
-        });
-
-        $serv->start();
+        $this->server = new \swoole_server("0.0.0.0", 9501);
+        $handler = new SwooleController();
+        $this->server->on('open', array($handler,'onOpen'));
+        $this->server->on('message', array($handler, 'onMessage'));
+        $this->server->on('request', array($handler, 'onRequest'));
+        $this->server->on('close', array($handler, 'onClose'));
+        $this->server->start();
     }
 }
