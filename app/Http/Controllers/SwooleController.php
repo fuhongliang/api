@@ -23,7 +23,9 @@ class SwooleController
             global $online;
             $online[$request->fd]=['fd'=>$request->fd,'uuid'=>time()];
             foreach ($server->connections as $fd) {
-                $server->push($fd, json_encode($online));
+                if($fd != $request->fd) {
+                    $server->push($fd, json_encode($online));
+                }
             }
         }
     }
@@ -32,7 +34,7 @@ class SwooleController
         global $online;
         unset($online[$fd]);
         foreach ($server->connections as $fd_) {
-            if($fd !== $fd_)
+            if($fd != $fd_)
             {
                 $server->push($fd, $fd.'断开连接通道');
             }
