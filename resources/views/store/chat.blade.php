@@ -117,7 +117,7 @@
             };
             $("#send").click(function(){
                 var json = {
-                    "message": $('input[name="message"]').val();
+                    "message": $('input[name="message"]').val(),
                     "from": 'admin'
                 };
                 websocket.send(json);
