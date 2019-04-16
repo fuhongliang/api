@@ -8,14 +8,14 @@ use Illuminate\Http\Request;
 
 class SwooleController
 {
-    static function checkToken($token)
+    static function checkToken($data)
     {
-        return false;
+        return true;
     }
 
     public function onOpen($server, $request){
-        $token=$request->get;//获取请求的参数 数组格式
-        if(!self::checkToken($token))
+        $data=$request->get;//获取请求的参数 数组格式
+        if(!self::checkToken($data))
         {
             $this->onClose($server,$request->fd);
         }else{
