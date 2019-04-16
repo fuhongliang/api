@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Console\\Commands\\SwooleServer' => $baseDir . '/app/Console/Commands/SwooleServer.php',
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
     'App\\Exceptions\\Handler' => $baseDir . '/app/Exceptions/Handler.php',
     'App\\Http\\Controllers\\Auth\\ForgotPasswordController' => $baseDir . '/app/Http/Controllers/Auth/ForgotPasswordController.php',
@@ -51,6 +52,12 @@ return array(
     'App\\model\\V2\\Store' => $baseDir . '/app/model/V2/Store.php',
     'App\\model\\V2\\Token' => $baseDir . '/app/model/V2/Token.php',
     'App\\model\\V2\\Voucher' => $baseDir . '/app/model/V2/Voucher.php',
+    'Asm89\\Stack\\Cors' => $vendorDir . '/asm89/stack-cors/src/Asm89/Stack/Cors.php',
+    'Asm89\\Stack\\CorsService' => $vendorDir . '/asm89/stack-cors/src/Asm89/Stack/CorsService.php',
+    'Barryvdh\\Cors\\HandleCors' => $vendorDir . '/barryvdh/laravel-cors/src/HandleCors.php',
+    'Barryvdh\\Cors\\HandlePreflight' => $vendorDir . '/barryvdh/laravel-cors/src/HandlePreflight.php',
+    'Barryvdh\\Cors\\LumenServiceProvider' => $vendorDir . '/barryvdh/laravel-cors/src/LumenServiceProvider.php',
+    'Barryvdh\\Cors\\ServiceProvider' => $vendorDir . '/barryvdh/laravel-cors/src/ServiceProvider.php',
     'Carbon\\Carbon' => $vendorDir . '/nesbot/carbon/src/Carbon/Carbon.php',
     'Carbon\\CarbonInterval' => $vendorDir . '/nesbot/carbon/src/Carbon/CarbonInterval.php',
     'Carbon\\Exceptions\\InvalidDateException' => $vendorDir . '/nesbot/carbon/src/Carbon/Exceptions/InvalidDateException.php',
