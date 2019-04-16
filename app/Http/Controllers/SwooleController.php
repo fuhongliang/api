@@ -8,13 +8,13 @@ use Illuminate\Http\Request;
 
 class SwooleController
 {
-    public function onOpen($server, $fd){
-        echo $fd."上线";
+    public function onOpen($server, $req){
+        echo "客户端: ".$req->fd."上线\n";
     }
     
     public function onClose($server, $fd){
         //添加警报
-        echo "断开连接通道";
+        echo $fd."断开连接通道";
     }
 
     public function onMessage($server, $frame){
