@@ -55,7 +55,7 @@ class SwooleServer extends Command
                 $this->error("unknown command");
         }
     }
-    function start(Request $request){
+    function start(){
         $this->server = new \swoole_websocket_server("0.0.0.0", 9501);
         $handler = new SwooleController();
         $this->server->on('open', array($handler,'onOpen'));
