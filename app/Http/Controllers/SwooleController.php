@@ -24,7 +24,6 @@ class SwooleController
             $online[$request->fd]=['fd'=>$request->fd,'uuid'=>time()];//记录所有登录的信息
             $push_data=array(
                 'target_type'=>'chatgroups',//target_type	发送的目标类型；users：给用户发消息，chatgroups：给群发消息，chatrooms：给聊天室发消息
-                'target'=>$online,
                 'msg'=>'用户登录',
                 'type'=>'txt',
                 'from'=>'admin'
@@ -33,12 +32,11 @@ class SwooleController
                     //type	消息类型；txt:文本消息，img：图片消息，loc：位置消息，audio：语音消息，video：视频消息，file：文件消息
                     //from	表示消息发送者;无此字段Server会默认设置为“from”:“admin”，有from字段但值为空串(“”)时请求失败
             );
-            var_dump($online);
-//            foreach ($online as $fd) {
-//                if($fd != $request->fd) {
-//                    $server->push($fd, json_encode($push_data));
-//                }
-//            }
+            foreach ($online as $val) {
+                if($val['fd'] != $request->fd) {
+                    $server->push($fd, json_encode($push_data));
+                }
+            }
         }
     }
     
