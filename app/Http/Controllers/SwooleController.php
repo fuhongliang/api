@@ -8,7 +8,13 @@ use Illuminate\Http\Request;
 
 class SwooleController
 {
+    public function checkToken($token)
+    {
+        echo $token;
+    }
+
     public function onOpen($server, $req){
+        echo $server->data;
         echo "客户端: ".$req->fd."上线\n";
     }
     

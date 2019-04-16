@@ -82,14 +82,13 @@
             </div>
             <!-- /.box-body -->
             <div class="box-footer">
-                <form action="#" method="post">
                     <div class="input-group">
+                        <input type="text" name="token" value="962e376d8f251d5eae046ae54fb5e985" class="form-control">
                         <input type="text" name="message" placeholder="Type Message ..." class="form-control">
                         <span class="input-group-btn">
-                        <button type="submit" class="btn btn-success btn-flat">Send</button>
+                        <button type="submit" class="btn btn-success btn-flat" id="send">Send</button>
                       </span>
                     </div>
-                </form>
             </div>
             <!-- /.box-footer-->
         </div>
@@ -98,7 +97,8 @@
     <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
     <script>
         $(document).ready(function(){
-            var wsServer = 'ws://47.111.27.189:9501';
+            var token=$('input[name="token"]').val();
+            var wsServer = 'ws://47.111.27.189:9501/token='+token;
             var websocket = new WebSocket(wsServer);
             websocket.onopen = function (evt) {
                 console.log("连接成功");

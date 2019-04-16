@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\SwooleController;
+use Illuminate\Http\Request;
 use Illuminate\Console\Command;
 
 class SwooleServer extends Command
@@ -54,7 +55,7 @@ class SwooleServer extends Command
                 $this->error("unknown command");
         }
     }
-    function start(){
+    function start(Request $request){
         $this->server = new \swoole_websocket_server("0.0.0.0", 9501);
         $handler = new SwooleController();
         $this->server->on('open', array($handler,'onOpen'));
