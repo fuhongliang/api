@@ -190,6 +190,8 @@ class GoodsController extends Base
         $goods_com=Goods::getGoodsCommonInfo(['goods_commonid'=>$goods_info->goods_commonid],['goods_sale_time','goods_body']);
         $goods_info->goods_body=$goods_com->goods_body;
         $goods_info->sell_time=unserialize($goods_com->goods_sale_time);
+        $goods_info->goods_image=getenv('GOODS_IMAGE').$store_id.'/'.$goods_info->goods_image;
+
         if($goods_info)
         {
             return Base::jsonReturn(200,'获取成功',$goods_info);
