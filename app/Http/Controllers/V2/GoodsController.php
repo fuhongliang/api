@@ -285,7 +285,7 @@ class GoodsController extends Base
             );
             $data=array(
                 'img_name'=>$file_name,
-                'img_path'=>getenv('GOODS_IMAGE').$store_id.'/'.$file_name,
+                'img_path'=>getenv('GOODS_IMAGE').$tokenInfo->store_id.'/'.$file_name,
             );
             return Base::jsonReturn(200,'获取成功',$data);
         }else{
