@@ -122,8 +122,9 @@ class Store extends Model
             {
                 foreach ($ids as $k=>$goods_id)
                 {
-                    $fields=['goods_id','goods_name','goods_price','goods_marketprice','goods_state','goods_storage'];
+                    $fields=['goods_id','goods_name','goods_price','goods_marketprice','goods_state','goods_storage','goods_image'];
                     $goods_info[$k]=Goods::getGoodsInfo(['goods_id'=>$goods_id],$fields);
+                    $goods_info[$k]->goods_image=getenv('GOODS_IMAGE').$store_id.'/'.$goods_info[$k]->goods_image;
                 }
             }
             return $goods_info;
