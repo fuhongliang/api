@@ -33,11 +33,12 @@ class SwooleController
                     //type	消息类型；txt:文本消息，img：图片消息，loc：位置消息，audio：语音消息，video：视频消息，file：文件消息
                     //from	表示消息发送者;无此字段Server会默认设置为“from”:“admin”，有from字段但值为空串(“”)时请求失败
             );
-            foreach ($online as $fd) {
-                if($fd != $request->fd) {
-                    $server->push($fd, json_encode($push_data));
-                }
-            }
+            var_dump($online);
+//            foreach ($online as $fd) {
+//                if($fd != $request->fd) {
+//                    $server->push($fd, json_encode($push_data));
+//                }
+//            }
         }
     }
     
