@@ -13,9 +13,9 @@ class SwooleController
         echo $token;
     }
 
-    public function onOpen($server, $req){
-        echo $server->data;
-        echo "客户端: ".$req->fd."上线\n";
+    public function onOpen($server, $request){
+        echo $request->data;
+        echo "客户端: ".$request->fd."上线\n";
     }
     
     public function onClose($server, $fd){
