@@ -220,28 +220,28 @@ class GoodsController extends Base
             return Base::jsonReturn(2000,'删除失败');
         }
     }
-    public function getGoodsInfo(Request $request)
-    {
-        $store_id=$request->input('store_id');
-        $goods_id=$request->input('goods_id');//
-        if(!$store_id || !$goods_id)
-        {
-            return Base::jsonReturn(1000,'参数缺失');
-        }
-        $field=['goods_id','goods_commonid','goods_image','goods_name','goods_stcid','goods_marketprice','goods_price','goods_storage'];
-        $goods_info=Goods::getGoodsInfo(['store_id'=>$store_id,'goods_id'=>$goods_id],$field);
-        $goods_com=Goods::getGoodsCommonInfo(['goods_commonid'=>$goods_info->goods_commonid],['goods_sale_time','goods_body']);
-        $goods_info->goods_body=$goods_com->goods_body;
-        $goods_info->sell_time=unserialize($goods_com->goods_sale_time);
-        $goods_info->goods_image=getenv('GOODS_IMAGE').$store_id.'/'.$goods_info->goods_image;
-
-        if($goods_info)
-        {
-            return Base::jsonReturn(200,'获取成功',$goods_info);
-        }else{
-            return Base::jsonReturn(2000,'获取失败');
-        }
-    }
+//    public function getGoodsInfo(Request $request)
+//    {
+//        $store_id=$request->input('store_id');
+//        $goods_id=$request->input('goods_id');//
+//        if(!$store_id || !$goods_id)
+//        {
+//            return Base::jsonReturn(1000,'参数缺失');
+//        }
+//        $field=['goods_id','goods_commonid','goods_image','goods_name','goods_stcid','goods_marketprice','goods_price','goods_storage'];
+//        $goods_info=Goods::getGoodsInfo(['store_id'=>$store_id,'goods_id'=>$goods_id],$field);
+//        $goods_com=Goods::getGoodsCommonInfo(['goods_commonid'=>$goods_info->goods_commonid],['goods_sale_time','goods_body']);
+//        $goods_info->goods_body=$goods_com->goods_body;
+//        $goods_info->sell_time=unserialize($goods_com->goods_sale_time);
+//        $goods_info->goods_image=getenv('GOODS_IMAGE').$store_id.'/'.$goods_info->goods_image;
+//
+//        if($goods_info)
+//        {
+//            return Base::jsonReturn(200,'获取成功',$goods_info);
+//        }else{
+//            return Base::jsonReturn(2000,'获取失败');
+//        }
+//    }
 
     public function editGoods(Request $request)
     {
@@ -329,9 +329,9 @@ class GoodsController extends Base
                 $save_path,$file_name
             );
             $data=array(
-                'img_name'=>$file_name,
-                'img_path'=>getenv('GOODS_IMAGE').$tokenInfo->store_id.'/'.$file_name,
-            );
+            'img_name'=>$file_name,
+            'img_path'=>getenv('GOODS_IMAGE').$tokenInfo->store_id,
+        );
             return Base::jsonReturn(200,'获取成功',$data);
         }else{
             return Base::jsonReturn(2000,'上传失败');
