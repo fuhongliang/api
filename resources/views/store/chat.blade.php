@@ -2,7 +2,7 @@
     <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
     <script>
         $(document).ready(function(){
-            var wsServer = 'ws://47.111.27.189:2346';
+            var wsServer = 'ws://47.111.27.189:9501';
             var websocket = new WebSocket(wsServer);
             console.log(websocket);
             websocket.onopen = function (evt) {

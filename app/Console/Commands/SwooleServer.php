@@ -55,7 +55,7 @@ class SwooleServer extends Command
         }
     }
     function start(){
-        $serv = new \swoole_websocket_server("0.0.0.0", 2346);
+        $serv = new \swoole_websocket_server("0.0.0.0", 9501);
 
 //监听WebSocket连接打开事件
         $serv->on('open', function($server, $req) {
