@@ -21,7 +21,7 @@ class SwooleController
             $this->onClose($server,$request->fd);
         }else{
             global $online;
-            array_push($online,['fd'=>$request->fd,'uuid'=>time()]);
+            $online[$request->fd]=['fd'=>$request->fd,'uuid'=>time()];
             foreach ($server->connections as $fd) {
                 $server->push($fd, json_encode($online));
             }
