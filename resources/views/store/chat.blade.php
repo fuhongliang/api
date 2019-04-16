@@ -13,7 +13,7 @@
                 <h3 class="box-title">聊天</h3>
 
                 <div class="box-tools pull-right">
-                    <span data-toggle="tooltip" title="3 New Messages" class="badge bg-green">3</span>
+                    <span data-toggle="tooltip" title="3 New Messages" class="badge bg-green" id="tooltip"></span>
                     <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
                     </button>
                     <button type="button" class="btn btn-box-tool" data-toggle="tooltip" title="Contacts" data-widget="chat-pane-toggle">
@@ -107,8 +107,10 @@
                 console.log("关闭成功");
             };
             websocket.onmessage = function (evt) {
-                console.log('收到服务器信息');
-                alert(evt.data);
+                console.log(evt.data);
+                var jsonData = eval("("+evt.data+")");
+                $('#tooltip').html(jsonData.msg);
+
             };
             websocket.onerror = function (evt, e) {
                 console.log('错误: ' + evt.data);
