@@ -297,7 +297,7 @@ class GoodsController extends Base
             $goods_array['goods_image']=$file_name;
             $goods_comm['goods_image']=$file_name;
         }
-        $field=Goods::getGoodsInfo(['goods_id'=>$goods_id],['goods_commonid','goods_image']);
+        $field=Goods::getGoodsInfo(['goods_id'=>$goods_id],['a.goods_commonid','a.goods_image']);
         if(!empty($field->goods_image))
         {
             $file_name=$field->goods_image;
