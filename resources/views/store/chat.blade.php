@@ -109,7 +109,7 @@
             websocket.onmessage = function (evt) {
                 console.log(evt.data);
                 var jsonData = eval("("+evt.data+")");
-                $('#tooltip').html(jsonData.msg);
+                $('#tooltip').html(jsonData.username+jsonData.msg);
 
             };
             websocket.onerror = function (evt, e) {
