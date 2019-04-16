@@ -29,7 +29,8 @@ class SwooleController
     }
     
     public function onClose($server, $fd){
-        //添加警报
+        global $online;
+        unset($online[$fd]);
         echo $fd."断开连接通道";
     }
 

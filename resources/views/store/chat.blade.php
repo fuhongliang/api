@@ -107,7 +107,8 @@
                 console.log("关闭成功");
             };
             websocket.onmessage = function (evt) {
-                console.log('收到服务器信息: ' + evt.data);
+                console.log('收到服务器信息');
+                alert(evt.data);
             };
             websocket.onerror = function (evt, e) {
                 console.log('错误: ' + evt.data);
