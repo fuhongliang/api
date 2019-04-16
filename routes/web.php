@@ -101,9 +101,9 @@ Route::group(['namespace'=>'V2','prefix'=>'v2','middleware'=>['checktoken']],fun
 
     Route::any('sort_goods_class','StoreController@sortStoreGoodsClass');//店铺商品分类排序
 
-    Route::any('goods_list','VoucherController@storeGoodsList');//店铺商品列表-----
+    Route::any('goods_list','GoodsController@storeGoodsList');//店铺商品列表-----
 
-    Route::any('chgoods_state','VoucherController@changeGoodsState');//商品上下架
+    Route::any('chgoods_state','GoodsController@changeGoodsState');//商品上下架
 
     Route::any('add_goods','GoodsController@addGoods');//新建商品-----
 

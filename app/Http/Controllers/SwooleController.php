@@ -19,7 +19,10 @@ class SwooleController
         {
             $this->onClose($server,$request->fd);
         }else{
-            echo "已连接上";
+            $data=array(
+                ''
+            );
+            return
         }
     }
     

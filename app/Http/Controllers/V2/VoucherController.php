@@ -14,48 +14,8 @@ use Illuminate\Support\Facades\DB;
 
 class VoucherController extends Base
 {
-    /** 商品列表  第二版
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function storeGoodsList(Request $request)
-    {
-        $class_id = $request->input('class_id');
-        $store_id = $request->input('store_id');
-        if (empty($store_id)) {
-            return Base::jsonReturn(1000,  '参数缺失');
-        }
-        if(empty($class_id)) {
-            $stcId = Store::getStoreClassStcId(['store_id' => $store_id], ['stc_id']);
-            $class_id=$stcId->stc_id;
-        }
-        $result=array();
-        $result['class_list']=Store::getAllStoreClass(['store_id'=>$store_id],['stc_id','stc_name']);
-        $result['goods_list']=Store::getStoreGoodsListByStcId($store_id,$class_id);
-        return Base::jsonReturn(200,  '获取成功',$result);
-    }
 
-    /** 商品上下架  第二版
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function changeGoodsState(Request $request)
-    {
-        $goods_id = $request->input('goods_id');
-        $store_id = $request->input('store_id');
-        if (empty($store_id) || empty($goods_id)) {
-            return Base::jsonReturn(1000,  '参数缺失');
-        }
-        $res=Goods::changeGoodsState($goods_id,$store_id);
-        if ($res == 1) {
-            return Base::jsonReturn(200,  '上架成功');
-        } elseif($res == 0) {
-            return Base::jsonReturn(200,  '下架成功');
-        }else{
-            return Base::jsonReturn(2000,  '操作失败');
-        }
 
-    }
 
 
     /**  添加/编辑代金券

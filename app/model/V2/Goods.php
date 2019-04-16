@@ -10,7 +10,11 @@ class Goods extends Model
 {
     static function getGoodsInfo($condition, $field = ['*'])
     {
-        return DB::table('goods')->where($condition)->get($field)->first();
+        return DB::table('goods as a')
+            ->where($condition)
+            ->leftJoin('goods_common as b','a.goods_commonid','b.goods_commonid')
+            ->get($field)
+            ->first();
     }
     static function getGoodsCommonInfo($condition, $field = ['*'])
     {
