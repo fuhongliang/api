@@ -138,7 +138,7 @@ class GoodsController extends Base
         $goods['areaid_2']          = $common_array['areaid_2'];
         $goods['color_id']          = 0;
         $goods['transport_id']      = $common_array['transport_id'];
-        $goods['goods_freight']     = $common_array['goodgetGoodsInfos_freight'];
+        $goods['goods_freight']     = $common_array['goods_freight'];
         $goods['goods_vat']         = $common_array['goods_vat'];
         $goods['goods_commend']     = $common_array['goods_commend'];
         $goods['goods_stcids']      = $common_array['goods_stcids'];
