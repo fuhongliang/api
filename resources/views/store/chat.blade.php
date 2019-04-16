@@ -31,8 +31,8 @@
                         </div>
                         <!-- /.direct-chat-info -->
                         <img class="direct-chat-img" src="{{asset('AdminLTE/dist/img/user1-128x128.jpg')}}" alt="Message User Image"><!-- /.direct-chat-img -->
-                        <div class="direct-chat-text">
-                            Is this template really for free? That's unbelievable!
+                        <div class="direct-chat-text" id="admin">
+
                         </div>
                         <!-- /.direct-chat-text -->
                     </div>
@@ -107,7 +107,7 @@
             websocket.onmessage = function (evt) {
                 var jsonData = eval("("+evt.data+")");
                 console.log(jsonData);
-                //$('#tooltip').html(jsonData.username+jsonData.msg);
+                $('#admin').html(jsonData.msg);
 
             };
             websocket.onerror = function (evt, e) {
