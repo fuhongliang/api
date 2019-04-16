@@ -45,7 +45,7 @@ class SwooleController
         $data=json_decode($frame->data);
         if($data->type == 1)//对个人
         {
-            $server->send($data->target, 666);
+            $server->push($data->target, 666);
         }
     }
     public function onRequest($request, $response){
