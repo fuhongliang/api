@@ -35,13 +35,9 @@ class SwooleController
         global $online;
         unset($online[$fd]);
         $push_data=self::oMsg('users','zhangsan',2);
-        foreach($server->connections as $fds)
+        foreach($online as $fds)
         {
-            if($fds != $fd)
-            {
-                $server->push($fds, json_encode($push_data));
-            }
-
+            $server->push($fds, json_encode($push_data));
         }
     }
 
