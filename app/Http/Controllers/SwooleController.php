@@ -8,13 +8,19 @@ use Illuminate\Http\Request;
 
 class SwooleController
 {
-    public function checkToken($token)
+    static function checkToken($token)
     {
         echo $token;
     }
 
     public function onOpen($server, $request){
-        dd($request->get);
+        $token=$request->get;//获取请求的参数
+        if(!self::checkToken($token))
+        {
+            $this->onClose($server,$request->fd);
+        }
+        echo "已连接上";
+
     }
     
     public function onClose($server, $fd){
