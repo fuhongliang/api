@@ -14,8 +14,7 @@ class SwooleController
     }
 
     public function onOpen($server, $request){
-        echo $request->data;
-        echo "客户端: ".$request->fd."上线\n";
+        dd($request);
     }
     
     public function onClose($server, $fd){
