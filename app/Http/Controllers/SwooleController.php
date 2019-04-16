@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 class SwooleController
 {
+    public $online;
     static function checkToken($data)
     {
         return true;
@@ -19,10 +20,11 @@ class SwooleController
         {
             $this->onClose($server,$request->fd);
         }else{
-            $data=array(
-                ''
-            );
-            return
+            global $online;
+            array_push($online,['fd'=>$request->fd,'uuid'=>time()]);
+            foreach ($server->connections as $fd) {
+                $server->push($fd, json_encode($online));
+            }
         }
     }
     
