@@ -98,7 +98,7 @@
     <script>
         $(document).ready(function(){
             var token=$('input[name="token"]').val();
-            var wsServer = 'ws://47.111.27.189:9501/token='+token;
+            var wsServer = 'ws://47.111.27.189:9501?token='+token;
             var websocket = new WebSocket(wsServer);
             websocket.onopen = function (evt) {
                 console.log("连接成功");
