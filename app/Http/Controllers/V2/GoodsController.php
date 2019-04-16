@@ -147,7 +147,8 @@ class GoodsController extends Base
         }
         foreach ($sell_time as $k=>$val)
         {
-            $goods_sell_time[$k][intval($val['start_time'])]=$val['end_time'];
+            $goods_sell_time[$k][$val['start_time']]=$val['start_time'];
+            $goods_sell_time[$k][$val['end_time']]=$val['end_time'];
         }
         $common_array['goods_sale_time']        = serialize($goods_sell_time);
         $common_array['goods_selltime']    = time();
