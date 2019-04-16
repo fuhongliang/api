@@ -31,7 +31,7 @@ class Goods extends Model
     static function delGoods($store_id,$goods_id)
     {
         DB::transaction(function () use ($goods_id,$store_id){
-            $data= self::getGoodsInfo(['goods_id'=>$goods_id],['goods_commonid']);
+            $data= self::getGoodsInfo(['goods_id'=>$goods_id],['a.goods_commonid']);
             $where=array();
             $where['goods_lock']=0;
             $where['goods_commonid']=$data->goods_commonid;
