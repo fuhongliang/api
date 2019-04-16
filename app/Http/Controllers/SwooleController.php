@@ -10,7 +10,7 @@ class SwooleController
 {
     static function checkToken($token)
     {
-        return true;
+        return false;
     }
 
     public function onOpen($server, $request){
