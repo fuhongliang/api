@@ -33,11 +33,13 @@ class SwooleController
     public function onClose($server, $fd){
         global $online;
         unset($online[$fd]);
-        foreach ($server->connections as $fd_) {
-            if($fd != $fd_)
+        foreach($server->connections as $fds)
+        {
+            if($fds != $fd)
             {
-                $server->push($fd, $fd.'断开连接通道');
+                $server->send($fd, "hello");
             }
+
         }
     }
 
