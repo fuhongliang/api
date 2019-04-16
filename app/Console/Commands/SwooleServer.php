@@ -55,12 +55,12 @@ class SwooleServer extends Command
         }
     }
     function start(){
-        $this->server = new \swoole_server("0.0.0.0", 9501);
+        $server = new swoole_websocket_server("0.0.0.0", 9501);
         $handler = new SwooleController();
-        $this->server->on('open', array($handler,'onOpen'));
-        $this->server->on('message', array($handler, 'onMessage'));
-        $this->server->on('request', array($handler, 'onRequest'));
-        $this->server->on('close', array($handler, 'onClose'));
-        $this->server->start();
+        $server->on('open', array($handler,'onOpen'));
+        $server->on('message', array($handler, 'onMessage'));
+        $server->on('request', array($handler, 'onRequest'));
+        $server->on('close', array($handler, 'onClose'));
+        $server->start();
     }
 }
