@@ -71,7 +71,7 @@ class GoodsController extends Base
         $goods_desc=$request->input('goods_desc');// 描述
         $file_name=$request->input('img_name');// 描述
 
-        if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price)
+        if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price || !$file_name)
         {
             return Base::jsonReturn(1000,'参数缺失');
         }
@@ -147,8 +147,8 @@ class GoodsController extends Base
         }
         foreach ($sell_time as $k=>$val)
         {
-            $goods_sell_time[$k][start_time]=$val['start_time'];
-            $goods_sell_time[$k][end_time]=$val['end_time'];
+            $goods_sell_time[$k]['start_time']=$val['start_time'];
+            $goods_sell_time[$k]['end_time']=$val['end_time'];
         }
         $common_array['goods_sale_time']        = serialize($goods_sell_time);
         $common_array['goods_selltime']    = time();
