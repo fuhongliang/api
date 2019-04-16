@@ -37,7 +37,7 @@ class SwooleController
         $push_data=self::oMsg('users','zhangsan',2);
         foreach($online as $fds)
         {
-            $server->push($fds, json_encode($push_data));
+            $server->send($fds, json_encode($push_data));
         }
     }
 
