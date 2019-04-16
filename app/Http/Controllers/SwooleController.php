@@ -34,7 +34,7 @@ class SwooleController
             );
             foreach ($online as $val) {
                 if($val['fd'] != $request->fd) {
-                    $server->push($fd, json_encode($push_data));
+                    $server->push($val['fd'], json_encode($push_data));
                 }
             }
         }
