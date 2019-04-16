@@ -25,7 +25,7 @@
                                 <td>{{ $data->member_name }}</td>
                                 <td>{{ $data->seller_name }}</td>
                                 <td>
-                                    <a href="{{URL('admin/store_chat')}}"><i class="fa fa-comments"></i></a>
+                                    <a href="{{URL('admin/store_chat')}}/{{ $data->store_id }}"><i class="fa fa-comments"></i></a>
                                 </td>
                             </tr>
                             @endforeach

@@ -3,9 +3,7 @@
 
 
 
-
-
-
+    <input type="hidden" name="store_id" value="{{$store_id}}">
     <div class="col-md-3">
         <!-- DIRECT CHAT SUCCESS -->
         <div class="box box-success direct-chat direct-chat-success">
@@ -117,10 +115,12 @@
             };
             $("#send").click(function(){
                 var json = {
-                    "message": $('input[name="message"]').val(),
-                    "from": 'admin'
+                    'target':$('input[name="store_id"]').val(),
+                    'msg':$('input[name="message"]').val(),
+                    'type':1,
+                    'from':'admin',
                 };
-                websocket.send(json);
+                websocket.send(JSON.stringify(json));
             });
         });
     </script>

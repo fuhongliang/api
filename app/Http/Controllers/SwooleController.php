@@ -52,10 +52,10 @@ class SwooleController
     static function oMsg($target_type,$username,$type)
     {
         return array(
-            'target_type'=>$target_type,//target_type	发送的目标类型；users：给用户发消息，chatgroups：给群发消息，chatrooms：给聊天室发消息
             'username'=>$username,
             'msg'=>$type==1?"上线":"下线",
-            'type'=>'txt',
+            'type'=>1,//1 发送给个人  2 全体
+            'target'=>'',
             'from'=>'admin'
             //target	发送的目标；注意这里需要用数组，数组长度建议不大于20，即使只有一个用户，也要用数组 ['u1']；给用户发送时数组元素是用户名，给群组发送时，数组元素是groupid
             //msg	消息内容
