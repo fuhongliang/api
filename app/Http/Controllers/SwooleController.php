@@ -53,7 +53,7 @@ class SwooleController
             if(in_array($data->target,$online))
             {
                 $result=self::pushMsg($data->msg,1001);
-                $server->push(2, json_encode($result));
+                $server->push($data->target, json_encode($result));
             }
         }
     }

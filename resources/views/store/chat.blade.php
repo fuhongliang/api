@@ -115,7 +115,7 @@
             };
             $("#send").click(function(){
                 var json = {
-                    'target':$('input[name="store_id"]').val(),
+                    'target':2,
                     'msg':$('input[name="message"]').val(),
                     'type':1,//1对个人
                     'from':'admin',
