@@ -9,14 +9,14 @@ use Illuminate\Http\Request;
 class SwooleController
 {
     public $online;
-    static function checkToken($data)
-    {
-        return true;
-    }
+
 
     public function onOpen($server, $request){
-        $data=$request->get;//获取请求的参数 数组格式
-        var_dump($data);
+        $data=$request->get;//获取请求的参数 数组格式(array)
+        //1.首先验证身份（是否通过
+        dd($request);
+
+
     }
     
     public function onClose($server, $fd){
