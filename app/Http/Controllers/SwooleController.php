@@ -23,7 +23,7 @@ class SwooleController
         $connections[$fd]=$con_info;
         foreach ($connections as $val)
         {
-            $server->push($val['fd'],666666);
+            $server->push($val['fd'],$fd."加入");
         }
     }
     
@@ -31,7 +31,10 @@ class SwooleController
         global $connections;
         unset($connections[$fd]);
         //当有人退出时,发起广播
-        var_dump($connections);
+        foreach ($connections as $val)
+        {
+            $server->push($val['fd'],$fd."退出");
+        }
 
     }
     public function onMessage($server, $frame){
