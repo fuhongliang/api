@@ -14,6 +14,7 @@
 ////////
 Route::group(['namespace'=>'WebIM','middleware' => 'web'],function(){
     Route::any('/','IndexController@index');
+    Route::any('checklogin','IndexController@checkLogin');
 });
 //////////////第一版
 Route::any('test','testController@test');

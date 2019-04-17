@@ -120,12 +120,28 @@ class Store extends Model
             }
             if(!empty($ids))
             {
+                $xianshi_data=DB::table('p_xianshi_goods')
+                    ->where('store_id',$store_id)
+                    ->get(['xianshi_goods_id','xianshi_price']);
+                if(!$xianshi_data->isEmpty())
+                {
+                    $xianshi=[];
+                    foreach ($xianshi_data as $k=>$val){
+                        $xianshi[$val->xianshi_goods_id]=$val->xianshi_price;
+                    }
+                }
                 foreach ($ids as $k=>$goods_id)
                 {
                     $fields=['a.goods_id','a.goods_name','a.goods_price','a.goods_marketprice','b.goods_body as goods_desc','b.goods_sale_time','a.goods_state','a.goods_storage','a.goods_image as img_name'];
                     $goods_info[$k]=Goods::getGoodsInfo(['goods_id'=>$goods_id],$fields);
                     $goods_info[$k]->img_path=getenv('GOODS_IMAGE').$store_id;
                     $goods_info[$k]->goods_sale_time=unserialize($goods_info[$k]->goods_sale_time);
+                    if(array_key_exists($goods_id, $xianshi))
+                    {
+                        $goods_info[$k]->xianshi_price=$xianshi[$goods_id];
+                    }else{
+                        $goods_info[$k]->xianshi_price="";
+                    }
                 }
             }
             return $goods_info;
