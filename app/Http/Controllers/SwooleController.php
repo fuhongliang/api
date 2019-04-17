@@ -28,8 +28,8 @@ class SwooleController
             {
                 $server->push($val['fd'],json_encode($con_info));
             }
+            $server->push($fd,json_encode($connections));
         }
-        $server->push($fd,json_encode($connections));
     }
     
     public function onClose($server, $fd){
