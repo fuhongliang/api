@@ -28,7 +28,7 @@ class SwooleController
             {
                 $server->push($val['fd'],json_encode($con_info));
             }
-            $server->push($fd,json_encode($connections));
+            $server->push($val['fd'],555);
         }
     }
     
