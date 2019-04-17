@@ -24,7 +24,7 @@ class SwooleController
         //有人上线时，发起广播
         foreach ($connections as $client_fd)
         {
-            if($fd !== $client_fd)
+            if($fd !== $client_fd['fd'])
             {
                 $server->send($client_fd, '有人上线了');
             }
