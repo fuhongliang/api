@@ -21,15 +21,27 @@ class SwooleController
             'type'=>1//1登录
         );
         $connections[$fd]=$con_info;
-        var_dump($connections);
-
+        //有人上线时，发起广播
+        foreach ($connections as $client_fd)
+        {
+            if($fd ! == $client_fd)
+            {
+                $server->push($client_fd, '有人上线了');
+            }
+        }
 
     }
     
     public function onClose($server, $fd){
         global $connections;
         unset($connections[$fd]);
-        var_dump($connections);
+        //当有人退出时,发起广播
+        foreach ($connections as $client_fd)
+        {
+
+            $server->push($client_fd, '有人下线了');
+
+        }
 
     }
     public function onMessage($server, $frame){
