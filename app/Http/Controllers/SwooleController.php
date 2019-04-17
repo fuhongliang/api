@@ -23,7 +23,6 @@ class SwooleController
         );
         $userinfo=array(
             'fd'=>$fd,
-            'username'=>'zhangsan',
             'uuid'=>time(),
             'type'=>'1002'//在线人员列表
            );
