@@ -23,18 +23,22 @@ class SwooleController
         );
         $userinfo=array(
             'fd'=>$fd,
-            'uuid'=>time(),
-            'type'=>'1002'//在线人员列表
+            'uuid'=>time()
            );
         $connections[$fd]=$userinfo;
-
+        $online_list=array(
+            'from'=>'admin',
+            'type'=>1002,//1000登入,1001登出，1002在线列表
+            'msg'=>"",
+            'data'=>$connections
+        );
         foreach ($connections as $val)
         {
             if($val != $fd)
             {
                 $server->push($val['fd'],json_encode($con_info));
             }
-            $server->push($val['fd'],json_encode($connections));
+            $server->push($val['fd'],json_encode($online_list));
         }
     }
     
@@ -48,9 +52,16 @@ class SwooleController
             'type'=>1001,//1000登入,1001登出，
             'msg'=>$fd."登出",
         );
+        $online_list=array(
+            'from'=>'admin',
+            'type'=>1002,//1000登入,1001登出，1002在线列表
+            'msg'=>"",
+            'data'=>$connections
+        );
         foreach ($connections as $val)
         {
             $server->push($val['fd'],json_encode($con_info));
+            $server->push($val['fd'],json_encode($online_list));
         }
 
     }
