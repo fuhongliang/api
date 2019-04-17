@@ -64,8 +64,8 @@ class GoodsController extends Base
         $store_id=$request->input('store_id');
         $class_id=$request->input('class_id');//分类
         $goods_name=$request->input('goods_name');//名称
-        $goods_price=$request->input('goods_price');//价格
-        $origin_price=$request->input('origin_price');//原价
+        $goods_price=Base::ncPriceFormat($request->input('goods_price'));//价格
+        $origin_price=Base::ncPriceFormat($request->input('origin_price'));//原价
         $goods_storage=$request->input('goods_storage');//库存
         $sell_time=$request->input('sell_time'); // 出售时间
         $goods_desc=$request->input('goods_desc');// 描述

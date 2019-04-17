@@ -11,11 +11,10 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
 ////////
-
+Route::group(['namespace'=>'WebIM','middleware' => 'web'],function(){
+    Route::any('/','IndexController@index');
+});
 //////////////第一版
 Route::any('test','testController@test');
 Route::any('v1/member_login','V1\MemberController@login');
