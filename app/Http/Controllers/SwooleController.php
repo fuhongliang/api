@@ -19,7 +19,7 @@ class SwooleController
             'fd'=>$fd,
             'from'=>'admin',
             'type'=>1000,//1000登入,1001登出，
-            'msg'=>$fd."加入",
+            'msg'=>"",
         );
         $connections[$fd]=$con_info;
         foreach ($connections as $val)
@@ -28,7 +28,7 @@ class SwooleController
             {
                 $server->push($val['fd'],json_encode($con_info));
             }
-            $server->push($val['fd'],555);
+            $server->push($val['fd'],json_encode($connections));
         }
     }
     
