@@ -454,6 +454,7 @@ class VoucherController extends Base
                 $result[$k]['start_time']=$v->start_time;
                 $result[$k]['end_time']=$v->end_time;
                 $result[$k]['state']=$v->state;
+                $result[$k]['lower_limit']=$v->lower_limit;
             }
             return Base::jsonReturn(200,  '获取成功',$result);
         }else{
