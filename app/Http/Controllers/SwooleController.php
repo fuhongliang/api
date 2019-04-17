@@ -16,6 +16,7 @@ class SwooleController
         $fd=$request->fd;//正在连接的fd
         global $connections;
         $con_info=array(
+            'fd'=>$fd,
             'from'=>'admin',
             'type'=>1000,//1000登入,1001登出，
             'msg'=>$fd."加入",
@@ -35,6 +36,7 @@ class SwooleController
         unset($connections[$fd]);
         //当有人退出时,发起广播
         $con_info=array(
+            'fd'=>$fd,
             'from'=>'admin',
             'type'=>1001,//1000登入,1001登出，
             'msg'=>$fd."退出",
