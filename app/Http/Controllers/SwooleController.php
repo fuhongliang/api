@@ -24,7 +24,7 @@ class SwooleController
         //有人上线时，发起广播
         foreach ($connections as $client_fd)
         {
-            if($fd ! == $client_fd)
+            if($fd !== $client_fd)
             {
                 $server->push($client_fd, '有人上线了');
             }
@@ -38,9 +38,7 @@ class SwooleController
         //当有人退出时,发起广播
         foreach ($connections as $client_fd)
         {
-
             $server->push($client_fd, '有人下线了');
-
         }
 
     }
@@ -60,34 +58,5 @@ class SwooleController
         echo "这是request";
     }
 
-    //////
-    static function onlineMsg($target_type,$username)
-    {
-        return array(
-            'username'=>$username,
-            'msg'=>"上线",
-            'type'=>1,//1 发送给个人  2 全体
-            'target'=>'',
-            'from'=>'admin'
-            );
-    }
-    static function oflineMsg($target_type,$username)
-    {
-        return array(
-            'username'=>$username,
-            'msg'=>"下线",
-            'type'=>1,//1 发送给个人  2 全体
-            'target'=>'',
-            'from'=>'admin'
-        );
-    }
-    static function pushMsg($msg,$type)
-    {
-        return array(
-            'msg'=>$msg,
-            'type'=>$type,//1000 系统消息  ， 10001 聊天消息
-            'target'=>'',
-            'from'=>'admin'
-        );
-    }
+
 }
