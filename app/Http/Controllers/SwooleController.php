@@ -21,14 +21,21 @@ class SwooleController
             'type'=>1000,//1000登入,1001登出，
             'msg'=>$fd."登入",
         );
-        $connections[$fd]=$fd;
+        $userinfo=array(
+            'fd'=>$fd,
+            'username'=>'zhangsan',
+            'uuid'=>time(),
+            'type'=>'1002'//在线人员列表
+           );
+        $connections[$fd]=$userinfo;
+
         foreach ($connections as $val)
         {
             if($val != $fd)
             {
-                $server->push($val,json_encode($con_info));
+                $server->push($val['fd'],json_encode($con_info));
             }
-            $server->push($val,json_encode($connections));
+            $server->push($val['fd'],json_encode($connections));
         }
     }
     
@@ -44,7 +51,7 @@ class SwooleController
         );
         foreach ($connections as $val)
         {
-            $server->push($val,json_encode($con_info));
+            $server->push($val['fd'],json_encode($con_info));
         }
 
     }
