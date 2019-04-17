@@ -19,16 +19,16 @@ class SwooleController
             'fd'=>$fd,
             'from'=>'admin',
             'type'=>1000,//1000登入,1001登出，
-            'msg'=>"",
+            'msg'=>$fd."登入",
         );
-        $connections[$fd]=$con_info;
+        $connections[$fd]=$fd;
         foreach ($connections as $val)
         {
-            if($val['fd'] != $fd)
+            if($val != $fd)
             {
-                $server->push($val['fd'],json_encode($con_info));
+                $server->push($val,json_encode($con_info));
             }
-            $server->push($val['fd'],json_encode($connections));
+            $server->push($val,json_encode($connections));
         }
     }
     
@@ -40,11 +40,11 @@ class SwooleController
             'fd'=>$fd,
             'from'=>'admin',
             'type'=>1001,//1000登入,1001登出，
-            'msg'=>$fd."退出",
+            'msg'=>$fd."登出",
         );
         foreach ($connections as $val)
         {
-            $server->push($val['fd'],json_encode($con_info));
+            $server->push($val,json_encode($con_info));
         }
 
     }
