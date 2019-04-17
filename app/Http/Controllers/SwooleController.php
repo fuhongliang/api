@@ -38,7 +38,7 @@ class SwooleController
         //当有人退出时,发起广播
         foreach ($connections as $client_fd)
         {
-            $server->push($client_fd['fd'], '有人下线了');
+            $server->send($client_fd['fd'], '有人下线了');
         }
 
     }
