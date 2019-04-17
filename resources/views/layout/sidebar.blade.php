@@ -36,6 +36,17 @@
                     <li class="active"><a href="{{URL('admin/store_list')}}"><i class="fa fa-circle-o"></i> 店铺列表</a></li>
                 </ul>
             </li>
+            <li class="active treeview">
+                <a href="#">
+                    <i class="fa fa-dashboard"></i> <span>测试</span>
+                    <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="{{URL('admin/msg_add')}}"><i class="fa fa-circle-o"></i> 测试</a></li>
+                </ul>
+            </li>
         </ul>
     </section>
     <!-- /.sidebar -->

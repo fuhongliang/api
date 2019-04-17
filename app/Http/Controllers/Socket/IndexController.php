@@ -21,4 +21,8 @@ class IndexController extends Controller
     {
         return view('store.chat',compact('store_id'));
     }
+    function msg_add()
+    {
+        return view('msg.add');
+    }
 }

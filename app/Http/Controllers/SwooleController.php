@@ -16,19 +16,7 @@ class SwooleController
 
     public function onOpen($server, $request){
         $data=$request->get;//获取请求的参数 数组格式
-        if(!self::checkToken($data))
-        {
-            $this->onClose($server,$request->fd);
-        }else{
-            global $online;
-            $online[$request->fd]=['fd'=>$request->fd,'uuid'=>time()];//记录所有登录的信息
-            $push_data=self::onlineMsg('users','zhangsan');
-            foreach ($online as $val) {
-                if($val['fd'] != $request->fd) {
-                    $server->push($val['fd'], json_encode($push_data));
-                }
-            }
-        }
+        var_dump($data);
     }
     
     public function onClose($server, $fd){
@@ -44,7 +32,6 @@ class SwooleController
         }
 
     }
-
     public function onMessage($server, $frame){
         global $online;
         $data=json_decode($frame->data);
