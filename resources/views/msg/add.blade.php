@@ -25,7 +25,7 @@
                 console.log("关闭成功");
             };
             websocket.onmessage = function (evt) {
-                var jsonData = eval("("+evt.data+")");
+                //var jsonData = eval("("+evt.data+")");
                 console.log(evt);
             };
             websocket.onerror = function (evt, e) {

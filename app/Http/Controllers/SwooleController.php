@@ -23,7 +23,10 @@ class SwooleController
         $connections[$fd]=$con_info;
         foreach ($connections as $val)
         {
-            $server->push($val['fd'],$fd."加入");
+            if($val['fd'] != $fd)
+            {
+                $server->push($val['fd'],$fd."加入");
+            }
         }
     }
     
