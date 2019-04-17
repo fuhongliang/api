@@ -26,7 +26,7 @@
             };
             websocket.onmessage = function (evt) {
                 var jsonData = eval("("+evt.data+")");
-                console.log(jsonData);
+                console.log(evt);
             };
             websocket.onerror = function (evt, e) {
                 console.log('错误: ' + evt.data);

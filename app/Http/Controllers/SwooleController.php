@@ -26,7 +26,7 @@ class SwooleController
         {
             if($fd !== $client_fd['fd'])
             {
-                $server->send($client_fd, '有人上线了');
+                $server->send($client_fd['fd'], '有人上线了');
             }
         }
 
