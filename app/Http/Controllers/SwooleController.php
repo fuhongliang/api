@@ -21,7 +21,10 @@ class SwooleController
             'type'=>1//1登录
         );
         $connections[$fd]=$con_info;
-        var_dump($connections);
+        foreach ($connections as $val)
+        {
+            $server->push($val['fd'],666666);
+        }
     }
     
     public function onClose($server, $fd){
