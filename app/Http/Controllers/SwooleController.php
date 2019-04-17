@@ -8,13 +8,20 @@ use Illuminate\Http\Request;
 
 class SwooleController
 {
-    public $online;
-
+    public $connections;
 
     public function onOpen($server, $request){
         $data=$request->get;//获取请求的参数 数组格式(array)
-        //1.首先验证身份（是否通过
-        dd($request);
+        //1.首先验证身份（是否通过)
+        $fd=$request->fd;//正在连接的fd
+        global $connections;
+        $con_info=array(
+            'fd'=>$fd,
+            'from'=>'admin',
+            'type'=>1//1登录
+        );
+        $connections[$fd]=$con_info;
+        var_dump($connections);
 
 
     }
