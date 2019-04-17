@@ -16,16 +16,16 @@ class SwooleController
         $fd=$request->fd;//正在连接的fd
         global $connections;
         $con_info=array(
-            'fd'=>$fd,
             'from'=>'admin',
-            'type'=>1//1登录
+            'type'=>1000,//1000登入,1001登出，
+            'msg'=>$fd."加入",
         );
         $connections[$fd]=$con_info;
         foreach ($connections as $val)
         {
             if($val['fd'] != $fd)
             {
-                $server->push($val['fd'],$fd."加入");
+                $server->push($val['fd'],json_encode($con_info));
             }
         }
     }
@@ -34,9 +34,14 @@ class SwooleController
         global $connections;
         unset($connections[$fd]);
         //当有人退出时,发起广播
+        $con_info=array(
+            'from'=>'admin',
+            'type'=>1001,//1000登入,1001登出，
+            'msg'=>$fd."退出",
+        );
         foreach ($connections as $val)
         {
-            $server->push($val['fd'],$fd."退出");
+            $server->push($val['fd'],json_encode($con_info));
         }
 
     }
