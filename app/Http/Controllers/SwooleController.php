@@ -27,16 +27,9 @@ class SwooleController
     }
     
     public function onClose($server, $fd){
-        global $online;
-        if(!empty($online))
-        {
-            unset($online[$fd]);
-            $push_data=self::oflineMsg('users','zhangsan');
-            foreach($online as $fds)
-            {
-                $server->send($fds, json_encode($push_data));
-            }
-        }
+        global $connections;
+        unset($connections[$fd]);
+        var_dump($connections);
 
     }
     public function onMessage($server, $frame){
