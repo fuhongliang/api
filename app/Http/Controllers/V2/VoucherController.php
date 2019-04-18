@@ -493,7 +493,7 @@ class VoucherController extends Base
         if (!$xianshi_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        $res=Voucher::getXianshiInfoData($xianshi_id);
+        $res=Voucher::getXianshiInfoData($store_id,$xianshi_id);
         if ($res) {
             return Base::jsonReturn(200, '获取成功',$res);
         } else {
