@@ -385,7 +385,7 @@ class VoucherController extends Base
                 'xianshi_price'=>666
             )
         );
-        if (!$store_id || !$xianshi_name || !$xianshi_title || !$xianshi_explain || !$start_time ||!$end_time || !$lower_limit || !$goods_list) {
+        if (!$store_id || !$xianshi_name  || !$start_time ||!$end_time || !$lower_limit || !$goods_list) {
             return Base::jsonReturn(1000, '参数缺失');
         }
 //        $xianshi_quota_list=Voucher::getXianShiInfo(['store_id'=>$store_id]);
