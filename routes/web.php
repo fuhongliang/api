@@ -12,12 +12,8 @@
 */
 
 ////////
-Route::group(['namespace'=>'WebIM','middleware' => 'web'],function(){
-    Route::any('/','IndexController@index');
-    Route::any('checklogin','IndexController@checkLogin');
-});
+
 //////////////第一版
-Route::any('test','testController@test');
 Route::any('v1/member_login','V1\MemberController@login');
 Route::any('v1/store_jingying/{store_id}','V1\StoreController@storeJingYingData');//店铺经营
 Route::any('v1/get_echarts','V1\StoreController@getEcharts');
@@ -156,6 +152,8 @@ Route::group(['namespace'=>'V2','prefix'=>'v2','middleware'=>['checktoken']],fun
     Route::any('xianshi_edit','VoucherController@xianshiEdit');//添加/编辑折扣------------
 
     Route::any('xianshi_list','VoucherController@xianshiList');//折扣列表------------
+
+    Route::any('xianshi_goods_list','GoodsController@xianshiGoodsList');//折扣商品列表------------
 
     Route::any('xianshi_del','VoucherController@xianshiDel');//折扣删除------------
 

@@ -33,6 +33,23 @@ class GoodsController extends Base
         $result['goods_list']=Store::getStoreGoodsListByStcId($store_id,$class_id);
         return Base::jsonReturn(200,  '获取成功',$result);
     }
+
+    public function xianshiGoodsList(Request $request)
+    {
+        $class_id = $request->input('class_id');
+        $store_id = $request->input('store_id');
+        if (empty($store_id)) {
+            return Base::jsonReturn(1000,  '参数缺失');
+        }
+        if(empty($class_id)) {
+            $stcId = Store::getStoreClassStcId(['store_id' => $store_id], ['stc_id']);
+            $class_id=$stcId->stc_id;
+        }
+        $result=array();
+        $result['class_list']=Store::getAllStoreClass(['store_id'=>$store_id],['stc_id','stc_name']);
+        $result['goods_list']=Store::getXianshiGoodsList($store_id,$class_id);
+        return Base::jsonReturn(200,  '获取成功',$result);
+    }
     /** 商品上下架  第二版
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse

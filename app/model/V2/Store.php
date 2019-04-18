@@ -147,6 +147,56 @@ class Store extends Model
             return $goods_info;
         }
     }
+    static function getXianshiGoodsList($store_id,$class_id)
+    {
+        $goods_info=$ids=array();
+        $arr=DB::table('p_xianshi_goods')->where(['store_id'=>$store_id])->get(['goods_id']);
+        if($arr->isEmpty())
+        {
+            $data=DB::table('goods')
+                ->where('store_id',$store_id)
+                ->whereNotNull('goods_stcids')
+                ->get(['goods_id','goods_stcids']);
+        }else{
+            $arr_goods_ids=[];
+            foreach ($arr as $v)
+            {
+                $arr_goods_ids[]=$v->goods_id;
+            }
+            $data=DB::table('goods')
+                ->where('store_id',$store_id)
+                ->whereNotNull('goods_stcids')
+                ->whereNotIn('goods_id',$arr_goods_ids)
+                ->get(['goods_id','goods_stcids']);
+        }
+        if(empty($data))
+        {
+            return $goods_info;
+        }else{
+            foreach ($data as $val)
+            {
+                if(!empty($val->goods_stcids))
+                {
+                    $stcids=explode(',',$val->goods_stcids);
+                    if(in_array($class_id,$stcids))
+                    {
+                        array_push($ids,$val->goods_id);
+                    }
+                }
+            }
+            if(!empty($ids))
+            {
+                foreach ($ids as $k=>$goods_id)
+                {
+                    $fields=['a.goods_id','a.goods_name','a.goods_price','a.goods_marketprice','b.goods_body as goods_desc','b.goods_sale_time','a.goods_state','a.goods_storage','a.goods_image as img_name'];
+                    $goods_info[$k]=Goods::getGoodsInfo(['goods_id'=>$goods_id],$fields);
+                    $goods_info[$k]->img_path=getenv('GOODS_IMAGE').$store_id;
+                    $goods_info[$k]->goods_sale_time=unserialize($goods_info[$k]->goods_sale_time);
+                }
+            }
+            return $goods_info;
+        }
+    }
     static function getStoreBindClass($condition, $field = ['*'])
     {
         return DB::table('store_bind_class')
