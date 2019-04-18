@@ -379,12 +379,6 @@ class VoucherController extends Base
         $end_time = $request->input('end_time');
         $lower_limit= $request->input('lower_limit');
         $goods_list= $request->input('goods_list');
-        $goods_list=array(
-            array(
-                'goods_id'=>100058,
-                'xianshi_price'=>666
-            )
-        );
         if (!$store_id || !$xianshi_name  || !$start_time ||!$end_time || !$lower_limit || !$goods_list) {
             return Base::jsonReturn(1000, '参数缺失');
         }

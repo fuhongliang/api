@@ -215,6 +215,7 @@ class Voucher extends Model
     static function getXianshiInfoData($store_id,$xianshi_id)
     {
         $data=self::getXianshiData(['xianshi_id'=>$xianshi_id],['xianshi_id','xianshi_name','xianshi_title','xianshi_explain','start_time','end_time','lower_limit']);
+
         $data->goods_list=self::getXianshiGoodsData(['xianshi_id'=>$xianshi_id],['goods_id','goods_name','goods_image as img_name','xianshi_price','goods_price']);
         $data->img_path=getenv('GOODS_IMAGE').$store_id;
         return $data;
