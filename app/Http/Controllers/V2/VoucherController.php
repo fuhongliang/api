@@ -40,10 +40,10 @@ class VoucherController extends Base
             ['quota_storeid', '=', $store_id],
             ['quota_endtime', '>', time()],
         ];
-        $quotainfo=Voucher::getVoucherQuotaInfo($where);
-        if(empty($quotainfo)){
-            return Base::jsonReturn(2000,  '你还没有购买代金券套餐');
-        }
+//        $quotainfo=Voucher::getVoucherQuotaInfo($where);
+//        if(empty($quotainfo)){
+//            return Base::jsonReturn(2000,  '你还没有购买代金券套餐');
+//        }
         $count=Voucher::getVoucherTemplateCount(['voucher_t_quotaid'=>$quotainfo->quota_id,'voucher_t_state'=>1]);
         if ($count >= getenv('PROMOTION_VOUCHER_STORETIMES_LIMIT')){
             return Base::jsonReturn(2000,  '代金券数量超过最多限制');
@@ -291,11 +291,11 @@ class VoucherController extends Base
         if (!$store_id || !$mansong_name || !$start_time || !$end_time || !$remark ||!$rules) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        $mansong_quota_list=Voucher::getManSongInfo(['store_id'=>$store_id],['quota_id']);
-        if(empty($mansong_quota_list))
-        {
-            return Base::jsonReturn(2000,  '你还没有购买套餐');
-        }
+//        $mansong_quota_list=Voucher::getManSongInfo(['store_id'=>$store_id],['quota_id']);
+//        if(empty($mansong_quota_list))
+//        {
+//            return Base::jsonReturn(2000,  '你还没有购买套餐');
+//        }
         $storeInfo=Store::getStoreInfo(['store_id'=>$store_id]);
         $data=array(
             'store_id'=>$store_id,
@@ -387,11 +387,11 @@ class VoucherController extends Base
         if (!$store_id || !$xianshi_name || !$xianshi_title || !$xianshi_explain || !$start_time ||!$end_time || !$lower_limit || !$goods_list) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        $xianshi_quota_list=Voucher::getXianShiInfo(['store_id'=>$store_id]);
-        if(empty($xianshi_quota_list))
-        {
-            return Base::jsonReturn(2000,  '你还没有购买套餐');
-        }
+//        $xianshi_quota_list=Voucher::getXianShiInfo(['store_id'=>$store_id]);
+//        if(empty($xianshi_quota_list))
+//        {
+//            return Base::jsonReturn(2000,  '你还没有购买套餐');
+//        }
         $storeInfo=Store::getStoreInfo(['store_id'=>$store_id]);
         $data=array(
             'store_id'=>$store_id,
