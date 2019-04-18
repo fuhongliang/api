@@ -44,7 +44,7 @@ class VoucherController extends Base
 //        if(empty($quotainfo)){
 //            return Base::jsonReturn(2000,  '你还没有购买代金券套餐');
 //        }
-        $count=Voucher::getVoucherTemplateCount(['voucher_t_quotaid'=>$quotainfo->quota_id,'voucher_t_state'=>1]);
+        $count=Voucher::getVoucherTemplateCount(['voucher_t_quotaid'=>1,'voucher_t_state'=>1]);
         if ($count >= getenv('PROMOTION_VOUCHER_STORETIMES_LIMIT')){
             return Base::jsonReturn(2000,  '代金券数量超过最多限制');
         }
@@ -71,7 +71,7 @@ class VoucherController extends Base
         $insert_arr['voucher_t_giveout'] = 0;
         $insert_arr['voucher_t_used'] = 0;
         $insert_arr['voucher_t_add_date'] = time();
-        $insert_arr['voucher_t_quotaid'] = $quotainfo->quota_id ? $quotainfo->quota_id : 0;
+        $insert_arr['voucher_t_quotaid'] = 1;
         $insert_arr['voucher_t_points'] = 0;
         $insert_arr['voucher_t_eachlimit'] = $eachlimit;
         if($voucher_id)
@@ -302,7 +302,7 @@ class VoucherController extends Base
             'mansong_name'=>$mansong_name,
             'start_time'=>strtotime($start_time),
             'end_time'=>strtotime($end_time),
-            'quota_id'=>$mansong_quota_list->quota_id,
+            'quota_id'=>1,
             'member_id'=>$storeInfo->member_id,
             'member_name'=>$storeInfo->member_name,
             'store_name'=>$storeInfo->store_name,
@@ -401,7 +401,7 @@ class VoucherController extends Base
             'start_time'=>strtotime($start_time),
             'end_time'=>strtotime($end_time),
             'lower_limit'=>$lower_limit,
-            'quota_id'=>$xianshi_quota_list->quota_id,
+            'quota_id'=>1,
             'member_id'=>$storeInfo->member_id,
             'member_name'=>$storeInfo->member_name,
             'store_name'=>$storeInfo->store_name,
