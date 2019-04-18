@@ -430,8 +430,8 @@ class VoucherController extends Base
                 'goods_name'=>$goods_info->goods_name,
                 'goods_price'=>$goods_info->goods_price,
                 'goods_image'=>$goods_info->goods_image,
-                'start_time'=>$start_time,
-                'end_time'=>$end_time,
+                'start_time'=>strtotime($start_time),
+                'end_time'=>strtotime($end_time),
                 'lower_limit'=>$lower_limit,
                 'xianshi_price'=>$v['xianshi_price']
             );
