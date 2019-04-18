@@ -450,6 +450,7 @@ class VoucherController extends Base
             $result=array();
             foreach ($list as $k=>$v)
             {
+                $result[$k]['xianshi_id']=$v->xianshi_id;
                 $result[$k]['xianshi_name']=$v->xianshi_name;
                 $result[$k]['start_time']=$v->start_time;
                 $result[$k]['end_time']=$v->end_time;
