@@ -324,7 +324,7 @@ class VoucherController extends Base
                 'mansong_id'=>$mansong_id,
                 'price'=>$v['price'],
                 'discount' =>$v['discount'],
-                'mansong_goods_name'=>$v['mansong_goods_name']
+                'mansong_goods_name'=>''
             );
             Voucher::addManSongRuleData($arr);
         }
