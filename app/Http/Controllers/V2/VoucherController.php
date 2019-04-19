@@ -283,9 +283,17 @@ class VoucherController extends Base
         $end_time = $request->input('end_time');
         $remark = $request->input('remark');
         $rules = $request->input('rules');//{['price'=>100058,'discount'=>333,'mansong_goods_name'=>333],['price'=>100058,'discount'=>333,'mansong_goods_name'=>333]}
-        if (!$store_id || !$mansong_name || !$start_time || !$end_time || !$remark ||!$rules) {
+        if (!$store_id || !$mansong_name || !$start_time || !$end_time  ||!$rules) {
             return Base::jsonReturn(1000, '参数缺失');
         }
+//        $rules=array(
+//            array(
+//                'price'=>100058,'discount'=>333,'mansong_goods_name'=>333
+//            ),
+//            array(
+//                'price'=>100058,'discount'=>333,'mansong_goods_name'=>333
+//            ),
+//        );
 //        $mansong_quota_list=Voucher::getManSongInfo(['store_id'=>$store_id],['quota_id']);
 //        if(empty($mansong_quota_list))
 //        {
@@ -302,7 +310,7 @@ class VoucherController extends Base
             'member_name'=>$storeInfo->member_name,
             'store_name'=>$storeInfo->store_name,
             'state'=>2,
-            'remark'=>$remark
+            'remark'=>empty($remark) ? "":$remark
         );
         if($mansong_id)
         {
@@ -313,6 +321,7 @@ class VoucherController extends Base
         }else{
             $mansong_id=Voucher::addManSongData($data);
         }
+
         foreach($rules as $v)
         {
             $arr=array(
