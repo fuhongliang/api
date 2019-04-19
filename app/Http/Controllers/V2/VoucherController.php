@@ -283,11 +283,6 @@ class VoucherController extends Base
         $end_time = $request->input('end_time');
         $remark = $request->input('remark');
         $rules = $request->input('rules');//{['price'=>100058,'discount'=>333,'mansong_goods_name'=>333],['price'=>100058,'discount'=>333,'mansong_goods_name'=>333]}
-        $rules=array(array(
-            'price'=>100058,
-            'discount'=>333,
-            'mansong_goods_name'=>333
-        ));
         if (!$store_id || !$mansong_name || !$start_time || !$end_time || !$remark ||!$rules) {
             return Base::jsonReturn(1000, '参数缺失');
         }
