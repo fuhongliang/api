@@ -10,6 +10,7 @@ use App\model\V2\Goods;
 use App\model\V2\Store;
 use App\model\V2\Voucher;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 
 class VoucherController extends Base
