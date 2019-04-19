@@ -88,7 +88,8 @@ class Voucher extends Model
     }
     static function getBundlingGoods($condition,$field=['*'])
     {
-        return DB::table('p_bundling_goods')
+        return DB::table('p_bundling_goods as a')
+            ->leftJoin('goods as b','a.goods_id','b.goods_id')
             ->where($condition)
             ->get($field);
     }
@@ -98,10 +99,11 @@ class Voucher extends Model
             ->where($condition)
             ->delete();
     }
-    static function getBundlingInfo($bundling_id)
+    static function getBundlingInfo($store_id,$bundling_id)
     {
         $data=self::getBundling(['bl_id'=>$bundling_id],['bl_id','bl_name','bl_discount_price as bl_price','bl_state']);
-        $data->goods_list=self::getBundlingGoods(['bl_id'=>$bundling_id],['goods_id','goods_name','goods_image','bl_goods_price as goods_price']);
+        $data->goods_list=self::getBundlingGoods(['a.bl_id'=>$bundling_id],['a.goods_id','a.goods_name','a.goods_image as img_name','a.bl_goods_price as goods_price','b.goods_price as goods_origin_price']);
+        $data->img_path=getenv('GOODS_IMAGE').$store_id;
         return $data;
     }
 

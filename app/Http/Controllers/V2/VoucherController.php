@@ -59,14 +59,14 @@ class VoucherController extends Base
         $insert_arr['voucher_t_limit'] = $limit;
         $insert_arr['voucher_t_desc'] = $describe;
         $insert_arr['voucher_t_start_date'] = time();
-        if ($enddate > $quotainfo->quota_endtime){
-            $enddate = $quotainfo->quota_endtime;
-        }
+//        if ($enddate > $quotainfo->quota_endtime){
+//            $enddate = $quotainfo->quota_endtime;
+//        }
         $insert_arr['voucher_t_end_date'] = $enddate;
         $insert_arr['voucher_t_store_id'] = $store_id;
-        $insert_arr['voucher_t_storename'] = $quotainfo->quota_storename;
+        $insert_arr['voucher_t_storename'] = 6666666;
         $insert_arr['voucher_t_sc_id'] = Store::getStoreField(['store_id'=>$store_id],'sc_id');
-        $insert_arr['voucher_t_creator_id'] = $quotainfo->quota_memberid;
+        $insert_arr['voucher_t_creator_id'] = 66666;
         $insert_arr['voucher_t_state'] = 1;
         $insert_arr['voucher_t_total'] = $total;
         $insert_arr['voucher_t_giveout'] = 0;
@@ -112,11 +112,11 @@ class VoucherController extends Base
             ['quota_storeid', '=', $store_id],
             ['quota_endtime', '>', time()],
         ];
-        $quotainfo=Voucher::getVoucherQuotaInfo($where);
-        if(empty($quotainfo))
-        {
-            return Base::jsonReturn(2000,  '你还没有购买代金券套餐');
-        }
+//        $quotainfo=Voucher::getVoucherQuotaInfo($where);
+//        if(empty($quotainfo))
+//        {
+//            return Base::jsonReturn(2000,  '你还没有购买代金券套餐');
+//        }
         $list=Voucher::getVoucherTemplateList(['voucher_t_store_id'=>$store_id]);
         if($list->isEmpty())
         {
@@ -166,21 +166,13 @@ class VoucherController extends Base
      */
     public function bundlingEdit(Request $request)
     {
+        Log::info(serialize($request->all()));
         $store_id = $request->input('store_id');
         $bundling_name = $request->input('bundling_name');
         $bl_discount_price = $request->input('discount_price');
         $goods_list = $request->input('goods_list');
         $bundling_id = $request->input('bundling_id');
-        $goods_list=array(
-            array(
-                'goods_id'=>100058,
-                'goods_price'=>333
-            ),
-            array(
-                'goods_id'=>100066,
-                'goods_price'=>200
-            ),
-        );
+        $state = $request->input('state');
         if (!$store_id || !$bundling_name || !$bl_discount_price || !$goods_list) {
             return Base::jsonReturn(1000, '参数缺失');
         }
@@ -188,10 +180,10 @@ class VoucherController extends Base
             'store_id'=>$store_id,
             'bl_name'=>$bundling_name,
             'store_name'=>Store::getStoreField(['store_id'=>$store_id],'store_name'),
-            'bl_discount_price'=>$bl_discount_price,
+            'bl_discount_price'=>Base::ncPriceFormat($bl_discount_price),
             'bl_freight_choose'=>1,
             'bl_freight'=>0,
-
+            'bl_state'=>isset($state)? $state:1
         );
         if($bundling_id)
         {
@@ -202,14 +194,13 @@ class VoucherController extends Base
         }else{
             $bundling_id=Voucher::addBundlingData($data);
         }
-
         foreach ($goods_list as $key => $val){
-            $goods_info = Goods::getGoodsInfo(['goods_id'=>$val['goods_id']],['goods_id','goods_name','goods_image','store_id']);
+            $goods_info = Goods::getGoodsInfo(['a.goods_id'=>$val['goods_id']],['a.goods_id','a.goods_name','a.goods_image','a.store_id']);
             $array = array();
             $array['bl_id'] = $bundling_id;
             $array['goods_id'] = $val['goods_id'];
-            $array['goods_name'] = empty($goods_info->goods_name) ? "":$goods_info->goods_name;
-            $array['goods_image'] =empty( $goods_info->goods_image)? "": $goods_info->goods_image;
+            $array['goods_name'] = $goods_info->goods_name;
+            $array['goods_image'] =$goods_info->goods_image;
             $array['bl_goods_price'] = Base::ncPriceFormat($val['goods_price']);
             $array['bl_appoint'] = 1;
             Voucher::addBundlingGoodsData($array);
@@ -267,7 +258,7 @@ class VoucherController extends Base
         if (!$bundling_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        $res=Voucher::getBundlingInfo($bundling_id);
+        $res=Voucher::getBundlingInfo($store_id,$bundling_id);
         if ($res) {
             return Base::jsonReturn(200, '获取成功',$res);
         } else {
