@@ -183,7 +183,7 @@ class VoucherController extends Base
             'bl_discount_price'=>Base::ncPriceFormat($bl_discount_price),
             'bl_freight_choose'=>1,
             'bl_freight'=>0,
-            'bl_state'=>isset($state)? $state:1
+            'bl_state'=>$state == 1? 1:0
         );
         if($bundling_id)
         {
