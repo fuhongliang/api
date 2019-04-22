@@ -41,7 +41,7 @@ Route::group(['namespace'=>'V2','middleware'=>['checktoken']],function(){
     Route::post('edit_passwd','StoreController@editPasswd');//修改密码
     Route::post('get_store_com','StoreController@getStoreCom');//获取店铺评论
     Route::post('store_feedback','StoreController@storeFeedback');//店铺回复
-    Route::post('store_yunying','StoreController@storeYunYingInfo');//店铺运营
+    Route::any('store_yunying','StoreController@storeYunYingInfo');//店铺运营
     Route::post('edit_goods','GoodsController@editGoods');//编辑商品-------------
     Route::post('goods_info','GoodsController@getGoodsInfo');//商品详情-------------
     Route::post('mianzhi_list','VoucherController@mianzhiList');//面值列表------------
