@@ -110,7 +110,7 @@ class Voucher extends BModel
      */
     static function getBundlingData($condition,$field=['*'])
     {
-        return BModel::getTableAllData('p_bundling',$condition,$field)
+        return BModel::getTableAllData('p_bundling',$condition,$field);
     }
 
     /**
