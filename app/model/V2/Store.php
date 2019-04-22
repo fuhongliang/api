@@ -158,17 +158,17 @@ class Store extends BModel
         $data=DB::table('goods')
             ->where('store_id',$store_id)
             ->whereNotNull('goods_stcids')
-            ->get(['goods_id','goods_stcids']);
+            ->get(['goods_id','goods_stcid']);
+
         if(empty($data))
         {
             return $goods_info;
         }else{
             foreach ($data as $val)
             {
-                if(!empty($val->goods_stcids))
+                if(!empty($val->goods_stcid))
                 {
-                    $stcids=explode(',',$val->goods_stcids);
-                    if(in_array($class_id,$stcids))
+                    if($class_id==$val->goods_stcid)
                     {
                         array_push($ids,$val->goods_id);
                     }
@@ -176,10 +176,10 @@ class Store extends BModel
             }
             if(!empty($ids))
             {
+                $xianshi=[];
                 $xianshi_data=BModel::getTableAllData('p_xianshi_goods',['store_id'=>$store_id],['xianshi_goods_id','xianshi_price']);
                 if(!$xianshi_data->isEmpty())
                 {
-                    $xianshi=[];
                     foreach ($xianshi_data as $k=>$val){
                         $xianshi[$val->xianshi_goods_id]=$val->xianshi_price;
                     }
