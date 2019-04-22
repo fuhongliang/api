@@ -2,11 +2,12 @@
 
 namespace App\model\V2;
 
+use App\BModel;
 use App\Http\Controllers\BaseController as Base;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class Store extends Model
+class Store extends BModel
 {
     /**
      * @param $condition
@@ -14,7 +15,7 @@ class Store extends Model
      */
     static function getStoreInfo($condition)
     {
-       return DB::table('store')->where($condition)->first();
+        return BModel::getTableFirstData('store',$condition);
     }
 
     /**
@@ -31,6 +32,12 @@ class Store extends Model
             ->get($field)
             ->first();
     }
+
+    /**
+     * @param $store_id
+     * @param $class_name
+     * @return bool
+     */
     static function checkStoreGoodsClassExist($store_id,$class_name)
     {
         $data=DB::table('store_goods_class')
@@ -39,10 +46,21 @@ class Store extends Model
             ->first();
         return empty($data)?true:false;
     }
+
+    /**
+     * @param $ins_data
+     * @return int
+     */
     static function addStoreGoodsClass($ins_data)
     {
-        return DB::table('store_goods_class')->insert($ins_data);
+        return BModel::insertData('store_goods_class',$ins_data);
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return \Illuminate\Support\Collection
+     */
     static function getAllStoreClass($condition, $field = ['*'])
     {
         return DB::table('store_goods_class')
@@ -50,25 +68,47 @@ class Store extends Model
             ->orderBy('stc_sort','asc')
             ->get($field);
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return mixed
+     */
     static function getStoreClassInfo($condition, $field = ['*'])
     {
-        return DB::table('store_goods_class')->where($condition)->get($field)->first();
+        return BModel::getTableFieldFirstData('store_goods_class',$condition,$field);
     }
+
+    /**
+     * @param $condition
+     * @param $up_data
+     * @return int
+     */
     static function editStoreClassInfo($condition,$up_data)
     {
-        return DB::table('store_goods_class')
-            ->where($condition)
-            ->update($up_data);
+        return BModel::upTableData('store_goods_class',$condition,$up_data);
     }
+
+    /**
+     * @param $class_id
+     * @param $store_id
+     * @return bool
+     */
     static function delStoreClassInfo($class_id,$store_id)
     {
         DB::transaction(function () use ($class_id,$store_id){
-            DB::table('store_goods_class')->where(['stc_id'=>$class_id,'store_id'=>$store_id])->delete();
-            DB::table('goods')->where('goods_stcid',$class_id)->delete();
-            DB::table('goods_common')->where('goods_stcid',$class_id)->delete();
+            BModel::delData('store_goods_class',['stc_id'=>$class_id,'store_id'=>$store_id]);
+            BModel::delData('goods',['goods_stcid'=>$class_id]);
+            BModel::delData('goods_common',['goods_stcid'=>$class_id]);
         });
         return true;
     }
+
+    /**
+     * @param $class_ids
+     * @param $store_id
+     * @return bool
+     */
     static function sortStoreGoodsClass($class_ids,$store_id)
     {
         if(!empty($class_ids))
@@ -81,12 +121,22 @@ class Store extends Model
         }
         return false;
     }
+
+    /**
+     * @param $condition
+     * @param $up_data
+     * @return int
+     */
     static function upStoreGoodsClassSort($condition,$up_data)
     {
-        return DB::table('store_goods_class')
-            ->where($condition)
-            ->update($up_data);
+        return BModel::upTableData('store_goods_class',$up_data);
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return mixed
+     */
     static function getStoreClassStcId($condition, $field =['*'])
     {
         $res= DB::table('store_goods_class')
@@ -96,6 +146,12 @@ class Store extends Model
             ->first();
         return $res;
     }
+
+    /**
+     * @param $store_id
+     * @param $class_id
+     * @return array
+     */
     static function getStoreGoodsListByStcId($store_id,$class_id)
     {
         $goods_info=$ids=array();
@@ -120,9 +176,7 @@ class Store extends Model
             }
             if(!empty($ids))
             {
-                $xianshi_data=DB::table('p_xianshi_goods')
-                    ->where('store_id',$store_id)
-                    ->get(['xianshi_goods_id','xianshi_price']);
+                $xianshi_data=BModel::getTableAllData('p_xianshi_goods',['store_id'=>$store_id],['xianshi_goods_id','xianshi_price']);
                 if(!$xianshi_data->isEmpty())
                 {
                     $xianshi=[];
@@ -147,10 +201,16 @@ class Store extends Model
             return $goods_info;
         }
     }
+
+    /**
+     * @param $store_id
+     * @param $class_id
+     * @return array
+     */
     static function getXianshiGoodsList($store_id,$class_id)
     {
         $goods_info=$ids=array();
-        $arr=DB::table('p_xianshi_goods')->where(['store_id'=>$store_id])->get(['goods_id']);
+        $arr=BModel::getTableAllData('p_xianshi_goods',['store_id'=>$store_id],['goods_id']);
         if($arr->isEmpty())
         {
             $data=DB::table('goods')
@@ -197,13 +257,22 @@ class Store extends Model
             return $goods_info;
         }
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return mixed
+     */
     static function getStoreBindClass($condition, $field = ['*'])
     {
-        return DB::table('store_bind_class')
-            ->where($condition)
-            ->get($field)
-            ->first();
+        return BModel::getTableFieldFirstData('store_bind_class',$condition,$field);
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return array
+     */
     static function getStoreData($condition, $field = ['*'])
     {
         $result=array();
@@ -223,6 +292,11 @@ class Store extends Model
         }
         return $result;
     }
+
+    /**
+     * @param $state
+     * @return string
+     */
     static function getStoreState($state)
     {
         if($state == 0)
@@ -235,12 +309,22 @@ class Store extends Model
             return '审核中';
         }
     }
+
+    /**
+     * @param $condition
+     * @param $up_data
+     * @return int
+     */
     static function setWorkState($condition, $up_data)
     {
-        return DB::table('store')
-            ->where($condition)
-            ->update($up_data);
+        return BModel::upTableData('store',$condition,$up_data);
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return mixed
+     */
     static function  getStoreMemInfo($condition,$field = ['*'])
     {
         return DB::table('store as a')
@@ -249,10 +333,20 @@ class Store extends Model
             ->get($field)
             ->first();
     }
-    static function addAppFeedBack($data)
+
+    /**
+     * @param $data
+     * @return int
+     */
+     static function addAppFeedBack($data)
     {
-        return  DB::table('mb_feedback')->insertGetId($data);
+        return BModel::insertData('mb_feedback',$data);
     }
+
+    /**
+     * @param $store_id
+     * @return array
+     */
     static function getComNums($store_id)
     {
         $result=array();
@@ -267,10 +361,20 @@ class Store extends Model
         }
         return $result;
     }
+
+    /**
+     * @param $condition
+     * @return int
+     */
     static function getPingNumsByType($condition)
     {
-        return DB::table('store_com')->where($condition)->count();
+        return BModel::getCount('store_com',$condition);
     }
+
+    /**
+     * @param $condition
+     * @return array
+     */
     static function getStoreComAllData($condition)
     {
         $result=array();
@@ -301,27 +405,42 @@ class Store extends Model
         return $result;
 
     }
+
+    /**
+     * @param $condition
+     * @return mixed
+     */
     static function getComReplay($condition)
     {
-        $data=DB::table('store_com')
-            ->where($condition)
-            ->value('content');
-        return $data;
+        return BModel::getTableValue('store_com',$condition,'content');
     }
+
+    /**
+     * @param $data
+     * @return int
+     */
     static function addStoreCom($data)
     {
-        return  DB::table('store_com')->insertGetId($data);
+        return  BModel::insertData('store_com',$data);
     }
+
+    /**
+     * @param $condition
+     * @param $up_data
+     * @return int
+     */
     static function upStoreCom($condition, $up_data)
     {
-        return DB::table('store_com')
-            ->where($condition)
-            ->update($up_data);
+        return BModel::upTableData('store_com',$condition,$up_data);
     }
+
+    /**
+     * @param $condition
+     * @param $field
+     * @return mixed
+     */
     static function getStoreField($condition,$field)
     {
-        return DB::table('store')
-            ->where($condition)
-            ->value($field);
+        return BModel::getTableValue('store',$condition,$field)
     }
 }

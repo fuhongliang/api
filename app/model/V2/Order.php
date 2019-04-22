@@ -2,14 +2,15 @@
 
 namespace App\model\V2;
 
+use App\BModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class Order extends Model
+class Order extends BModel
 {
 
     static function getNewOrder($condition, $fields =['*']) {
-        $order_info = DB::table('order')->where($condition)->get($fields);
+        $order_info = BModel::getTableAllData('order',$condition,$fields);
         if (empty($order_info)) {
             return array();
         }
@@ -111,12 +112,30 @@ class Order extends Model
         }
         return $order_info;
     }
+
+    /**
+     * @param $condition
+     * @param array $fields
+     * @return Model|\Illuminate\Database\Query\Builder|object|null
+     */
     static function getOrderCommonInfo($condition , $fields = ['*']) {
         return DB::table('order_common')->where($condition)->first($fields);
     }
+
+    /**
+     * @param $condition
+     * @param array $fields
+     * @return \Illuminate\Support\Collection
+     */
     static function getOrderGoodsList($condition , $fields = ['*']) {
-        return DB::table('order_goods')->where($condition)->get($fields);
+        return BModel::getTableAllData('order_goods',$condition,$fields);
     }
+
+    /**
+     * @param $order_id
+     * @param $refuse_reason
+     * @return bool
+     */
     static function cancelOrder($order_id,$refuse_reason)
     {
         $fields=['goods_id','goods_num'];
@@ -133,11 +152,15 @@ class Order extends Model
         }
         return true;
     }
+
+    /**
+     * @param $condition
+     * @param $up_data
+     * @return int
+     */
     static function editOrder($condition,$up_data)
     {
-        return DB::table('order')
-            ->where($condition)
-            ->update($up_data);
+        return BModel::upTableData('order',$condition,$up_data);
     }
 
 

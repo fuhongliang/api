@@ -17,6 +17,16 @@ class BModel extends Model
         return DB::table($table)->where($condition)->first();
     }
 
+    /**获取所有信息
+     * @param $table
+     * @param $condition
+     * @param array $fields
+     * @return \Illuminate\Support\Collection
+     */
+    static function getTableAllData($table,$condition,$fields=['*'])
+    {
+        return DB::table($table)->where($condition)->get($fields);
+    }
     /** 获取第一条数据中部分信息
      * @param $table
      * @param $condition
@@ -31,7 +41,7 @@ class BModel extends Model
     /**获取单列信息
      * @param $table
      * @param $condition
-     * @param $field
+     * @param $value
      * @return mixed
      */
     static function getTableValue($table,$condition,$value)
