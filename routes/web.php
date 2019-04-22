@@ -161,4 +161,8 @@ Route::group(['namespace'=>'V2','prefix'=>'v2','middleware'=>['checktoken']],fun
 
     Route::any('image_upload/{type}','GoodsController@upImage');//文件上传------------
 
+    Route::any('check_mobile','MemberController@checkMobile');//商家注册检测手机号------------
+
+    Route::any('member_register','MemberController@memberRegister');//商家注册------------
+
 });
