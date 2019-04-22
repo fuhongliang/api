@@ -39,6 +39,10 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
+        $this->mapV2Routes();
+
+        $this->mapV3Routes();
+
         //
     }
 
@@ -56,6 +60,24 @@ class RouteServiceProvider extends ServiceProvider
              ->group(base_path('routes/web.php'));
     }
 
+    /**
+     *
+     */
+    protected function mapV2Routes()//自定义路由方法
+    {
+        Route::prefix('v2')
+            ->middleware('web')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/v2.php'));
+    }
+
+    protected function mapV3Routes()//自定义路由方法
+    {
+        Route::prefix('v3')
+            ->middleware('web')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/v3.php'));
+    }
     /**
      * Define the "api" routes for the application.
      *
