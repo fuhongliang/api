@@ -150,10 +150,21 @@ class Voucher extends BModel
             ->where($condition)
             ->get($field);
     }
+
+    /**
+     * @param $condition
+     * @return int
+     */
     static function delVoucher($condition)
     {
         return BModel::delData('voucher_template',$condition);
     }
+
+    /**
+     * @param $store_id
+     * @param $bundling_id
+     * @return mixed
+     */
     static function getBundlingInfo($store_id,$bundling_id)
     {
         $data=self::getBundling(['bl_id'=>$bundling_id],['bl_id','bl_name','bl_discount_price as bl_price','bl_state']);
@@ -165,120 +176,182 @@ class Voucher extends BModel
     static function delBundling($condition)
     {
         DB::transaction(function () use($condition){
-            DB::table('p_bundling')
-                ->where($condition)
-                ->delete();
-            DB::table('p_bundling_goods')
-                ->where($condition)
-                ->delete();
+            BModel::delData('p_bundling',$condition);
+            BModel::delData('p_bundling_goods',$condition);
         });
         return true;
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return mixed
+     */
     static function getManSongInfo($condition,$field=['*'])
     {
-       return DB::table('p_mansong_quota')
-            ->where($condition)
-            ->get($field)
-            ->first();
+       return BModel::getTableFieldFirstData('p_mansong_quota',$condition,$field);
     }
+
+    /**
+     * @param $data
+     * @return int
+     */
     static function addManSongData($data)
     {
-        return  DB::table('p_mansong')->insertGetId($data);
+        return  BModel::insertData('p_mansong',$data);
     }
+
+    /**
+     * @param $data
+     * @return int
+     */
     static function addManSongRuleData($data)
     {
-        return  DB::table('p_mansong_rule')->insertGetId($data);
+        return  BModel::insertData('p_mansong_rule',$data);
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return \Illuminate\Support\Collection
+     */
     static function getManSongList($condition,$field=['*'])
     {
-        return DB::table('p_mansong')
-            ->where($condition)
-            ->get($field);
+        return BModel::getTableAllData('p_mansong',$condition,$field);
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return \Illuminate\Support\Collection
+     */
     static function getManSongRuleList($condition,$field=['*'])
     {
-        return DB::table('p_mansong_rule')
-            ->where($condition)
-            ->get($field);
+        return BModel::getTableAllData('p_mansong_rule',$condition,$field);
     }
+
+    /**
+     * @param $condition
+     * @return bool
+     */
     static function delMansong($condition)
     {
         DB::transaction(function ()use ($condition) {
-            DB::table('p_mansong')
-                ->where($condition)
-                ->delete();
-            DB::table('p_mansong_rule')
-                ->where($condition)
-                ->delete();
+            BModel::delData('p_mansong',$condition);
+            BModel::delData('p_mansong_rule',$condition);
         });
         return true;
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return mixed
+     */
     static function getXianShiInfo($condition,$field=['*'])
     {
-        return DB::table('p_xianshi_quota')
-            ->where($condition)
-            ->get($field)
-            ->first();
+        return BModel::getTableFieldFirstData('p_xianshi_quota',$condition,$field)
     }
+
+    /**
+     * @param $data
+     * @return int
+     */
     static function addXianShiData($data)
     {
-        return  DB::table('p_xianshi')->insertGetId($data);;
+        return BModel::insertData('p_xianshi',$data);
     }
+
+    /**
+     * @param $condition
+     * @param $data
+     * @return int
+     */
     static function upXianShiData($condition,$data)
     {
-        return DB::table('p_xianshi')
-            ->where($condition)
-            ->update($data);
+        return BModel::upTableData('p_xianshi',$condition,$data);
     }
+
+    /**
+     * @param $condition
+     * @param $data
+     * @return int
+     */
     static function upManSongData($condition,$data)
     {
-        return DB::table('p_mansong')
-            ->where($condition)
-            ->update($data);
+        return BModel::upTableData('p_mansong',$condition,$data);
     }
+
+    /**
+     * @param $data
+     * @return int
+     */
     static function addXianShiGoodsData($data)
     {
-        return  DB::table('p_xianshi_goods')->insertGetId($data);;
+        return BModel::insertData('p_xianshi_goods',$data);
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return \Illuminate\Support\Collection
+     */
     static function getXianshiList($condition,$field=['*'])
     {
-        return DB::table('p_xianshi')
-            ->where($condition)
-            ->get($field);
+        return BModel::getTableAllData('p_xianshi',$condition,$field);
     }
+
+    /**
+     * @param $condition
+     * @return bool
+     */
     static function delXianshi($condition)
     {
         DB::transaction(function () use($condition) {
-            DB::table('p_xianshi')
-                ->where($condition)
-                ->delete();
-            DB::table('p_xianshi_goods')
-                ->where($condition)
-                ->delete();
+            BModel::delData('p_xianshi',$condition);
+            BModel::delData('p_xianshi_goods',$condition);
         });
         return true;
     }
+
+    /**
+     * @param $field
+     * @return \Illuminate\Support\Collection
+     */
     static function getMianzhiList($field)
     {
         return DB::table('voucher_price')
             ->get($field);
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return mixed
+     */
     static function getXianshiData($condition,$field=['*'])
     {
-        return  DB::table('p_xianshi')
-        ->where($condition)
-        ->first($field);
+        return BModel::getTableFieldFirstData('p_xianshi',$condition,$field)
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return mixed
+     */
     static function getXianshiGoodsData($condition,$field=['*'])
     {
-        return DB::table('p_xianshi_goods')
-            ->where($condition)
-            ->get($field);
+        return getTableAllData('p_xianshi_goods',$condition,$field);
     }
+
+    /**
+     * @param $store_id
+     * @param $xianshi_id
+     * @return mixed
+     */
     static function getXianshiInfoData($store_id,$xianshi_id)
     {
         $data=self::getXianshiData(['xianshi_id'=>$xianshi_id],['xianshi_id','xianshi_name','xianshi_title','xianshi_explain','start_time','end_time','lower_limit']);
-
         $data->goods_list=self::getXianshiGoodsData(['xianshi_id'=>$xianshi_id],['goods_id','goods_name','goods_image as img_name','xianshi_price','goods_price']);
         $data->img_path=getenv('GOODS_IMAGE').$store_id;
         return $data;
