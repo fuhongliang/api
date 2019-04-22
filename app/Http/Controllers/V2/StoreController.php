@@ -316,7 +316,6 @@ class StoreController extends Base
 
     public function storeYunYingInfo(Request $request)
     {
-        echo 88;die;
         $store_id = $request->input('store_id');
         if (empty($store_id)) {
             return Base::jsonReturn(1000, '参数缺失');
@@ -363,7 +362,7 @@ class StoreController extends Base
         $result['30_orderamount']=$data->orderamount;
         $result['store_collect']=$store_collect_data->store_collect;
         $result['goods_num']=$goods_num;
-        $result['jingying_url']='http://47.111.27.189:2000/v1/store_jingying/'.$store_id;
+        $result['jingying_url']='http://47.111.27.189:2000/v2/store_jingying/'.$store_id;
         return Base::jsonReturn(200, '获取成功', $result);
     }
     public function storeJingYingData(Request $request)
