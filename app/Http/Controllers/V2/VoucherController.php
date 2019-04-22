@@ -343,7 +343,7 @@ class VoucherController extends Base
                 $result[$k]['start_time']=$v->start_time;
                 $result[$k]['end_time']=$v->end_time;
                 $result[$k]['state']=$v->state;
-                if($v->end_time <= time() && $v->state ==2)
+                if($v->end_time <= time())
                 {
                     $result[$k]['state']=5;
                     Voucher::upManSongData(['mansong_id'=>$v->mansong_id],['state'=>5]);
