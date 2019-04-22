@@ -175,6 +175,12 @@ class Voucher extends Model
             ->where($condition)
             ->update($data);
     }
+    static function upManSongData($condition,$data)
+    {
+        return DB::table('p_mansong')
+            ->where($condition)
+            ->update($data);
+    }
     static function addXianShiGoodsData($data)
     {
         return  DB::table('p_xianshi_goods')->insertGetId($data);;
