@@ -250,7 +250,7 @@ class Voucher extends BModel
      */
     static function getXianShiInfo($condition,$field=['*'])
     {
-        return BModel::getTableFieldFirstData('p_xianshi_quota',$condition,$field)
+        return BModel::getTableFieldFirstData('p_xianshi_quota',$condition,$field);
     }
 
     /**
@@ -331,7 +331,7 @@ class Voucher extends BModel
      */
     static function getXianshiData($condition,$field=['*'])
     {
-        return BModel::getTableFieldFirstData('p_xianshi',$condition,$field)
+        return BModel::getTableFieldFirstData('p_xianshi',$condition,$field);
     }
 
     /**
