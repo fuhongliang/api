@@ -2,34 +2,31 @@
 
 namespace App\model\V2;
 
+use App\BModel;
 use App\Http\Controllers\BaseController as Base;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class Token extends Model
-{ /**
- * @param $data
- * @return int|string
- */
+class Token extends BModel
+{
+
+    /**
+     * @param $data
+     * @return int
+     */
     static function addToken($data)
     {
-        return  DB::table('token')->insertGetId($data);
+        return BModel::insertData('token',$data);
     }
 
     /**
      * @param $condition
      * @param $field
-     * @return array|\PDOStatement|string|Model|null
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @return mixed
      */
     static function getTokenField($condition,$field)
     {
-        return DB::table('token')
-            ->where($condition)
-            ->get($field)
-            ->first();
+        return BModel::getTableFieldFirstData('token',$condition,$field);
     }
 
 

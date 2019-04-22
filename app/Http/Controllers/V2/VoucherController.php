@@ -97,7 +97,7 @@ class VoucherController extends Base
         $field=['voucher_t_id as voucher_id','voucher_t_title as voucher_title','voucher_t_price as voucher_price',
             'voucher_t_limit as voucher_limit','voucher_t_end_date as voucher_end_date',
             'voucher_t_total as voucher_total','voucher_t_eachlimit as voucher_eachlimit','voucher_t_desc as voucher_desc'];
-        $info=Voucher::addVoucherInfo(['voucher_t_id'=>$voucher_id],$field);
+        $info=Voucher::getVoucherInfo(['voucher_t_id'=>$voucher_id],$field);
         $info->voucher_end_date=date('Y-m-d H:i:s',$info->voucher_end_date);
         return Base::jsonReturn(200, '获取成功',$info);
     }

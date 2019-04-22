@@ -2,40 +2,62 @@
 
 namespace App\model\V2;
 
+use App\BModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class Voucher extends Model
+class Voucher extends BModel
 {
-    //
+    /**
+     * @param $data
+     * @return int
+     */
     static function addVoucherTemplate($data)
     {
-        return  DB::table('voucher_template')->insertGetId($data);
+        return  BModel::insertData('voucher_template',$data);
     }
+
+    /**
+     * @param $condition
+     * @return Model|\Illuminate\Database\Query\Builder|object|null
+     */
     static function getVoucherQuotaInfo($condition)
     {
-        return DB::table('voucher_quota')
-            ->where($condition)
-            ->first();
+        return BModel::getTableFirstData('voucher_quota',$condition);
     }
-    static function addVoucherInfo($condition,$field=['*'])
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return mixed
+     */
+    static function getVoucherInfo($condition,$field=['*'])
     {
-        return DB::table('voucher_template')
-            ->where($condition)
-            ->first($field);
+        return BModel::getTableFieldFirstData('voucher_template',$condition,$field);
     }
+
+    /**
+     * @param $condition
+     * @param $data
+     * @return int
+     */
     static function upVoucherTemplate($condition,$data)
     {
-        return DB::table('voucher_template')
-            ->where($condition)
-            ->update($data);
+        return BModel::upTableData('voucher_template',$condition,$data);
     }
+
+    /**
+     * @param $condition
+     * @return int
+     */
     static function getVoucherTemplateCount($condition)
     {
-       return  DB::table('voucher_template')
-           ->where($condition)
-           ->count();
+       return  BModel::getCount('voucher_template',$condition);
     }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
     static function  getVoucherPriceList()
     {
        return DB::table('voucher_price')
@@ -43,39 +65,68 @@ class Voucher extends Model
             ->get();
     }
 
+    /**
+     * @param $condition
+     * @param array $field
+     * @return \Illuminate\Support\Collection
+     */
     static function  getVoucherTemplateList($condition,$field=['*'])
     {
-        return DB::table('voucher_template')
-            ->where($condition)
-            ->get($field);
+        return BModel::getTableAllData('voucher_template',$condition,$field);
     }
 
+    /**
+     * @param $data
+     * @return int
+     */
     static function addBundlingData($data)
     {
-        return  DB::table('p_bundling')->insertGetId($data);
+        return  BModel::insertData('p_bundling',$data);
     }
+
+    /**
+     * @param $data
+     * @return int
+     */
     static function addBundlingGoodsData($data)
     {
-        return  DB::table('p_bundling_goods')->insertGetId($data);
+        return  BModel::insertData('p_bundling_goods',$data);
     }
+
+    /**
+     * @param $condition
+     * @param $data
+     * @return int
+     */
     static function upBundlingData($condition,$data)
     {
-        return DB::table('p_bundling')
-            ->where($condition)
-            ->update($data);
+        return BModel::upTableData('p_bundling',$condition,$data);
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return \Illuminate\Support\Collection
+     */
     static function getBundlingData($condition,$field=['*'])
     {
-        return DB::table('p_bundling')
-            ->where($condition)
-            ->get($field);
+        return BModel::getTableAllData('p_bundling',$condition,$field)
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return mixed
+     */
     static function  getBundling($condition,$field=['*'])
     {
-        return DB::table('p_bundling')
-            ->where($condition)
-            ->first($field);
+        return BModel::getTableFieldFirstData('p_bundling',$condition,$field);
     }
+
+    /**
+     * @param $condition
+     * @return Model|\Illuminate\Database\Query\Builder|object|null
+     */
     static function getBundlingGoodsTotalPrice($condition)
     {
         return DB::table('p_bundling_goods')
@@ -86,6 +137,12 @@ class Voucher extends Model
             )
         );
     }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return \Illuminate\Support\Collection
+     */
     static function getBundlingGoods($condition,$field=['*'])
     {
         return DB::table('p_bundling_goods as a')
@@ -95,9 +152,7 @@ class Voucher extends Model
     }
     static function delVoucher($condition)
     {
-        return DB::table('voucher_template')
-            ->where($condition)
-            ->delete();
+        return BModel::delData('voucher_template',$condition);
     }
     static function getBundlingInfo($store_id,$bundling_id)
     {
