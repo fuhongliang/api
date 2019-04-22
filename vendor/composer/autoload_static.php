@@ -366,6 +366,7 @@ class ComposerStaticInit7f69e2e8817818ae449452c01cd56b34
     );
 
     public static $classMap = array (
+        'App\\BModel' => __DIR__ . '/../..' . '/app/BModel.php',
         'App\\Console\\Commands\\SwooleServer' => __DIR__ . '/../..' . '/app/Console/Commands/SwooleServer.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
@@ -376,7 +377,6 @@ class ComposerStaticInit7f69e2e8817818ae449452c01cd56b34
         'App\\Http\\Controllers\\BaseController' => __DIR__ . '/../..' . '/app/Http/Controllers/BaseController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\SMSController' => __DIR__ . '/../..' . '/app/Http/Controllers/SMSController.php',
-        'App\\Http\\Controllers\\Socket\\IndexController' => __DIR__ . '/../..' . '/app/Http/Controllers/Socket/IndexController.php',
         'App\\Http\\Controllers\\SwooleController' => __DIR__ . '/../..' . '/app/Http/Controllers/SwooleController.php',
         'App\\Http\\Controllers\\V1\\GoodsController' => __DIR__ . '/../..' . '/app/Http/Controllers/V1/GoodsController.php',
         'App\\Http\\Controllers\\V1\\MemberController' => __DIR__ . '/../..' . '/app/Http/Controllers/V1/MemberController.php',
@@ -387,6 +387,7 @@ class ComposerStaticInit7f69e2e8817818ae449452c01cd56b34
         'App\\Http\\Controllers\\V2\\OrderController' => __DIR__ . '/../..' . '/app/Http/Controllers/V2/OrderController.php',
         'App\\Http\\Controllers\\V2\\StoreController' => __DIR__ . '/../..' . '/app/Http/Controllers/V2/StoreController.php',
         'App\\Http\\Controllers\\V2\\VoucherController' => __DIR__ . '/../..' . '/app/Http/Controllers/V2/VoucherController.php',
+        'App\\Http\\Controllers\\V3\\IndexController' => __DIR__ . '/../..' . '/app/Http/Controllers/V3/IndexController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
         'App\\Http\\Middleware\\CheckForMaintenanceMode' => __DIR__ . '/../..' . '/app/Http/Middleware/CheckForMaintenanceMode.php',
         'App\\Http\\Middleware\\EncryptCookies' => __DIR__ . '/../..' . '/app/Http/Middleware/EncryptCookies.php',

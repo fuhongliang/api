@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\BModel' => $baseDir . '/app/BModel.php',
     'App\\Console\\Commands\\SwooleServer' => $baseDir . '/app/Console/Commands/SwooleServer.php',
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
     'App\\Exceptions\\Handler' => $baseDir . '/app/Exceptions/Handler.php',
@@ -16,7 +17,6 @@ return array(
     'App\\Http\\Controllers\\BaseController' => $baseDir . '/app/Http/Controllers/BaseController.php',
     'App\\Http\\Controllers\\Controller' => $baseDir . '/app/Http/Controllers/Controller.php',
     'App\\Http\\Controllers\\SMSController' => $baseDir . '/app/Http/Controllers/SMSController.php',
-    'App\\Http\\Controllers\\Socket\\IndexController' => $baseDir . '/app/Http/Controllers/Socket/IndexController.php',
     'App\\Http\\Controllers\\SwooleController' => $baseDir . '/app/Http/Controllers/SwooleController.php',
     'App\\Http\\Controllers\\V1\\GoodsController' => $baseDir . '/app/Http/Controllers/V1/GoodsController.php',
     'App\\Http\\Controllers\\V1\\MemberController' => $baseDir . '/app/Http/Controllers/V1/MemberController.php',
@@ -27,6 +27,7 @@ return array(
     'App\\Http\\Controllers\\V2\\OrderController' => $baseDir . '/app/Http/Controllers/V2/OrderController.php',
     'App\\Http\\Controllers\\V2\\StoreController' => $baseDir . '/app/Http/Controllers/V2/StoreController.php',
     'App\\Http\\Controllers\\V2\\VoucherController' => $baseDir . '/app/Http/Controllers/V2/VoucherController.php',
+    'App\\Http\\Controllers\\V3\\IndexController' => $baseDir . '/app/Http/Controllers/V3/IndexController.php',
     'App\\Http\\Kernel' => $baseDir . '/app/Http/Kernel.php',
     'App\\Http\\Middleware\\CheckForMaintenanceMode' => $baseDir . '/app/Http/Middleware/CheckForMaintenanceMode.php',
     'App\\Http\\Middleware\\EncryptCookies' => $baseDir . '/app/Http/Middleware/EncryptCookies.php',
