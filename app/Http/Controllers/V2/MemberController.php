@@ -7,7 +7,7 @@ use App\Http\Controllers\BaseController;
 use App\model\V2\Member;
 use App\model\V2\Store;
 use App\model\V2\Token;
-use Illuminate\Filesystem\Cache;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -31,7 +31,7 @@ class MemberController extends Base
         {
             return Base::jsonReturn(1001, '手机号已存在申请记录');
         }
-        return Base::jsonReturn(200,'监测成功');
+        return Base::jsonReturn(200,'可以注册');
     }
 
     /** 商户注册
