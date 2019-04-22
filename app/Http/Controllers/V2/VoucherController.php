@@ -15,10 +15,6 @@ use Illuminate\Support\Facades\Log;
 
 class VoucherController extends Base
 {
-
-
-
-
     /**  添加/编辑代金券
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -465,7 +461,7 @@ class VoucherController extends Base
         if (!$xianshi_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        $res=Voucher::delXianshi(['xianshi_id'=>$xianshi_id]);
+        $res=Voucher::delXianshi(['xianshi_id'=>$xianshi_id,'store_id'=>$store_id]);
         if ($res) {
             return Base::jsonReturn(200, '删除成功');
         } else {
