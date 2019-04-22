@@ -441,6 +441,6 @@ class Store extends BModel
      */
     static function getStoreField($condition,$field)
     {
-        return BModel::getTableValue('store',$condition,$field)
+        return BModel::getTableValue('store',$condition,$field);
     }
 }

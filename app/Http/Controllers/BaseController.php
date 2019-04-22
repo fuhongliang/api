@@ -23,14 +23,29 @@ class BaseController extends Controller
             'msg'=>$msg
         ]);
     }
+
+    /**
+     * @param $price
+     * @return string
+     */
     static function ncPriceFormat($price) {
         $price_format   = number_format($price,2,'.','');
         return $price_format;
     }
+
+    /**
+     * @param $store_id
+     * @param $member_name
+     * @return mixed
+     */
     static function makeToken($store_id,$member_name)
     {
         return Crypt::encryptString(serialize($store_id));
     }
+
+    /**
+     * @return string
+     */
     static function getSysSetPath(){
         switch(getenv('IMAGE_DIR_TYPE')){
             case "1":

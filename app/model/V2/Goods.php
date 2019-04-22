@@ -118,7 +118,7 @@ class Goods extends BModel
             $goods_state=1;
         }
         DB::transaction(function () use ($goods_id,$store_id,$goods_state){
-           BModel::upTableData(’goods,['goods_id'=>$goods_id,'store_id'=>$store_id],['goods_state' => $goods_state])
+           BModel::upTableData(’goods,['goods_id'=>$goods_id,'store_id'=>$store_id],['goods_state' => $goods_state]);
         });
         return $goods_state;
     }
