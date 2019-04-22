@@ -13,7 +13,7 @@
 
 Route::group(['namespace'=>'V2'],function(){
     Route::post('member_login','MemberController@login');
-    Route::post('store_jingying/{store_id}','StoreController@storeJingYingData');//店铺经营
+    Route::any('store_jingying/{store_id}','StoreController@storeJingYingData');//店铺经营
     Route::any('get_echarts','StoreController@getEcharts');
     Route::any('get_echarts_','StoreController@getEcharts_');
 });
