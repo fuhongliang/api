@@ -362,9 +362,12 @@ class Voucher extends BModel
     static function getXianshiInfoData($store_id,$xianshi_id)
     {
         $data=self::getXianshiData(['xianshi_id'=>$xianshi_id],['xianshi_id','xianshi_name','xianshi_title','xianshi_explain','start_time','end_time','lower_limit']);
-        $data->goods_list=self::getXianshiGoodsData(['xianshi_id'=>$xianshi_id],['goods_id','goods_name','goods_image as img_name','xianshi_price','goods_price']);
-        $data->img_path="http://47.111.27.189:2000/storage/shop/store/goods/".$store_id;
-        return $data;
+        $goods_list=self::getXianshiGoodsData(['xianshi_id'=>$xianshi_id],['goods_id','goods_name','goods_image as img_name','xianshi_price','goods_price']);
+        foreach ($goods_list as &$v)
+        {
+            $v->img_path="http://47.111.27.189:2000/storage/shop/store/goods/".$store_id;
+        }
+        return $goods_list;
     }
 
 
