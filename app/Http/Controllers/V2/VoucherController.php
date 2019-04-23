@@ -173,7 +173,7 @@ class VoucherController extends Base
         $bl_discount_price = $request->input('discount_price');
         $goods_list = $request->input('goods_list');
         $bundling_id = $request->input('bundling_id');
-        $state = $request->input('state');
+        $state = $request->input('bl_state');
         if (!$store_id || !$bundling_name || !$bl_discount_price || !$goods_list) {
             return Base::jsonReturn(1000, '参数缺失');
         }
