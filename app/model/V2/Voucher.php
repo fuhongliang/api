@@ -167,11 +167,20 @@ class Voucher extends BModel
      */
     static function getBundlingInfo($store_id,$bundling_id)
     {
-        $data=self::getBundling(['bl_id'=>$bundling_id],['bl_id','bl_name','bl_discount_price as bl_price','bl_state']);
-        $data->goods_list=self::getBundlingGoods(['a.bl_id'=>$bundling_id],['a.goods_id','a.goods_name','a.goods_image as img_name','a.bl_goods_price as goods_price','b.goods_price as goods_origin_price']);
-        $data->img_path="http://47.111.27.189:2000/storage/shop/store/goods/".$store_id;
+        $ids=BModel::getTableAllData('p_bundling_goods',['bl_id'=>$bundling_id],['goods_id']);
+        $goods_info=[];
+        if(!$ids->isEmpty())
+        {
+            foreach ($ids as $k=>$v)
+            {
+                $fields=['a.goods_id','a.goods_name','a.goods_price','a.goods_marketprice','b.goods_body as goods_desc','b.goods_sale_time','a.goods_state','a.goods_storage','a.goods_image as img_name'];
+                $goods_info[$k]=Goods::getGoodsInfo(['goods_id'=>$v->goods_id],$fields);
+                $goods_info[$k]->img_path="http://47.111.27.189:2000/storage/shop/store/goods/".$store_id;
+                $goods_info[$k]->goods_sale_time=unserialize($goods_info[$k]->goods_sale_time);
 
-        return $data;
+            }
+        }
+        return $goods_info;
     }
 
     static function delBundling($condition)
