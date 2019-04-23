@@ -26,7 +26,7 @@ class checkToken
             return Base::jsonReturn(3000,  'token缺失');
         }else{
             $token=Token::getTokenField(['token'=>$token],['token','expire_time','store_id']);
-            if (empty($token) || ! Store::getStoreInfo(['store_id'=>$token->store_id]))
+            if (empty($token) || !Store::getStoreInfo(['store_id'=>$token->store_id]))
             {
                 return Base::jsonReturn(3001,  'token伪造');
             }else{
