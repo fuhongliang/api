@@ -27,7 +27,7 @@ class GoodsController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000,  '商家不存在');
         }
-        if(empty($class_id)) {
+        if(!$class_id) {
             $stcId = Store::getStoreClassStcId(['store_id' => $store_id], ['stc_id']);
             $class_id=$stcId->stc_id;
         }
