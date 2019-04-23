@@ -129,7 +129,7 @@ class Store extends BModel
      */
     static function upStoreGoodsClassSort($condition,$up_data)
     {
-        return BModel::upTableData('store_goods_class',$up_data);
+        return BModel::upTableData('store_goods_class',$condition,$up_data);
     }
 
     /**
