@@ -339,7 +339,7 @@ class GoodsController extends Base
         if($type == 'goods_img')
         {
             $tokenInfo=Token::getTokenField(['token'=>$token],['store_id']);
-            $save_path = '/shop/store/goods' . '/' . $tokenInfo->store_id  . Base::getSysSetPath();
+            $save_path = '/shop/store/goods' . '/' . $tokenInfo->store_id;
             $entension = $goods_image -> getClientOriginalExtension();
             $file_name=md5(microtime()).'.'.$entension;
             $image_path = $goods_image->storeAs(
