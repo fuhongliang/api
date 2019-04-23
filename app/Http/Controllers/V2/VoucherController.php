@@ -33,6 +33,9 @@ class VoucherController extends Base
         {
             return Base::jsonReturn(1000,'参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
         $where=[
             ['quota_storeid', '=', $store_id],
             ['quota_endtime', '>', time()],
@@ -147,6 +150,9 @@ class VoucherController extends Base
         if (!$store_id || !$voucher_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
         $res=Voucher::delVoucher(['voucher_t_store_id'=>$store_id,'voucher_t_id'=>$voucher_id]);
         if ($res) {
             return Base::jsonReturn(200, '删除成功');
@@ -162,7 +168,6 @@ class VoucherController extends Base
      */
     public function bundlingEdit(Request $request)
     {
-        Log::info(serialize($request->all()));
         $store_id = $request->input('store_id');
         $bundling_name = $request->input('bundling_name');
         $bl_discount_price = $request->input('discount_price');
@@ -171,6 +176,9 @@ class VoucherController extends Base
         $state = $request->input('state');
         if (!$store_id || !$bundling_name || !$bl_discount_price || !$goods_list) {
             return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
         $data=array(
             'store_id'=>$store_id,
@@ -211,6 +219,9 @@ class VoucherController extends Base
         {
             return Base::jsonReturn(1000,'参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
         $list= Voucher::getBundlingData(['store_id'=>$store_id],['bl_id','bl_name','bl_state']);
         if(!empty($list))
         {
@@ -240,6 +251,9 @@ class VoucherController extends Base
         if (!$bundling_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2001,  '商家不存在');
+        }
         $res=Voucher::delBundling(['bl_id'=>$bundling_id]);
         if ($res) {
             return Base::jsonReturn(200, '删除成功');
@@ -253,6 +267,9 @@ class VoucherController extends Base
         $store_id = $request->input('store_id');
         if (!$bundling_id) {
             return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2001,  '商家不存在');
         }
         $res=Voucher::getBundlingInfo($store_id,$bundling_id);
         if ($res) {
@@ -273,6 +290,9 @@ class VoucherController extends Base
         $rules = $request->input('rules');//{['price'=>100058,'discount'=>333,'mansong_goods_name'=>333],['price'=>100058,'discount'=>333,'mansong_goods_name'=>333]}
         if (!$store_id || !$mansong_name || !$start_time || !$end_time  ||!$rules) {
             return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
 //        $rules=array(
 //            array(
@@ -328,6 +348,9 @@ class VoucherController extends Base
         if (!$store_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
         $list=Voucher::getManSongList(['store_id'=>$store_id]);
         if(!empty($list))
         {
@@ -358,6 +381,9 @@ class VoucherController extends Base
         if (!$mansong_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
         $res=Voucher::delMansong(['mansong_id'=>$mansong_id]);
         if ($res) {
             return Base::jsonReturn(200, '删除成功');
@@ -378,6 +404,9 @@ class VoucherController extends Base
         $goods_list= $request->input('goods_list');
         if (!$store_id || !$xianshi_name  || !$start_time ||!$end_time || !$lower_limit || !$goods_list) {
             return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
 //        $xianshi_quota_list=Voucher::getXianShiInfo(['store_id'=>$store_id]);
 //        if(empty($xianshi_quota_list))
@@ -436,6 +465,9 @@ class VoucherController extends Base
         if (!$store_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
         $list=Voucher::getXianshiList(['store_id'=>$store_id]);
         if(!empty($list))
         {
@@ -461,6 +493,9 @@ class VoucherController extends Base
         if (!$xianshi_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
         $res=Voucher::delXianshi(['xianshi_id'=>$xianshi_id,'store_id'=>$store_id]);
         if ($res) {
             return Base::jsonReturn(200, '删除成功');
@@ -484,6 +519,9 @@ class VoucherController extends Base
         $store_id = $request->input('store_id');
         if (!$xianshi_id) {
             return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
         $res=Voucher::getXianshiInfoData($store_id,$xianshi_id);
         if ($res) {

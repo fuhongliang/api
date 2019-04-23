@@ -24,6 +24,9 @@ class GoodsController extends Base
         if (empty($store_id)) {
             return Base::jsonReturn(1000,  '参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
         if(empty($class_id)) {
             $stcId = Store::getStoreClassStcId(['store_id' => $store_id], ['stc_id']);
             $class_id=$stcId->stc_id;
@@ -40,6 +43,9 @@ class GoodsController extends Base
         $store_id = $request->input('store_id');
         if (empty($store_id)) {
             return Base::jsonReturn(1000,  '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
         if(empty($class_id)) {
             $stcId = Store::getStoreClassStcId(['store_id' => $store_id], ['stc_id']);
@@ -60,6 +66,9 @@ class GoodsController extends Base
         $store_id = $request->input('store_id');
         if (empty($store_id) || empty($goods_id)) {
             return Base::jsonReturn(1000,  '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2001,  '商家不存在');
         }
         $res=Goods::changeGoodsState($goods_id,$store_id);
         if ($res == 1) {
@@ -91,6 +100,9 @@ class GoodsController extends Base
         if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price || !$file_name)
         {
             return Base::jsonReturn(1000,'参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
         if(!$goods_storage)
         {
@@ -229,6 +241,9 @@ class GoodsController extends Base
         {
             return Base::jsonReturn(1000,'参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2001,  '商家不存在');
+        }
         $res=Goods::delGoods($store_id,$goods_id);
         if($res)
         {
@@ -244,6 +259,9 @@ class GoodsController extends Base
         if(!$store_id || !$goods_id)
         {
             return Base::jsonReturn(1000,'参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2001,  '商家不存在');
         }
         $field=['goods_id','goods_commonid','goods_image','goods_name','goods_stcid','goods_marketprice','goods_price','goods_storage'];
         $goods_info=Goods::getGoodsInfo(['store_id'=>$store_id,'goods_id'=>$goods_id],$field);
@@ -274,7 +292,10 @@ class GoodsController extends Base
         $file_name=$request->input('img_name');// 描述
         if(!$goods_id || !$store_id)
         {
-        return Base::jsonReturn(1000,'参数缺失');
+            return Base::jsonReturn(1000,'参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
         $goods_array=$goods_comm=array();
         if($class_id)
@@ -342,7 +363,7 @@ class GoodsController extends Base
             $save_path = '/shop/store/goods' . '/' . $tokenInfo->store_id;
             $entension = $goods_image -> getClientOriginalExtension();
             $file_name=md5(microtime()).'.'.$entension;
-            $image_path = $goods_image->storeAs(
+            $goods_image->storeAs(
                 $save_path,$file_name
             );
             $data=array(

@@ -2,13 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
+use App\BModel;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\DB;
 use Overtrue\EasySms\EasySms;
 class BaseController extends Controller
 {
+    /**
+     * @param $store_id
+     * @return bool
+     */
+    static function checkStoreExist($store_id)
+    {
+        $count=BModel::('store',['store_id'=>$store_id]);
+        return $count>0 ? true : false;
+    }
+
     /**
      * @param int $code
      * @param string $msg

@@ -4,13 +4,10 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Controllers\BaseController as Base;
 use App\Http\Controllers\SMSController;
-use App\Http\Controllers\BaseController;
 use App\model\V2\Goods;
 use App\model\V2\Member;
-use App\model\V2\Order;
 use App\model\V2\Store;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Overtrue\EasySms\EasySms;
@@ -24,6 +21,9 @@ class StoreController extends Base
         $class_name = $request->input('class_name');
         if (empty($store_id) || empty($class_name)) {
             return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
         if(!$class_id)
         {
@@ -76,6 +76,9 @@ class StoreController extends Base
         if (empty($class_id) || empty($store_id)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
         $res=Store::delStoreClassInfo($class_id,$store_id);
         if ($res) {
             return Base::jsonReturn(200, '删除成功');
@@ -89,6 +92,9 @@ class StoreController extends Base
         if (empty($store_id)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
         $data=Store::getAllStoreClass(['store_id'=>$store_id],['stc_id','stc_name','stc_sort']);
         return Base::jsonReturn(200, '获取成功',$data);
     }
@@ -98,6 +104,9 @@ class StoreController extends Base
         $store_id = $request->input('store_id');
         if (empty($class_ids) || empty($store_id)) {
             return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
         $res=Store::sortStoreGoodsClass($class_ids,$store_id);
         if ($res) {
@@ -113,6 +122,9 @@ class StoreController extends Base
         $store_id = $request->input('store_id');
         if (empty($store_id)) {
             return Base::jsonReturn(1000,  '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
         if(empty($class_id)) {
             $stcId = Store::getStoreClassStcId(['store_id' => $store_id], ['stc_id']);
@@ -135,6 +147,9 @@ class StoreController extends Base
         $store_id = $request->input('store_id');
         if (empty($store_id)) {
             return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
         $data=Store::getStoreData(['a.store_id'=>$store_id],
             ['a.store_state','a.store_description','a.store_label','a.store_phone',
@@ -159,6 +174,9 @@ class StoreController extends Base
         if (empty($store_id)) {
             return Base::jsonReturn(1000,  '参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
         $res=Store::setWorkState(['store_id'=>$store_id],['store_state'=>$store_state]);
         if ($res) {
             return Base::jsonReturn(200,  '设置成功');
@@ -173,6 +191,9 @@ class StoreController extends Base
         if (empty($store_id) || empty($store_desc)) {
             return Base::jsonReturn(1000,  '参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
         $res=Store::setWorkState(['store_id'=>$store_id],['store_description'=>$store_desc]);
         if ($res) {
             return Base::jsonReturn(200,  '设置成功');
@@ -186,6 +207,9 @@ class StoreController extends Base
         $phone_number = $request->input('phone_number');
         if (empty($store_id) || empty($phone_number)) {
             return Base::jsonReturn(1000,  '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
         if(!preg_match("/^(0[0-9]{2,3}-)?([2-9][0-9]{6,7})+(-[0-9]{1,4})?$/",$phone_number) && !preg_match("/^1[34578]{1}\d{9}$/",$phone_number))
         {
@@ -206,6 +230,9 @@ class StoreController extends Base
         if (empty($store_id) || empty($work_start_time) || empty($work_end_time)) {
             return Base::jsonReturn(1000,  '参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
         $res=Store::setWorkState(['store_id'=>$store_id],['work_start_time'=>$work_start_time,'work_end_time'=>$work_end_time]);
         if ($res) {
             return Base::jsonReturn(200,  '设置成功');
@@ -221,6 +248,9 @@ class StoreController extends Base
         $type = $request->input('type');// 1 安卓 2 ios
         if (empty($store_id) || empty($content) || empty($type)) {
             return Base::jsonReturn(1000,  '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
         $memdata=Store::getStoreMemInfo(['store_id'=>$store_id],['c.member_id','c.member_name']);
         $data=array(
@@ -279,6 +309,9 @@ class StoreController extends Base
         if (empty($store_id)) {
             return Base::jsonReturn(1000 ,'参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
         $result=array();
         if(!empty($no_com))//未回复
         {
@@ -305,6 +338,9 @@ class StoreController extends Base
         if (empty($store_id) || empty($content)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
         $ins_data=array(
             'store_id'=>$store_id,
             'content'=>$content,
@@ -323,6 +359,9 @@ class StoreController extends Base
         $store_id = $request->input('store_id');
         if (empty($store_id)) {
             return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
         $beginToday=mktime(0,0,0,date('m'),date('d'),date('Y'));
         $endToday=mktime(0,0,0,date('m'),date('d')+1,date('Y'))-1;
@@ -375,6 +414,9 @@ class StoreController extends Base
         $store_id = $request->route('store_id');
         if (empty($store_id)) {
             return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
         $data=array();
         $data['datetime']=date('Y-m-d');
@@ -453,12 +495,12 @@ class StoreController extends Base
     }
     public function getEcharts(Request $request)
     {
-        header("Access-Control-Allow-Origin:*");
-        header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
-        header("Access-Control-Allow-Headers:DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type, Accept-Language, Origin, Accept-Encoding");
         $store_id =$request->input('store_id');
         if (empty($store_id)) {
             return Base::jsonReturn(1000,'参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
         $data=$xday=$ydata=$result=array();
         for ($i=7;$i>0;$i--)
@@ -488,12 +530,12 @@ class StoreController extends Base
     }
     public function getEcharts_(Request $request)
     {
-        header("Access-Control-Allow-Origin:*");
-        header("Access-Control-Allow-Methods:GET, POST, OPTIONS, DELETE");
-        header("Access-Control-Allow-Headers:DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type, Accept-Language, Origin, Accept-Encoding");
         $store_id = $request->input('store_id');
         if (empty($store_id)) {
             return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
         }
         $data=$xday=$ydata=$result=array();
         for ($i=7;$i>0;$i--)
