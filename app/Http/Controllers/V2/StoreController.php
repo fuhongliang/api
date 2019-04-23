@@ -187,6 +187,10 @@ class StoreController extends Base
         if (empty($store_id) || empty($phone_number)) {
             return Base::jsonReturn(1000,  '参数缺失');
         }
+        if(!preg_match("/^(0[0-9]{2,3}-)?([2-9][0-9]{6,7})+(-[0-9]{1,4})?$/",$phone_number) && !preg_match("/^1[34578]{1}\d{9}$/",$phone_number))
+        {
+            return Base::jsonReturn(2001, '电话格式不正确');
+        }
         $res=Store::setWorkState(['store_id'=>$store_id],['store_phone'=>$phone_number]);
         if ($res) {
             return Base::jsonReturn(200,  '设置成功');
