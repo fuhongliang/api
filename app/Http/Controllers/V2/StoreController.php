@@ -426,12 +426,11 @@ class StoreController extends Base
             )
         );
 
-        //今日转化率
         if ($today_click->clicknum == 0)
         {
             $today_change=0;
         }else{
-            $today_change=$today_ordernum->ordernum/$today_click;
+            $today_change=$today_ordernum->ordernum/$today_click->clicknum;
         }
         if ($yest_click->clicknum == 0)
         {
