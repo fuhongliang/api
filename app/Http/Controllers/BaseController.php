@@ -13,7 +13,7 @@ class BaseController extends Controller
      */
     static function checkStoreExist($store_id)
     {
-        $count=BModel::('store',['store_id'=>$store_id]);
+        $count=BModel::getCount('store',['store_id'=>$store_id]);
         return $count>0 ? true : false;
     }
 
