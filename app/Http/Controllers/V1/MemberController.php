@@ -43,7 +43,8 @@ class MemberController extends Base
                     'member_id'=>$memberInfo->member_id,
                     'token'=>$data->token,
                     'add_time'=>time(),
-                    'expire_time'=>time()+24*5*3600
+                    'expire_time'=>time()+24*5*3600,
+                    'store_id'=> $data->store_id
                 );
                 Token::addToken($token_data);
                 Base::makeToken($member_name,$member_passwd);
