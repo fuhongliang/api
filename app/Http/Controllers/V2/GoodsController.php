@@ -27,11 +27,18 @@ class GoodsController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000,  '商家不存在');
         }
-        if(!$class_id) {
-            $stcId = Store::getStoreClassStcId(['store_id' => $store_id], ['stc_id']);
-            $class_id=$stcId->stc_id;
-        }
         $result=array();
+        if(empty($class_id)) {
+            $stcId = Store::getStoreClassStcId(['store_id' => $store_id], ['stc_id']);
+            if(!empty($stcId))
+            {
+                $class_id=$stcId->stc_id;
+            }else{
+                $result['class_list']=$result['goods_list']=null;
+                return Base::jsonReturn(200,  '获取成功',$result);
+            }
+        }
+
         $result['class_list']=Store::getAllStoreClass(['store_id'=>$store_id],['stc_id','stc_name']);
         $result['goods_list']=Store::getStoreGoodsListByStcId($store_id,$class_id);
         return Base::jsonReturn(200,  '获取成功',$result);
