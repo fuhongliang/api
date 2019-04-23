@@ -341,7 +341,7 @@ class Voucher extends BModel
      */
     static function getXianshiGoodsData($condition,$field=['*'])
     {
-        return getTableAllData('p_xianshi_goods',$condition,$field);
+        return BModel::getTableAllData('p_xianshi_goods',$condition,$field);
     }
 
     /**
