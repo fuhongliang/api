@@ -169,7 +169,8 @@ class Voucher extends BModel
     {
         $data=self::getBundling(['bl_id'=>$bundling_id],['bl_id','bl_name','bl_discount_price as bl_price','bl_state']);
         $data->goods_list=self::getBundlingGoods(['a.bl_id'=>$bundling_id],['a.goods_id','a.goods_name','a.goods_image as img_name','a.bl_goods_price as goods_price','b.goods_price as goods_origin_price']);
-        $data->img_path=getenv('GOODS_IMAGE').$store_id;
+        $data->img_path="http://47.111.27.189:2000/storage/shop/store/goods/".$store_id;
+
         return $data;
     }
 
