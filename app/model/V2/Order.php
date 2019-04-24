@@ -80,7 +80,7 @@ class Order extends BModel
             $data->extend_order_goods = $order_goods_list;
             foreach ($order_goods_list as $v)
             {
-                $total_price += $v->goods_pay_price*$v->goods_num;
+                $total_price = $v->goods_pay_price;
                 $commis_price +=$v->goods_pay_price*$v->goods_num*($v->commis_rate/100);
             }
 
