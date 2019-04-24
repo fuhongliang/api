@@ -7,9 +7,9 @@ use App\model\V2\Goods;
 use App\model\V2\Store;
 use App\model\V2\Token;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+
 
 class GoodsController extends Base
 {
@@ -275,7 +275,7 @@ class GoodsController extends Base
         $goods_com=Goods::getGoodsCommonInfo(['goods_commonid'=>$goods_info->goods_commonid],['goods_sale_time','goods_body']);
         $goods_info->goods_body=$goods_com->goods_body;
         $goods_info->sell_time=unserialize($goods_com->goods_sale_time);
-        $goods_info->goods_image=getenv('GOODS_IMAGE').$store_id.'/'.$goods_info->goods_image;
+        $goods_info->goods_image=getenv("GOODS_IMAGE").$store_id.'/'.$goods_info->goods_image;
 
         if($goods_info)
         {
@@ -375,7 +375,7 @@ class GoodsController extends Base
             );
             $data=array(
             'img_name'=>$file_name,
-            'img_path'=>getenv('GOODS_IMAGE').$tokenInfo->store_id,
+            'img_path'=>getenv("GOODS_IMAGE").$tokenInfo->store_id,
         );
             return Base::jsonReturn(200,'获取成功',$data);
         }else{
