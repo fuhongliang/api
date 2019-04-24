@@ -356,7 +356,7 @@ class Voucher extends BModel
         $data->goods_list=self::getXianshiGoodsData(['xianshi_id'=>$xianshi_id],['goods_id','goods_name','goods_image as img_name','xianshi_price','goods_price']);
         foreach ($data->goods_list as &$v)
         {
-            $v->img_path=getenv("GOODS_IMAGE")..$store_id;
+            $v->img_path=getenv("GOODS_IMAGE").$store_id;
         }
         return $data;
     }
