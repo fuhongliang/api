@@ -482,7 +482,7 @@ class VoucherController extends Base
                 if($v->end_time <= time())
                 {
                     $result[$k]['state']=0;
-                    Voucher::upXianshiData(['xianshi_id'=>$v->xianshi_id],['state'=>0]);
+                    Voucher::upXianShiData(['xianshi_id'=>$v->xianshi_id],['state'=>0]);
                 }
                 $result[$k]['lower_limit']=$v->lower_limit;
             }

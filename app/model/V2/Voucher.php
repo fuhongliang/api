@@ -283,11 +283,6 @@ class Voucher extends BModel
         return BModel::upTableData('p_mansong',$condition,$data);
     }
 
-    static function upXianshiData($condition,$data)
-    {
-        return BModel::upTableData('p_xianshi',$condition,$data);
-    }
-
     /**
      * @param $data
      * @return int
