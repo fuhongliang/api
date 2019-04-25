@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V3;
 
+use App\BModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\BaseController as Base;
@@ -40,10 +41,10 @@ class VoucherController extends Base
             ['quota_storeid', '=', $store_id],
             ['quota_endtime', '>', time()],
         ];
-//        $quotainfo=Voucher::getVoucherQuotaInfo($where);
-//        if(empty($quotainfo)){
-//            return Base::jsonReturn(2000,  '你还没有购买代金券套餐');
-//        }
+        $quotainfo=Voucher::getVoucherQuotaInfo($where);
+        if(empty($quotainfo)){
+            return Base::jsonReturn(2000,  '你还没有购买代金券套餐');
+        }
         $count=Voucher::getVoucherTemplateCount(['voucher_t_quotaid'=>1,'voucher_t_state'=>1]);
         if ($count >= getenv('PROMOTION_VOUCHER_STORETIMES_LIMIT')){
             return Base::jsonReturn(2000,  '代金券数量超过最多限制');
@@ -58,14 +59,14 @@ class VoucherController extends Base
         $insert_arr['voucher_t_limit'] = $limit;
         $insert_arr['voucher_t_desc'] = $describe;
         $insert_arr['voucher_t_start_date'] = time();
-//        if ($enddate > $quotainfo->quota_endtime){
-//            $enddate = $quotainfo->quota_endtime;
-//        }
+        if ($enddate > $quotainfo->quota_endtime){
+            $enddate = $quotainfo->quota_endtime;
+        }
         $insert_arr['voucher_t_end_date'] = $enddate;
         $insert_arr['voucher_t_store_id'] = $store_id;
-        $insert_arr['voucher_t_storename'] = 6666666;
+        $insert_arr['voucher_t_storename'] = $quotainfo->quota_storename;
         $insert_arr['voucher_t_sc_id'] = Store::getStoreField(['store_id'=>$store_id],'sc_id');
-        $insert_arr['voucher_t_creator_id'] = 66666;
+        $insert_arr['voucher_t_creator_id'] = $quotainfo->quota_storeid;
         $insert_arr['voucher_t_state'] = 1;
         $insert_arr['voucher_t_total'] = $total;
         $insert_arr['voucher_t_giveout'] = 0;
@@ -111,11 +112,11 @@ class VoucherController extends Base
             ['quota_storeid', '=', $store_id],
             ['quota_endtime', '>', time()],
         ];
-//        $quotainfo=Voucher::getVoucherQuotaInfo($where);
-//        if(empty($quotainfo))
-//        {
-//            return Base::jsonReturn(2000,  '你还没有购买代金券套餐');
-//        }
+        $quotainfo=Voucher::getVoucherQuotaInfo($where);
+        if(empty($quotainfo))
+        {
+            return Base::jsonReturn(2000,  '你还没有购买代金券套餐');
+        }
         $list=Voucher::getVoucherTemplateList(['voucher_t_store_id'=>$store_id]);
         if($list->isEmpty())
         {
@@ -294,26 +295,18 @@ class VoucherController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000,  '商家不存在');
         }
-//        $rules=array(
-//            array(
-//                'price'=>100058,'discount'=>333,'mansong_goods_name'=>333
-//            ),
-//            array(
-//                'price'=>100058,'discount'=>333,'mansong_goods_name'=>333
-//            ),
-//        );
-//        $mansong_quota_list=Voucher::getManSongInfo(['store_id'=>$store_id],['quota_id']);
-//        if(empty($mansong_quota_list))
-//        {
-//            return Base::jsonReturn(2000,  '你还没有购买套餐');
-//        }
+        $mansong_quota_list=Voucher::getManSongInfo(['store_id'=>$store_id],['quota_id']);
+        if(empty($mansong_quota_list))
+        {
+            return Base::jsonReturn(2000,  '你还没有购买套餐');
+        }
         $storeInfo=Store::getStoreInfo(['store_id'=>$store_id]);
         $data=array(
             'store_id'=>$store_id,
             'mansong_name'=>$mansong_name,
             'start_time'=>strtotime($start_time),
             'end_time'=>strtotime($end_time),
-            'quota_id'=>1,
+            'quota_id'=>$mansong_quota_list->quota_id,
             'member_id'=>$storeInfo->member_id,
             'member_name'=>$storeInfo->member_name,
             'store_name'=>$storeInfo->store_name,
@@ -408,11 +401,11 @@ class VoucherController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000,  '商家不存在');
         }
-//        $xianshi_quota_list=Voucher::getXianShiInfo(['store_id'=>$store_id]);
-//        if(empty($xianshi_quota_list))
-//        {
-//            return Base::jsonReturn(2000,  '你还没有购买套餐');
-//        }
+        $xianshi_quota_list=Voucher::getXianShiInfo(['store_id'=>$store_id]);
+        if(empty($xianshi_quota_list))
+        {
+            return Base::jsonReturn(2000,  '你还没有购买套餐');
+        }
         $storeInfo=Store::getStoreInfo(['store_id'=>$store_id]);
         $data=array(
             'store_id'=>$store_id,
@@ -422,7 +415,7 @@ class VoucherController extends Base
             'start_time'=>strtotime($start_time),
             'end_time'=>strtotime($end_time),
             'lower_limit'=>$lower_limit,
-            'quota_id'=>1,
+            'quota_id'=>$xianshi_quota_list->quota_id,
             'member_id'=>$storeInfo->member_id,
             'member_name'=>$storeInfo->member_name,
             'store_name'=>$storeInfo->store_name,
@@ -536,6 +529,170 @@ class VoucherController extends Base
         }
     }
 
+    /**购买限时折扣套餐
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addXianshiQuoTa(Request $request)
+    {
+        $month = $request->input('month');
+        $store_id = $request->input('store_id');
+        if (!$month  || !$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if ($month <= 0 || $month > 12) {
+            return Base::jsonReturn(2000,  '参数错误，购买失败.');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2001,  '商家不存在');
+        }
+        if(Voucher::checkQuoTaExist('p_xianshi_quota',['store_id'=>$store_id]))
+        {
+            return Base::jsonReturn(2002,  '已经过买过套餐');
+        }
+        $store_name=Store::getStoreField(['store_id'=>$store_id],'store_name');
+        $add_time = 86400 *30 * $month;
+        $now=time();
+        $storeInfo= Store::getStoreInfo(['store_id'=>$store_id]);
 
+        $param = array();
+        $param['member_id'] = $storeInfo->member_id;
+        $param['member_name'] = $storeInfo->member_name;
+        $param['store_id'] = $store_id;
+        $param['store_name'] = $store_name;
+        $param['start_time'] = $now;
+        $param['end_time'] = $now + $add_time;
+        BModel::insertData('p_xianshi_quota',$param);
+        $current_price = 20;
+        Voucher::recordStoreCost($store_id,$current_price * $month, '购买限时折扣');
+        Voucher::recordSellerLog($store_id,$store_name,'购买'.$month.'份限时折扣套餐，单价'.$current_price."元");
+        return Base::jsonReturn(200,  '添加成功');
+    }
+
+    /**购买满送套餐
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addManSongQuoTa(Request $request)
+    {
+        $month = $request->input('month');
+        $store_id = $request->input('store_id');
+        if (!$month  || !$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if ($month <= 0 || $month > 12) {
+            return Base::jsonReturn(2000,  '参数错误，购买失败.');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2001,  '商家不存在');
+        }
+        if(Voucher::checkQuoTaExist('p_mansong_quota',['store_id'=>$store_id]))
+        {
+            return Base::jsonReturn(2002,  '已经过买过套餐');
+        }
+        $store_name=Store::getStoreField(['store_id'=>$store_id],'store_name');
+        $add_time = 86400 *30 * $month;
+        $now=time();
+        $storeInfo= Store::getStoreInfo(['store_id'=>$store_id]);
+
+        $param = array();
+        $param['member_id'] = $storeInfo->member_id;
+        $param['apply_id'] = 0;
+        $param['member_name'] = $storeInfo->member_name;
+        $param['store_id'] = $store_id;
+        $param['store_name'] = $store_name;
+        $param['start_time'] = $now;
+        $param['end_time'] = $now + $add_time;
+        $param['state'] = 0;
+        BModel::insertData('p_mansong_quota',$param);
+        $current_price = 20;
+        Voucher::recordStoreCost($store_id,$current_price * $month, '购买满即送');
+        Voucher::recordSellerLog($store_id,$store_name,'购买'.$month.'份满即送套餐，单价'.$current_price."元");
+        return Base::jsonReturn(200,  '添加成功');
+    }
+
+    /**购买优惠套餐
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addBundlingQuoTa(Request $request)
+    {
+        $month = $request->input('month');
+        $store_id = $request->input('store_id');
+        if (!$month  || !$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if ($month <= 0 || $month > 12) {
+            return Base::jsonReturn(2000,  '参数错误，购买失败.');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2001,  '商家不存在');
+        }
+        if(Voucher::checkQuoTaExist('p_bundling_quota',['store_id'=>$store_id]))
+        {
+            return Base::jsonReturn(2002,  '已经过买过套餐');
+        }
+        $store_name=Store::getStoreField(['store_id'=>$store_id],'store_name');
+        $now=time();
+        $storeInfo= Store::getStoreInfo(['store_id'=>$store_id]);
+
+        $data = array();
+        $data['member_id'] = $storeInfo->member_id;
+        $data['member_name'] = $storeInfo->member_name;
+        $data['store_id'] = $store_id;
+        $data['store_name'] = $store_name;
+        $data['bl_quota_month']     = $month;
+        $data['bl_quota_starttime'] = $now;
+        $data['bl_quota_endtime']   = $now + 60 * 60 * 24 * 30 * $month;
+        $data['bl_state']     = 1;
+
+        BModel::insertData('p_bundling_quota',$data);
+        $current_price = 20;
+        Voucher::recordStoreCost($store_id,$current_price * $month, '购买优惠套装');
+        $end_time = $now + 60 * 60 * 24 * 30 * $month;
+        Voucher::addcron(array('exetime' => $end_time, 'exeid' =>$store_id, 'type' => 3), true);
+        Voucher::recordSellerLog($store_id,$store_name,'购买'.$month.'套优惠套装，单价'.$current_price."元");
+        return Base::jsonReturn(200,  '添加成功');
+    }
+
+    /**购买代金券
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addVoucherQuoTa(Request $request)
+    {
+        $month = $request->input('month');
+        $store_id = $request->input('store_id');
+        if (!$month  || !$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if ($month <= 0 || $month > 12) {
+            return Base::jsonReturn(2000,  '参数错误，购买失败.');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2001,  '商家不存在');
+        }
+        if(Voucher::checkQuoTaExist('voucher_quota',['store_id'=>$store_id]))
+        {
+            return Base::jsonReturn(2002,  '已经过买过套餐');
+        }
+        $store_name=Store::getStoreField(['store_id'=>$store_id],'store_name');
+        $add_time = 86400 *30 * $month;
+        $now=time();
+        $storeInfo= Store::getStoreInfo(['store_id'=>$store_id]);
+        $param = array();
+        $param['quota_memberid'] = $storeInfo->member_id;
+        $param['quota_membername'] = $storeInfo->member_name;
+        $param['quota_storeid'] = $store_id;
+        $param['quota_storename'] = $store_name;
+        $param['quota_starttime'] = $now;
+        $param['quota_endtime'] = $now + $add_time;
+        $param['quota_state'] = 1;
+        BModel::insertData('voucher_quota',$param);
+        $current_price = 20;
+        Voucher::recordStoreCost($store_id,$current_price * $month, '购买代金券套餐');
+        Voucher::recordSellerLog($store_id,$store_name,'购买'.$month.'份代金券套餐，单价'.$current_price."元");
+        return Base::jsonReturn(200,  '添加成功');
+    }
 
 }

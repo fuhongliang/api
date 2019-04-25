@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\V3;
 
+use App\BModel;
 use App\Http\Controllers\BaseController as Base;
 use App\Http\Controllers\SMSController;
 use App\model\V3\Goods;
 use App\model\V3\Member;
 use App\model\V3\Store;
+use App\model\V3\Voucher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -580,6 +582,136 @@ class StoreController extends Base
         } else {
             return Base::jsonReturn(2000,  '发送失败');
         }
+    }
+
+    /**添加银行卡
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addBankAccount(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        $account_name = $request->input('account_name');
+        $account_number = $request->input('account_number');
+        $bank_name = $request->input('bank_name');
+        $bank_type = $request->input('bank_type');
+
+        if (!$store_id ||  !$account_name || !$account_number || !$bank_name || !$bank_type) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
+        $member_id=BModel::getTableValue('store',['store_id'=>$store_id],'member_id');
+        $data=array(
+            'settlement_bank_account_name'=>$account_name,
+            'settlement_bank_account_number'=>$account_number,
+            'settlement_bank_name'=>$bank_name,
+            'settlement_bank_type'=>$bank_type
+        );
+        $res=BModel::upTableData('store_joinin',['member_id'=>$member_id],$data);
+        if ($res) {
+            return Base::jsonReturn(200,  '添加成功');
+        } else {
+            return Base::jsonReturn(2000,  '添加失败');
+        }
+    }
+
+    /**银行卡列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function bankAccountList(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        if (!$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
+        $member_id=BModel::getTableValue('store',['store_id'=>$store_id],'member_id');
+        $data=BModel::getTableFieldFirstData('store_joinin',['member_id'=>$member_id],
+            ['settlement_bank_account_name as account_name','settlement_bank_account_number as account_number','settlement_bank_type as bank_type']);
+        if ($data) {
+            return Base::jsonReturn(200,  '获取成功',$data);
+        } else {
+            return Base::jsonReturn(2000,  '获取失败');
+        }
+    }
+
+    /**银行卡详细信息
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function bankAccountInfo(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        if (!$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
+        $member_id=BModel::getTableValue('store',['store_id'=>$store_id],'member_id');
+        $data=BModel::getTableFieldFirstData('store_joinin',['member_id'=>$member_id],
+            ['settlement_bank_account_name as account_name','settlement_bank_account_number as account_number','settlement_bank_type as bank_type',
+                'settlement_bank_name as bank_name','settlement_bank_address as bank_address']);
+        if ($data) {
+            return Base::jsonReturn(200,  '获取成功',$data);
+        } else {
+            return Base::jsonReturn(2000,  '获取失败');
+        }
+    }
+
+    /**解绑银行卡
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function delBankAccount(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        if (!$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
+        $member_id=BModel::getTableValue('store',['store_id'=>$store_id],'member_id');
+        $data=array(
+            'settlement_bank_account_name'=>'',
+            'settlement_bank_account_number'=>'',
+            'settlement_bank_name'=>'',
+            'settlement_bank_type'=>''
+        );
+        $res=BModel::upTableData('store_joinin',['member_id'=>$member_id],$data);
+        if ($res) {
+            return Base::jsonReturn(200,  '解绑成功');
+        } else {
+            return Base::jsonReturn(2000,  '解绑失败');
+        }
+    }
+
+    public function storeJieSuan(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        if (!$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
+
+        Voucher::getJieSuan(['ob_store_id'=>$store_id,'ob_state'=>4]);//已结算
+        Voucher::getJieSuan(['ob_store_id'=>$store_id,'ob_state'=>['in',[1,2,3]]]);//未结算
 
     }
+    static function billList()
+    {
+        
+    }
+
+
+
+
 }

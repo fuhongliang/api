@@ -27,10 +27,10 @@ Route::group(['namespace'=>'V3','middleware'=>['checktoken']],function(){
     Route::post('del_goods_class','StoreController@delStoreGoodsClass');//店铺删除商品分类
     Route::post('goods_class_list','StoreController@storeGoodsClassList');//店铺商品分类列表
     Route::post('sort_goods_class','StoreController@sortStoreGoodsClass');//店铺商品分类排序
-    Route::post('goods_list','GoodsController@storeGoodsList');//店铺商品列表-----
+    Route::post('goods_list','GoodsController@storeGoodsList');//店铺商品列表
     Route::post('chgoods_state','GoodsController@changeGoodsState');//商品上下架
-    Route::post('add_goods','GoodsController@addGoods');//新建商品-----
-    Route::post('del_goods','GoodsController@delGoods');//删除商品-----
+    Route::post('add_goods','GoodsController@addGoods');//新建商品
+    Route::post('del_goods','GoodsController@delGoods');//删除商品
     Route::post('store_setting','StoreController@getStoreSetting');//门店设置详情
     Route::post('store_set_workstate','StoreController@setWorkState');//门店设置营业状态
     Route::post('store_set_desc','StoreController@setStoreDesc');//门店设置公告
@@ -64,4 +64,28 @@ Route::group(['namespace'=>'V3','middleware'=>['checktoken']],function(){
     Route::post('image_upload/{type}','GoodsController@upImage');//文件上传
     Route::post('check_mobile','MemberController@checkMobile');//商家注册检测手机号
     Route::post('member_register','MemberController@memberRegister');//商家注册
+    ////
+    Route::post('add_xianshi_quota','VoucherController@addXianshiQuoTa');//购买限时折扣套餐
+    Route::post('add_mansong_quota','VoucherController@addManSongQuoTa');//购买满送套餐
+    Route::post('add_bundling_quota','VoucherController@addBundlingQuoTa');//购买优惠
+    Route::post('add_voucher_quota','VoucherController@addVoucherQuoTa');//购买代金券
+
+    Route::post('add_bank_account','StoreController@addBankAccount');//添加银行卡
+    Route::post('bank_account_list','StoreController@bankAccountList');//银行卡列表
+    Route::post('del_bank_account','StoreController@delBankAccount');//解绑银行卡
+    Route::post('bank_account_info','StoreController@bankAccountInfo');//银行卡详情
+    Route::post('store_jiesuan','StoreController@storeJieSuan');//结算
+
+
+
+
+
+
+
+
+
+
+
+
+
 });

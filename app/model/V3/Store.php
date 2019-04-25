@@ -443,4 +443,5 @@ class Store extends BModel
     {
         return BModel::getTableValue('store',$condition,$field);
     }
+
 }

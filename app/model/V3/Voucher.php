@@ -254,6 +254,8 @@ class Voucher extends BModel
         return BModel::getTableFieldFirstData('p_xianshi_quota',$condition,$field);
     }
 
+
+
     /**
      * @param $data
      * @return int
@@ -359,6 +361,92 @@ class Voucher extends BModel
             $v->img_path=getenv("GOODS_IMAGE").$store_id;
         }
         return $data;
+    }
+
+    /**
+     * @param $table
+     * @param $condition
+     * @return bool
+     */
+    static function checkQuoTaExist($table,$condition)
+    {
+        $count=BModel::getCount($table,$condition);
+        return $count>0 ? true :false;
+    }
+
+    /**
+     * @param $store_id
+     * @param $cost_price
+     * @param $cost_remark
+     * @return int
+     */
+    static function recordStoreCost($store_id,$cost_price, $cost_remark) {
+        // 平台店铺不记录店铺费用
+        $param = array();
+        $param['cost_store_id'] = $store_id;
+        $param['cost_seller_id'] = $store_id;
+        $param['cost_price'] = $cost_price;
+        $param['cost_remark'] = $cost_remark;
+        $param['cost_state'] = 0;
+        $param['cost_time'] = time();
+        return BModel::insertData('store_cost',$param);
+    }
+
+    /**
+     * @param $store_id
+     * @param $store_name
+     * @param string $content
+     * @param int $state
+     * @return int
+     */
+    static function recordSellerLog($store_id,$store_name,$content = '', $state = 1){
+        $seller_info = array();
+        $seller_info['log_content'] = $content;
+        $seller_info['log_time'] = time();
+        $seller_info['log_seller_id'] = $store_id;
+        $seller_info['log_seller_name'] = $store_name;
+        $seller_info['log_store_id'] = $store_id;
+        $seller_info['log_seller_ip'] = '';
+        $seller_info['log_url'] = '';
+        $seller_info['log_state'] = $state;
+        return BModel::insertData('seller_log',$seller_info);
+    }
+
+    /**
+     * 添加到任务队列
+     *
+     * @param array $goods_array
+     * @param boolean $ifdel 是否删除以原记录
+     */
+    static function addcron($data = array(), $ifdel = false)
+    {
+        if (isset($data['content'])) {
+            $data['content'] = serialize($data['content']);
+        }
+        // 删除原纪录
+        if ($ifdel) {
+            BModel::delData('cron', array('type' => $data['type'], 'exeid' => $data['exeid']));
+        }
+        BModel::insertData('cron', $data);
+    }
+
+    /**
+     * @param $where
+     * @return int
+     */
+    static function getJieSuan($condition)
+    {
+        $total=0;
+        $data=BModel::getTableAllData('order_bill',$condition,['ob_order_totals','ob_commis_totals','ob_order_return_totals','ob_commis_return_totals','ob_store_cost_totals']);
+        if($data)
+        {
+            $total=0;
+            foreach ($data as $v)
+            {
+                $total +=$v->ob_order_totals - $v->ob_commis_totals - $v->ob_order_return_totals + $v->ob_commis_return_totals - $v->ob_store_cost_totals;
+            }
+        }
+        return $total;
     }
 
 
