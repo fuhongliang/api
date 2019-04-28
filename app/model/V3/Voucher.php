@@ -449,5 +449,42 @@ class Voucher extends BModel
         return $total;
     }
 
+    /**
+     * @param $condition
+     * @param $order
+     * @param $limit
+     * @param array $field
+     * @return array
+     */
+    static function getJieSuanOb($condition,$order,$limit,$field=['*'])
+    {
+        $result= DB::table('order_bill')->where($condition)->orderBy($order,'desc')->limit($limit)->get($field)->toArray();
+        return empty($result) ? array() : $result;
+    }
+
+    /**
+     * @param $condition
+     * @param array $field
+     * @return array
+     */
+    static function getAllJiesuanByYear($condition,$store_id,$field=['*'])
+    {
+        $result=[];
+        $os_month_list=BModel::getTableAllData('order_statis',$condition,['os_month']);
+        if(!$os_month_list->isEmpty())
+        {
+            foreach ($os_month_list as $k=>$val)
+            {
+                $result[$k]=DB::table('order_bill')
+                    ->where('os_month',$val->os_month)
+                    ->where('ob_store_id',$store_id)
+                    ->orderBy('ob_no','desc')
+                    ->first($field);
+            }
+
+        }
+        return $result;
+    }
+
 
 }

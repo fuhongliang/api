@@ -692,6 +692,10 @@ class StoreController extends Base
         }
     }
 
+    /**财务结算
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function storeJieSuan(Request $request)
     {
         $store_id = $request->input('store_id');
@@ -701,17 +705,92 @@ class StoreController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000,  '商家不存在');
         }
-
-        Voucher::getJieSuan(['ob_store_id'=>$store_id,'ob_state'=>4]);//已结算
-        Voucher::getJieSuan(['ob_store_id'=>$store_id,'ob_state'=>['in',[1,2,3]]]);//未结算
-
+        $jiesuan=Voucher::getJieSuan(['ob_store_id'=>$store_id,'ob_state'=>4]);//已结算
+        $w_jiesuan=Voucher::getJieSuan(['ob_store_id'=>$store_id,'ob_state'=>['in',[1,2,3]]]);//未结算
+        $data=[];
+        $data['jiesuan']=$jiesuan;
+        $data['w_jiesuan']=$w_jiesuan;
+        $data['list']=Voucher::getJieSuanOb(['ob_store_id'=>$store_id],'ob_no',4);
+        return Base::jsonReturn(200,  '获取成功',$data);
     }
-    static function billList()
+
+    /**全部账单
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function allStoreJieSuan(Request $request)
     {
-        
+        $store_id = $request->input('store_id');
+        $year = $request->input('year');
+        if (!$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
+        if (preg_match('/^\d{4}$/',$year,$match)) {
+            $condition['os_year'] = $year;
+        }else{
+            $condition['os_year'] = '2019';
+        }
+        $data=Voucher::getAllJiesuanByYear($condition,$store_id);
+        return Base::jsonReturn(200,  '获取成功',$data);
     }
 
-
+    /**提现列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function cashList(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        if (!$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
+        $member_id=BModel::getTableValue('store',['store_id'=>$store_id],'member_id');
+        $data=BModel::getTableAllOrderData('pd_cash',['pdc_member_id'=>$member_id],'pdc_id');
+        return Base::jsonReturn(200,  '获取成功',$data);
+    }
+    public function addCash(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        $money = $request->input('money');
+        if (!$store_id || !$money) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000,  '商家不存在');
+        }
+        $member_info=BModel::getTableFirstData('store',['store_id'=>$store_id],['member_id','member_name']);
+        $available_predeposit=Voucher::getTableValue('member',['member_id'=>$member_info->member_id],'available_predeposit');
+        //验证支付密码
+//        if (md5($_POST['password']) != $member_info['member_paypwd']) {
+//            showDialog('支付密码错误','','error');
+//        }
+        //验证金额是否足够
+        if (floatval($available_predeposit) < floatval($money)){
+            return Base::jsonReturn(2001,  '余额不足');
+        }
+        DB::transaction(function () use($member_info,$money){
+            $account_info=BModel::getTableFirstData('store_joinin',['member_id'=>$member_info->member_id],['settlement_bank_account_name','settlement_bank_type','settlement_bank_account_number']);
+            $pdc_sn = Store::makeSn($member_info->member_id);
+            $data = array();
+            $data['pdc_sn'] = $pdc_sn;
+            $data['pdc_member_id'] = $member_info->member_id;
+            $data['pdc_member_name'] = $member_info->member_name;
+            $data['pdc_amount'] = $money;
+            $data['pdc_bank_name'] = $account_info->settlement_bank_type;
+            $data['pdc_bank_no'] = $account_info->settlement_bank_account_number;
+            $data['pdc_bank_user'] = $account_info->settlement_bank_account_name;
+            $data['pdc_add_time'] = time();
+            $data['pdc_payment_state'] = 0;
+            BModel::insertData('pd_cash',$data);
+        });
+        return Base::jsonReturn(200,  '提现成功');
+    }
 
 
 }

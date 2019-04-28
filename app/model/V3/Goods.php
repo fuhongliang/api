@@ -6,6 +6,7 @@ use App\BModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use zgldh\QiniuStorage\QiniuStorage;
 
 class Goods extends BModel
 {
@@ -68,8 +69,10 @@ class Goods extends BModel
             self::delGoodsById(['goods_id'=>$goods_id]);
             if($file_name)
             {
-                $img_path = '/shop/store/goods' . '/' . $store_id  .'/'. $file_name;
-                Storage::disk('public')->delete($img_path);
+                $disk = QiniuStorage::disk('qiniu');
+                $disk->delete($file_name);
+//                $img_path = '/shop/store/goods' . '/' . $store_id  .'/'. $file_name;
+//                Storage::disk('public')->delete($img_path);
             }
         });
         return true;

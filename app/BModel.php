@@ -27,6 +27,18 @@ class BModel extends Model
     {
         return DB::table($table)->where($condition)->get($fields);
     }
+
+    /**
+     * @param $table
+     * @param $condition
+     * @param $order
+     * @param array $fields
+     * @return \Illuminate\Support\Collection
+     */
+    static function getTableAllOrderData($table,$condition,$order,$fields=['*'])
+    {
+        return DB::table($table)->where($condition)->orderBy($order,'desc')->get($fields);
+    }
     /** 获取第一条数据中部分信息
      * @param $table
      * @param $condition

@@ -9,7 +9,8 @@ use App\model\V3\Token;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
+use Qiniu\Config;
+use zgldh\QiniuStorage\QiniuStorage;
 
 class GoodsController extends Base
 {
@@ -102,7 +103,7 @@ class GoodsController extends Base
         $goods_storage=$request->input('goods_storage');//库存
         $sell_time=$request->input('sell_time'); // 出售时间
         $goods_desc=$request->input('goods_desc');// 描述
-        $file_name=$request->input('img_name');// 描述
+        $file_name=$request->input('img_name');//
 
         if(!$store_id || !$class_id || !$goods_name || !$goods_price || !$origin_price || !$file_name)
         {
@@ -296,7 +297,7 @@ class GoodsController extends Base
         $goods_storage=$request->input('goods_storage');//库存
         $sell_time=$request->input('sell_time'); // 出售时间
         $goods_desc=$request->input('goods_desc');// 描述
-        $file_name=$request->input('img_name');// 描述
+        $file_name=$request->input('img_name');//
         if(!$goods_id || !$store_id)
         {
             return Base::jsonReturn(1000,'参数缺失');
@@ -355,29 +356,45 @@ class GoodsController extends Base
         });
         return Base::jsonReturn(200,'编辑成功');
     }
+
+    /**
+     * @param Request $request
+     * @param $type
+     * @return \Illuminate\Http\JsonResponse
+     */
     function  upImage(Request $request, $type)
     {
-        $goods_image=$request->file('file');
+        $image=$request->file('file');
         $token=$request->header('token');
-        if(!$goods_image)
+        if(!$image)
         {
             return Base::jsonReturn(1000,'参数缺失');
         }
+        $filesize=$image->getClientSize();
+        if($filesize > 2048)
+        {
+            return Base::jsonReturn(2000,'图片大小超过2M限制');
+        }
+        $entension = $image->getClientOriginalExtension();
+        $allow_ext=['png','jpg','jpeg'];
+        if(!in_array($entension,$allow_ext))
+        {
+            return Base::jsonReturn(2001,'图片格式不允许');
+        }
         $file_name="";
+        $tokenInfo=Token::getTokenField(['token'=>$token],['store_id']);
+        $store_id=$tokenInfo->store_id;
         if($type == 'goods_img')
         {
-            $tokenInfo=Token::getTokenField(['token'=>$token],['store_id']);
-            $save_path = '/shop/store/goods' . '/' . $tokenInfo->store_id;
-            $entension = $goods_image -> getClientOriginalExtension();
-            $file_name=md5(microtime()).'.'.$entension;
-            $goods_image->storeAs(
-                $save_path,$file_name
-            );
-            $data=array(
-            'img_name'=>$file_name,
-            'img_path'=>getenv("GOODS_IMAGE").$tokenInfo->store_id,
-        );
-            return Base::jsonReturn(200,'获取成功',$data);
+            $disk = QiniuStorage::disk('qiniu');
+            $image_name=$disk->put('',$image);
+            if($image_name)
+            {
+               // $img_url=getenv('QINIU_DOMAIN').$image_name;
+                return Base::jsonReturn(200,'上传成功',$image_name);
+            }else{
+                return Base::jsonReturn(2000,'上传失败');
+            }
         }else{
             return Base::jsonReturn(2000,'上传失败');
         }

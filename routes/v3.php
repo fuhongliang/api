@@ -74,7 +74,10 @@ Route::group(['namespace'=>'V3','middleware'=>['checktoken']],function(){
     Route::post('bank_account_list','StoreController@bankAccountList');//银行卡列表
     Route::post('del_bank_account','StoreController@delBankAccount');//解绑银行卡
     Route::post('bank_account_info','StoreController@bankAccountInfo');//银行卡详情
-    Route::post('store_jiesuan','StoreController@storeJieSuan');//结算
+    Route::post('store_jiesuan','StoreController@storeJieSuan');//结算 4个
+    Route::post('all_store_jiesuan','StoreController@allStoreJieSuan');//所有结算
+    Route::post('pd_cash_list','StoreController@cashList');//提现列表
+    Route::post('pd_cash_add','StoreController@addCash');//提现
 
 
 
