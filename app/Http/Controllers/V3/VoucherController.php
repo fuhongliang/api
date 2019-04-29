@@ -528,7 +528,7 @@ class VoucherController extends Base
         if (!$month || !$store_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        if ($month <= 0 || $month > 12) {
+        if ($month <= 0) {
             return Base::jsonReturn(2000, '参数错误，购买失败.');
         }
         if (!Base::checkStoreExist($store_id)) {
@@ -567,7 +567,7 @@ class VoucherController extends Base
         if (!$month || !$store_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        if ($month <= 0 || $month > 12) {
+        if ($month <= 0) {
             return Base::jsonReturn(2000, '参数错误，购买失败.');
         }
         if (!Base::checkStoreExist($store_id)) {
@@ -608,7 +608,7 @@ class VoucherController extends Base
         if (!$month || !$store_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        if ($month <= 0 || $month > 12) {
+        if ($month <= 0) {
             return Base::jsonReturn(2000, '参数错误，购买失败.');
         }
         if (!Base::checkStoreExist($store_id)) {
@@ -651,7 +651,7 @@ class VoucherController extends Base
         if (!$month || !$store_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        if ($month <= 0 || $month > 12) {
+        if ($month <= 0) {
             return Base::jsonReturn(2000, '参数错误，购买失败.');
         }
         if (!Base::checkStoreExist($store_id)) {
@@ -678,5 +678,40 @@ class VoucherController extends Base
         Voucher::recordSellerLog($store_id, $store_name, '购买' . $month . '份代金券套餐，单价' . $current_price . "元");
         return Base::jsonReturn(200, '添加成功');
     }
+
+    /** 检查是否购买套餐
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkQuota(Request $request)
+    {
+        $type     = $request->input('type');
+        $store_id = $request->input('store_id');
+        if (!$store_id || !$type) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2001, '商家不存在');
+        }
+        $condition['store_id'] = $store_id;
+        if ($type == 1) {
+            $table = "p_xianshi_quota";
+        } elseif ($type == 2) {
+            $table = "p_mansong_quota";
+        } elseif ($type == 3) {
+            $table = "p_bundling_quota";
+        } elseif ($type == 4) {
+            $table = "voucher_quota";
+            unset($condition);
+            $condition['quota_storeid'] = $store_id;
+        }
+        $res = Voucher::checkQuoTaExist($table, $condition);
+        if ($res) {
+            return Base::jsonReturn(200, '已开通');
+        } else {
+            return Base::jsonReturn(2000, '未开通');
+        }
+    }
+
 
 }

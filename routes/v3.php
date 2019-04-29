@@ -71,6 +71,10 @@ Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () 
     Route::post('add_bundling_quota', 'VoucherController@addBundlingQuoTa');//购买优惠
     Route::post('add_voucher_quota', 'VoucherController@addVoucherQuoTa');//购买代金券
 
+
+    Route::post('check_quota', 'VoucherController@checkQuota');//检测是否开通套餐
+
+
     Route::post('add_bank_account', 'StoreController@addBankAccount');//添加银行卡
     Route::post('bank_account_list', 'StoreController@bankAccountList');//银行卡列表
     Route::post('del_bank_account', 'StoreController@delBankAccount');//解绑银行卡

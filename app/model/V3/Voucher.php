@@ -494,9 +494,9 @@ class Voucher extends BModel
             $data[$k]['ob_no']    = $v->ob_no;
             $data[$k]['os_month'] = substr($v->os_month,-2);
         }
-
         return $data;
     }
+
 
 
 }
