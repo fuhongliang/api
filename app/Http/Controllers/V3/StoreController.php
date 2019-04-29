@@ -813,5 +813,54 @@ class StoreController extends Base
         return Base::jsonReturn(200, '提现成功');
     }
 
+    /**入驻第一步
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function joininStep1(Request $request)
+    {
+        $param['member_id']                          = $request->input('member_id');
+        $param['company_name']                       = $request->input('company_name');
+        $param['contacts_name']                      = $request->input('contacts_name');
+        $param['contacts_phone']                     = $request->input('contacts_phone');
+        $param['company_address']                    = $request->input('company_address');
+        $param['company_address_detail']             = $request->input('company_address_detail');
+        $param['face_img']                           = $request->input('face_img');
+        $param['store_img']                          = $request->input('store_img');
+        $param['logo_img']                           = $request->input('logo_img');
+        $param['business_sphere']                    = $request->input('business_sphere');
+        $param['business_licence_number']            = $request->input('business_licence_number');
+        $param['ID_card']                            = $request->input('ID_card');
+        $param['business_licence_number_electronic'] = $request->input('business_licence_number_electronic');
+        $param['sc_id']                              = $request->input('sc_id');
+        $param['joinin_state']                       = 10;
+        if (!Member::getMemberInfo(['member_id' => $member_id])->isEmpty()) {
+            return Base::jsonReturn(2000, '店铺已存在');
+        }
+        $ins_id = BModel::insertData('store_joinin', $param);
+        if ($ins_id) {
+            return Base::jsonReturn(200, '提交成功');
+        } else {
+            return Base::jsonReturn(2001, '提交失败');
+        }
+    }
+
+    /**第二步
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function joininStep2(Request $request)
+    {
+        $member_id                         = $request->input('member_id');
+        $param['paying_money_certificate'] = $request->input('paying_money_certificate');
+        $param['paying_amount']            = $request->input('paying_amount');
+        $res = BModel::upTableData('store_joinin', ['member_id' => $member_id], $param);
+        if ($res) {
+            return Base::jsonReturn(200, '提交成功');
+        } else {
+            return Base::jsonReturn(2001, '提交失败');
+        }
+    }
+
 
 }

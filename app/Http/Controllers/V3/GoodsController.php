@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Qiniu\Config;
 use zgldh\QiniuStorage\QiniuStorage;
 
+
 class GoodsController extends Base
 {
     /** 商品列表  第二版
@@ -264,12 +265,12 @@ class GoodsController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2001, '商家不存在');
         }
-        $field                   = ['goods_id', 'goods_commonid', 'goods_image', 'goods_name', 'goods_stcid', 'goods_marketprice', 'goods_price', 'goods_storage'];
-        $goods_info              = Goods::getGoodsInfo(['store_id' => $store_id, 'goods_id' => $goods_id], $field);
-        $goods_com               = Goods::getGoodsCommonInfo(['goods_commonid' => $goods_info->goods_commonid], ['goods_sale_time', 'goods_body']);
-        $goods_info->goods_body  = $goods_com->goods_body;
-        $goods_info->sell_time   = unserialize($goods_com->goods_sale_time);
-        $goods_info->goods_image = getenv("GOODS_IMAGE") . $store_id . '/' . $goods_info->goods_image;
+        $field                  = ['goods_id', 'goods_commonid', 'goods_image', 'goods_name', 'goods_stcid', 'goods_marketprice', 'goods_price', 'goods_storage'];
+        $goods_info             = Goods::getGoodsInfo(['store_id' => $store_id, 'goods_id' => $goods_id], $field);
+        $goods_com              = Goods::getGoodsCommonInfo(['goods_commonid' => $goods_info->goods_commonid], ['goods_sale_time', 'goods_body']);
+        $goods_info->goods_body = $goods_com->goods_body;
+        $goods_info->sell_time  = unserialize($goods_com->goods_sale_time);
+        //$goods_info->goods_image = getenv("GOODS_IMAGE") . $store_id . '/' . $goods_info->goods_image;
 
         if ($goods_info) {
             return Base::jsonReturn(200, '获取成功', $goods_info);
@@ -329,8 +330,10 @@ class GoodsController extends Base
         $field = Goods::getGoodsInfo(['goods_id' => $goods_id], ['a.goods_commonid', 'a.goods_image']);
         if (!empty($field->goods_image)) {
             $file_name = $field->goods_image;
-            $img_path  = '/shop/store/goods' . '/' . $store_id . '/' . $file_name;
-            Storage::disk('public')->delete($img_path);
+            $disk      = QiniuStorage::disk('qiniu');
+            $disk->delete($file_name);
+//            $img_path  = '/shop/store/goods' . '/' . $store_id . '/' . $file_name;
+//            Storage::disk('public')->delete($img_path);
         }
         DB::transaction(function () use ($field, $goods_id, $goods_array, $goods_comm) {
             Goods::upGoodsField(['goods_id' => $goods_id], $goods_array);
@@ -361,20 +364,17 @@ class GoodsController extends Base
             return Base::jsonReturn(2001, '图片格式不允许');
         }
         $file_name = "";
-        $tokenInfo = Token::getTokenField(['token' => $token], ['store_id']);
-        $store_id  = $tokenInfo->store_id;
-        if ($type == 'goods_img') {
-            $disk       = QiniuStorage::disk('qiniu');
-            $image_name = $disk->put('', $image);
-            if ($image_name) {
-                // $img_url=getenv('QINIU_DOMAIN').$image_name;
-                return Base::jsonReturn(200, '上传成功', $image_name);
-            } else {
-                return Base::jsonReturn(2000, '上传失败');
-            }
+//        $tokenInfo = Token::getTokenField(['token' => $token], ['store_id']);
+//        $store_id  = $tokenInfo->store_id;
+        $disk       = QiniuStorage::disk('qiniu');
+        $image_name = $disk->put('', $image);
+        if ($image_name) {
+            // $img_url=getenv('QINIU_DOMAIN').$image_name;
+            return Base::jsonReturn(200, '上传成功', $image_name);
         } else {
             return Base::jsonReturn(2000, '上传失败');
         }
+
 
     }
 

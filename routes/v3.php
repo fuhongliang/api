@@ -62,7 +62,7 @@ Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () 
     Route::post('xianshi_goods_list', 'GoodsController@xianshiGoodsList');//折扣商品列表
     Route::post('xianshi_del', 'VoucherController@xianshiDel');//折扣删除
     Route::post('xianshi_info', 'VoucherController@xianshiInfo');//折扣详情
-    Route::post('image_upload/{type}', 'GoodsController@upImage');//文件上传
+    Route::post('image_upload', 'GoodsController@upImage');//文件上传
     Route::post('check_mobile', 'MemberController@checkMobile');//商家注册检测手机号
     Route::post('member_register', 'MemberController@memberRegister');//商家注册
     ////
@@ -70,10 +70,7 @@ Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () 
     Route::post('add_mansong_quota', 'VoucherController@addManSongQuoTa');//购买满送套餐
     Route::post('add_bundling_quota', 'VoucherController@addBundlingQuoTa');//购买优惠
     Route::post('add_voucher_quota', 'VoucherController@addVoucherQuoTa');//购买代金券
-
-
     Route::post('check_quota', 'VoucherController@checkQuota');//检测是否开通套餐
-
 
     Route::post('add_bank_account', 'StoreController@addBankAccount');//添加银行卡
     Route::post('bank_account_list', 'StoreController@bankAccountList');//银行卡列表
@@ -84,5 +81,6 @@ Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () 
     Route::post('pd_cash_list', 'StoreController@cashList');//提现列表
     Route::post('pd_cash_add', 'StoreController@addCash');//提现
 
-
+    Route::post('store_joinin_step1', 'StoreController@joininStep1');//商家入驻第一步
+    Route::post('store_joinin_step2', 'StoreController@joininStep2');//商家入驻第二步
 });

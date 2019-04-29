@@ -69,9 +69,9 @@ class MemberController extends Base
                 'password' => md5($password),
                 'add_time' => time()
             );
-            $res         = Member::insertMemberRegTmpData($regtmp_data);
-            if ($res) {
-                return Base::jsonReturn(200, '注册成功');
+            $member_id         = Member::insertMemberRegTmpData($regtmp_data);
+            if ($member_id) {
+                return Base::jsonReturn(200, '注册成功',['member_id'=>$member_id]);
             } else {
                 return Base::jsonReturn(2003, '注册失败');
             }
