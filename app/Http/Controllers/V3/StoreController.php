@@ -707,9 +707,13 @@ class StoreController extends Base
         $jiesuan           = Voucher::getJieSuan(['ob_store_id' => $store_id, 'ob_state' => 4]);//已结算
         $w_jiesuan         = Voucher::getJieSuan(['ob_store_id' => $store_id, 'ob_state' => ['in', [1, 2, 3]]]);//未结算
         $data              = [];
-        $data['jiesuan']   = $jiesuan;
-        $data['w_jiesuan'] = $w_jiesuan;
-        $data['list']      = Voucher::getJieSuanOb(['ob_store_id' => $store_id], 'ob_no', 4);
+        $data['y_jiesuan'] = $jiesuan;
+        $data['d_jiesuan'] = $w_jiesuan;
+        $field             = ['ob_state', 'ob_no', 'os_month', 'ob_order_totals', 'ob_commis_totals', 'ob_order_return_totals', 'ob_commis_return_totals', 'ob_store_cost_totals'];
+        $data['list']      = Voucher::getJieSuanOb(['ob_store_id' => $store_id], 'ob_no', 4, $field);
+        $member_id         = BModel::getTableValue('store', ['store_id' => $store_id], 'member_id');
+        $account           = BModel::getTableFieldFirstData('store_joinin', ['member_id' => $member_id], ['settlement_bank_type as bank_type', 'settlement_bank_account_number as account_number']);
+        $data['account']   = empty($account) ? null : $account;
         return Base::jsonReturn(200, '获取成功', $data);
     }
 
@@ -732,7 +736,10 @@ class StoreController extends Base
         } else {
             $condition['os_year'] = '2019';
         }
-        $data = Voucher::getAllJiesuanByYear($condition, $store_id);
+        $field                = ['ob_state', 'ob_no', 'os_month', 'ob_order_totals', 'ob_commis_totals', 'ob_order_return_totals', 'ob_commis_return_totals', 'ob_store_cost_totals'];
+        $data['list']         = Voucher::getAllJiesuanByYear($condition, $store_id, $field);
+        $total_amount         = array_column($data['list'], 'amount');
+        $data['total_amount'] = array_sum($total_amount);
         return Base::jsonReturn(200, '获取成功', $data);
     }
 
@@ -743,17 +750,31 @@ class StoreController extends Base
     public function cashList(Request $request)
     {
         $store_id = $request->input('store_id');
+        $keyword  = $request->input('keyword');
         if (!$store_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
+
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
-        $member_id = BModel::getTableValue('store', ['store_id' => $store_id], 'member_id');
-        $data      = BModel::getTableAllOrderData('pd_cash', ['pdc_member_id' => $member_id], 'pdc_id');
-        return Base::jsonReturn(200, '获取成功', $data);
+        $member_id            = BModel::getTableValue('store', ['store_id' => $store_id], 'member_id');
+        $available_predeposit = BModel::getTableValue('member', ['member_id' => $member_id], 'available_predeposit');
+
+        $condition['pdc_member_id'] = $member_id;
+        $field                      = ['pdc_amount as amount', 'pdc_payment_state as payment_state', 'pdc_add_time as add_time', 'pdc_bank_no as bank_no'];
+        $data                       = BModel::getTableAllData('pd_cash', $condition, $field);
+        $result                     = [];
+        $result['list']             = $data;
+        $result['balance']          = $available_predeposit;;
+        $result['total_amount'] = BModel::getSum('pd_cash', $condition, 'pdc_amount');
+        return Base::jsonReturn(200, '获取成功', $result);
     }
 
+    /**提现
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function addCash(Request $request)
     {
         $store_id = $request->input('store_id');

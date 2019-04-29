@@ -16,6 +16,7 @@ Route::group(['namespace' => 'V3'], function () {
     Route::any('store_jingying/{store_id}', 'StoreController@storeJingYingData');//店铺经营
     Route::any('get_echarts', 'StoreController@getEcharts');
     Route::any('get_echarts_', 'StoreController@getEcharts_');
+    Route::post('get_sms', 'StoreController@getSMS');//获取验证码
 });
 
 Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () {
@@ -37,7 +38,7 @@ Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () 
     Route::post('store_set_phone', 'StoreController@setStorePhone');//门店设置电话
     Route::post('store_set_worktime', 'StoreController@setStoreWorkTime');//门店设置营业时间
     Route::post('store_msg_feedback', 'StoreController@msgFeedBack');//意见反馈
-    Route::post('get_sms', 'StoreController@getSMS');//获取验证码
+
     Route::post('edit_passwd', 'StoreController@editPasswd');//修改密码
     Route::post('get_store_com', 'StoreController@getStoreCom');//获取店铺评论
     Route::post('store_feedback', 'StoreController@storeFeedback');//店铺回复

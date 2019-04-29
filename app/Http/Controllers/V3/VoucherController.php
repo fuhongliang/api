@@ -553,7 +553,7 @@ class VoucherController extends Base
         $current_price = 20;
         Voucher::recordStoreCost($store_id, $current_price * $month, '购买限时折扣');
         Voucher::recordSellerLog($store_id, $store_name, '购买' . $month . '份限时折扣套餐，单价' . $current_price . "元");
-        return Base::jsonReturn(200, '添加成功');
+        return Base::jsonReturn(200, '购买成功');
     }
 
     /**购买满送套餐

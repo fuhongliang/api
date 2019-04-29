@@ -104,4 +104,16 @@ class BModel extends Model
     {
         return  DB::table($table)->where($condition)->delete();
     }
+
+    /**求和
+     * @param $table
+     * @param $condition
+     * @param $field
+     * @return mixed
+     */
+    static function getSum($table,$condition,$field)
+    {
+        return  DB::table($table)->where($condition)->sum($field);
+    }
+
 }

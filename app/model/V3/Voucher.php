@@ -456,8 +456,17 @@ class Voucher extends BModel
      */
     static function getJieSuanOb($condition, $order, $limit, $field = ['*'])
     {
-        $result = DB::table('order_bill')->where($condition)->orderBy($order, 'desc')->limit($limit)->get($field)->toArray();
-        return empty($result) ? array() : $result;
+        $data   = [];
+        $result = DB::table('order_bill')->where($condition)->orderBy($order, 'desc')->limit($limit)->get($field);
+        if (!$result->isEmpty()) {
+            foreach ($result as $k => $v) {
+                $data['amount']   = $v->ob_order_totals - $v->ob_commis_totals - $v->ob_order_return_totals + $v->ob_commis_return_totals - $v->ob_store_cost_totals;
+                $data['state']    = $v->ob_state;
+                $data['ob_no']    = $v->ob_no;
+                $data['os_month'] = $v->os_month;
+            }
+        }
+        return $data;
     }
 
     /**
@@ -467,7 +476,7 @@ class Voucher extends BModel
      */
     static function getAllJiesuanByYear($condition, $store_id, $field = ['*'])
     {
-        $result        = [];
+        $data        = [];
         $os_month_list = BModel::getTableAllData('order_statis', $condition, ['os_month']);
         if (!$os_month_list->isEmpty()) {
             foreach ($os_month_list as $k => $val) {
@@ -479,7 +488,14 @@ class Voucher extends BModel
             }
 
         }
-        return $result;
+        foreach ($result as $k => $v) {
+            $data[$k]['amount']   = $v->ob_order_totals - $v->ob_commis_totals - $v->ob_order_return_totals + $v->ob_commis_return_totals - $v->ob_store_cost_totals;
+            $data[$k]['state']    = $v->ob_state;
+            $data[$k]['ob_no']    = $v->ob_no;
+            $data[$k]['os_month'] = substr($v->os_month,-2);
+        }
+
+        return $data;
     }
 
 
