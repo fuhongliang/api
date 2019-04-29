@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
 require_once base_path('lib/aliyun-dysms/api_sdk/vendor/autoload.php');
 
 use Aliyun\Core\Config;
@@ -14,6 +15,7 @@ use Aliyun\Api\Sms\Request\V20170525\QuerySendDetailsRequest;
 
 // 加载区域结点配置
 Config::load();
+
 class SMSController extends Controller
 {
 
@@ -24,7 +26,8 @@ class SMSController extends Controller
      *
      * @return DefaultAcsClient
      */
-    public static function getAcsClient() {
+    public static function getAcsClient()
+    {
         //产品名称:云通信短信服务API产品,开发者无需替换
         $product = "Dysmsapi";
 
@@ -43,7 +46,7 @@ class SMSController extends Controller
         $endPointName = "cn-hangzhou";
 
 
-        if(static::$acsClient == null) {
+        if (static::$acsClient == null) {
 
             //初始化acsClient,暂不支持region化
             $profile = DefaultProfile::getProfile($region, $accessKeyId, $accessKeySecret);
@@ -61,7 +64,8 @@ class SMSController extends Controller
      * 发送短信
      * @return stdClass
      */
-    public static function sendSms($phone,$code) {
+    public static function sendSms($phone, $code)
+    {
 
         // 初始化SendSmsRequest实例用于设置发送短信的参数
         $request = new SendSmsRequest();
@@ -80,7 +84,7 @@ class SMSController extends Controller
 
         // 可选，设置模板参数, 假如模板中存在变量需要替换则为必填项
         $request->setTemplateParam(json_encode(array(  // 短信模板中字段的值
-            "code"=>$code
+            "code" => $code
         ), JSON_UNESCAPED_UNICODE));
 
         // 可选，设置流水号
@@ -99,7 +103,8 @@ class SMSController extends Controller
      * 批量发送短信
      * @return stdClass
      */
-    public static function sendBatchSms() {
+    public static function sendBatchSms()
+    {
 
         // 初始化SendSmsRequest实例用于设置发送短信的参数
         $request = new SendBatchSmsRequest();
@@ -148,7 +153,8 @@ class SMSController extends Controller
      * 短信发送记录查询
      * @return stdClass
      */
-    public static function querySendDetails() {
+    public static function querySendDetails()
+    {
 
         // 初始化QuerySendDetailsRequest实例用于设置短信查询的参数
         $request = new QuerySendDetailsRequest();

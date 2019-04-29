@@ -16,7 +16,7 @@ class Token extends BModel
      */
     static function addToken($data)
     {
-        return BModel::insertData('token',$data);
+        return BModel::insertData('token', $data);
     }
 
     /**
@@ -24,11 +24,10 @@ class Token extends BModel
      * @param $field
      * @return mixed
      */
-    static function getTokenField($condition,$field)
+    static function getTokenField($condition, $field)
     {
-        return BModel::getTableFieldFirstData('token',$condition,$field);
+        return BModel::getTableFieldFirstData('token', $condition, $field);
     }
-
 
 
 }

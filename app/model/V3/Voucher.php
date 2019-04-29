@@ -14,7 +14,7 @@ class Voucher extends BModel
      */
     static function addVoucherTemplate($data)
     {
-        return  BModel::insertData('voucher_template',$data);
+        return BModel::insertData('voucher_template', $data);
     }
 
     /**
@@ -23,7 +23,7 @@ class Voucher extends BModel
      */
     static function getVoucherQuotaInfo($condition)
     {
-        return BModel::getTableFirstData('voucher_quota',$condition);
+        return BModel::getTableFirstData('voucher_quota', $condition);
     }
 
     /**
@@ -31,9 +31,9 @@ class Voucher extends BModel
      * @param array $field
      * @return mixed
      */
-    static function getVoucherInfo($condition,$field=['*'])
+    static function getVoucherInfo($condition, $field = ['*'])
     {
-        return BModel::getTableFieldFirstData('voucher_template',$condition,$field);
+        return BModel::getTableFieldFirstData('voucher_template', $condition, $field);
     }
 
     /**
@@ -41,9 +41,9 @@ class Voucher extends BModel
      * @param $data
      * @return int
      */
-    static function upVoucherTemplate($condition,$data)
+    static function upVoucherTemplate($condition, $data)
     {
-        return BModel::upTableData('voucher_template',$condition,$data);
+        return BModel::upTableData('voucher_template', $condition, $data);
     }
 
     /**
@@ -52,16 +52,16 @@ class Voucher extends BModel
      */
     static function getVoucherTemplateCount($condition)
     {
-       return  BModel::getCount('voucher_template',$condition);
+        return BModel::getCount('voucher_template', $condition);
     }
 
     /**
      * @return \Illuminate\Support\Collection
      */
-    static function  getVoucherPriceList()
+    static function getVoucherPriceList()
     {
-       return DB::table('voucher_price')
-            ->orderBy('voucher_price','asc')
+        return DB::table('voucher_price')
+            ->orderBy('voucher_price', 'asc')
             ->get();
     }
 
@@ -70,9 +70,9 @@ class Voucher extends BModel
      * @param array $field
      * @return \Illuminate\Support\Collection
      */
-    static function  getVoucherTemplateList($condition,$field=['*'])
+    static function getVoucherTemplateList($condition, $field = ['*'])
     {
-        return BModel::getTableAllData('voucher_template',$condition,$field);
+        return BModel::getTableAllData('voucher_template', $condition, $field);
     }
 
     /**
@@ -81,7 +81,7 @@ class Voucher extends BModel
      */
     static function addBundlingData($data)
     {
-        return  BModel::insertData('p_bundling',$data);
+        return BModel::insertData('p_bundling', $data);
     }
 
     /**
@@ -90,7 +90,7 @@ class Voucher extends BModel
      */
     static function addBundlingGoodsData($data)
     {
-        return  BModel::insertData('p_bundling_goods',$data);
+        return BModel::insertData('p_bundling_goods', $data);
     }
 
     /**
@@ -98,9 +98,9 @@ class Voucher extends BModel
      * @param $data
      * @return int
      */
-    static function upBundlingData($condition,$data)
+    static function upBundlingData($condition, $data)
     {
-        return BModel::upTableData('p_bundling',$condition,$data);
+        return BModel::upTableData('p_bundling', $condition, $data);
     }
 
     /**
@@ -108,9 +108,9 @@ class Voucher extends BModel
      * @param array $field
      * @return \Illuminate\Support\Collection
      */
-    static function getBundlingData($condition,$field=['*'])
+    static function getBundlingData($condition, $field = ['*'])
     {
-        return BModel::getTableAllData('p_bundling',$condition,$field);
+        return BModel::getTableAllData('p_bundling', $condition, $field);
     }
 
     /**
@@ -118,9 +118,9 @@ class Voucher extends BModel
      * @param array $field
      * @return mixed
      */
-    static function  getBundling($condition,$field=['*'])
+    static function getBundling($condition, $field = ['*'])
     {
-        return BModel::getTableFieldFirstData('p_bundling',$condition,$field);
+        return BModel::getTableFieldFirstData('p_bundling', $condition, $field);
     }
 
     /**
@@ -130,12 +130,12 @@ class Voucher extends BModel
     static function getBundlingGoodsTotalPrice($condition)
     {
         return DB::table('p_bundling_goods')
-        ->where($condition)
-        ->first(
-            array(
-                DB::raw('IFNULL(SUM(bl_goods_price),0) as price')
-            )
-        );
+            ->where($condition)
+            ->first(
+                array(
+                    DB::raw('IFNULL(SUM(bl_goods_price),0) as price')
+                )
+            );
     }
 
     /**
@@ -143,10 +143,10 @@ class Voucher extends BModel
      * @param array $field
      * @return \Illuminate\Support\Collection
      */
-    static function getBundlingGoods($condition,$field=['*'])
+    static function getBundlingGoods($condition, $field = ['*'])
     {
         return DB::table('p_bundling_goods as a')
-            ->leftJoin('goods as b','a.goods_id','b.goods_id')
+            ->leftJoin('goods as b', 'a.goods_id', 'b.goods_id')
             ->where($condition)
             ->get($field);
     }
@@ -157,7 +157,7 @@ class Voucher extends BModel
      */
     static function delVoucher($condition)
     {
-        return BModel::delData('voucher_template',$condition);
+        return BModel::delData('voucher_template', $condition);
     }
 
     /**
@@ -165,20 +165,20 @@ class Voucher extends BModel
      * @param $bundling_id
      * @return mixed
      */
-    static function getBundlingInfo($store_id,$bundling_id)
+    static function getBundlingInfo($store_id, $bundling_id)
     {
 
-        $data=self::getBundling(['bl_id'=>$bundling_id],['bl_id','bl_name','bl_discount_price as bl_price','bl_state']);
-        $data->goods_list=self::getBundlingGoods(['a.bl_id'=>$bundling_id],['a.goods_id','a.goods_name','a.goods_image as img_name','a.bl_goods_price as goods_price','b.goods_price as goods_origin_price']);
-        $data->img_path=getenv("GOODS_IMAGE").$store_id;
+        $data             = self::getBundling(['bl_id' => $bundling_id], ['bl_id', 'bl_name', 'bl_discount_price as bl_price', 'bl_state']);
+        $data->goods_list = self::getBundlingGoods(['a.bl_id' => $bundling_id], ['a.goods_id', 'a.goods_name', 'a.goods_image as img_name', 'a.bl_goods_price as goods_price', 'b.goods_price as goods_origin_price']);
+        $data->img_path   = getenv("GOODS_IMAGE") . $store_id;
         return $data;
     }
 
     static function delBundling($condition)
     {
-        DB::transaction(function () use($condition){
-            BModel::delData('p_bundling',$condition);
-            BModel::delData('p_bundling_goods',$condition);
+        DB::transaction(function () use ($condition) {
+            BModel::delData('p_bundling', $condition);
+            BModel::delData('p_bundling_goods', $condition);
         });
         return true;
     }
@@ -188,9 +188,9 @@ class Voucher extends BModel
      * @param array $field
      * @return mixed
      */
-    static function getManSongInfo($condition,$field=['*'])
+    static function getManSongInfo($condition, $field = ['*'])
     {
-       return BModel::getTableFieldFirstData('p_mansong_quota',$condition,$field);
+        return BModel::getTableFieldFirstData('p_mansong_quota', $condition, $field);
     }
 
     /**
@@ -199,7 +199,7 @@ class Voucher extends BModel
      */
     static function addManSongData($data)
     {
-        return  BModel::insertData('p_mansong',$data);
+        return BModel::insertData('p_mansong', $data);
     }
 
     /**
@@ -208,7 +208,7 @@ class Voucher extends BModel
      */
     static function addManSongRuleData($data)
     {
-        return  BModel::insertData('p_mansong_rule',$data);
+        return BModel::insertData('p_mansong_rule', $data);
     }
 
     /**
@@ -216,9 +216,9 @@ class Voucher extends BModel
      * @param array $field
      * @return \Illuminate\Support\Collection
      */
-    static function getManSongList($condition,$field=['*'])
+    static function getManSongList($condition, $field = ['*'])
     {
-        return BModel::getTableAllData('p_mansong',$condition,$field);
+        return BModel::getTableAllData('p_mansong', $condition, $field);
     }
 
     /**
@@ -226,9 +226,9 @@ class Voucher extends BModel
      * @param array $field
      * @return \Illuminate\Support\Collection
      */
-    static function getManSongRuleList($condition,$field=['*'])
+    static function getManSongRuleList($condition, $field = ['*'])
     {
-        return BModel::getTableAllData('p_mansong_rule',$condition,$field);
+        return BModel::getTableAllData('p_mansong_rule', $condition, $field);
     }
 
     /**
@@ -237,9 +237,9 @@ class Voucher extends BModel
      */
     static function delMansong($condition)
     {
-        DB::transaction(function ()use ($condition) {
-            BModel::delData('p_mansong',$condition);
-            BModel::delData('p_mansong_rule',$condition);
+        DB::transaction(function () use ($condition) {
+            BModel::delData('p_mansong', $condition);
+            BModel::delData('p_mansong_rule', $condition);
         });
         return true;
     }
@@ -249,11 +249,10 @@ class Voucher extends BModel
      * @param array $field
      * @return mixed
      */
-    static function getXianShiInfo($condition,$field=['*'])
+    static function getXianShiInfo($condition, $field = ['*'])
     {
-        return BModel::getTableFieldFirstData('p_xianshi_quota',$condition,$field);
+        return BModel::getTableFieldFirstData('p_xianshi_quota', $condition, $field);
     }
-
 
 
     /**
@@ -262,7 +261,7 @@ class Voucher extends BModel
      */
     static function addXianShiData($data)
     {
-        return BModel::insertData('p_xianshi',$data);
+        return BModel::insertData('p_xianshi', $data);
     }
 
     /**
@@ -270,9 +269,9 @@ class Voucher extends BModel
      * @param $data
      * @return int
      */
-    static function upXianShiData($condition,$data)
+    static function upXianShiData($condition, $data)
     {
-        return BModel::upTableData('p_xianshi',$condition,$data);
+        return BModel::upTableData('p_xianshi', $condition, $data);
     }
 
     /**
@@ -280,9 +279,9 @@ class Voucher extends BModel
      * @param $data
      * @return int
      */
-    static function upManSongData($condition,$data)
+    static function upManSongData($condition, $data)
     {
-        return BModel::upTableData('p_mansong',$condition,$data);
+        return BModel::upTableData('p_mansong', $condition, $data);
     }
 
     /**
@@ -291,7 +290,7 @@ class Voucher extends BModel
      */
     static function addXianShiGoodsData($data)
     {
-        return BModel::insertData('p_xianshi_goods',$data);
+        return BModel::insertData('p_xianshi_goods', $data);
     }
 
     /**
@@ -299,9 +298,9 @@ class Voucher extends BModel
      * @param array $field
      * @return \Illuminate\Support\Collection
      */
-    static function getXianshiList($condition,$field=['*'])
+    static function getXianshiList($condition, $field = ['*'])
     {
-        return BModel::getTableAllData('p_xianshi',$condition,$field);
+        return BModel::getTableAllData('p_xianshi', $condition, $field);
     }
 
     /**
@@ -310,9 +309,9 @@ class Voucher extends BModel
      */
     static function delXianshi($condition)
     {
-        DB::transaction(function () use($condition) {
-            BModel::delData('p_xianshi',$condition);
-            BModel::delData('p_xianshi_goods',$condition);
+        DB::transaction(function () use ($condition) {
+            BModel::delData('p_xianshi', $condition);
+            BModel::delData('p_xianshi_goods', $condition);
         });
         return true;
     }
@@ -332,9 +331,9 @@ class Voucher extends BModel
      * @param array $field
      * @return mixed
      */
-    static function getXianshiData($condition,$field=['*'])
+    static function getXianshiData($condition, $field = ['*'])
     {
-        return BModel::getTableFieldFirstData('p_xianshi',$condition,$field);
+        return BModel::getTableFieldFirstData('p_xianshi', $condition, $field);
     }
 
     /**
@@ -342,9 +341,9 @@ class Voucher extends BModel
      * @param array $field
      * @return mixed
      */
-    static function getXianshiGoodsData($condition,$field=['*'])
+    static function getXianshiGoodsData($condition, $field = ['*'])
     {
-        return BModel::getTableAllData('p_xianshi_goods',$condition,$field);
+        return BModel::getTableAllData('p_xianshi_goods', $condition, $field);
     }
 
     /**
@@ -352,13 +351,12 @@ class Voucher extends BModel
      * @param $xianshi_id
      * @return mixed
      */
-    static function getXianshiInfoData($store_id,$xianshi_id)
+    static function getXianshiInfoData($store_id, $xianshi_id)
     {
-        $data=self::getXianshiData(['xianshi_id'=>$xianshi_id],['xianshi_id','xianshi_name','xianshi_title','xianshi_explain','start_time','end_time','lower_limit']);
-        $data->goods_list=self::getXianshiGoodsData(['xianshi_id'=>$xianshi_id],['goods_id','goods_name','goods_image as img_name','xianshi_price','goods_price']);
-        foreach ($data->goods_list as &$v)
-        {
-            $v->img_path=getenv("GOODS_IMAGE").$store_id;
+        $data             = self::getXianshiData(['xianshi_id' => $xianshi_id], ['xianshi_id', 'xianshi_name', 'xianshi_title', 'xianshi_explain', 'start_time', 'end_time', 'lower_limit']);
+        $data->goods_list = self::getXianshiGoodsData(['xianshi_id' => $xianshi_id], ['goods_id', 'goods_name', 'goods_image as img_name', 'xianshi_price', 'goods_price']);
+        foreach ($data->goods_list as &$v) {
+            $v->img_path = getenv("GOODS_IMAGE") . $store_id;
         }
         return $data;
     }
@@ -368,10 +366,10 @@ class Voucher extends BModel
      * @param $condition
      * @return bool
      */
-    static function checkQuoTaExist($table,$condition)
+    static function checkQuoTaExist($table, $condition)
     {
-        $count=BModel::getCount($table,$condition);
-        return $count>0 ? true :false;
+        $count = BModel::getCount($table, $condition);
+        return $count > 0 ? true : false;
     }
 
     /**
@@ -380,16 +378,17 @@ class Voucher extends BModel
      * @param $cost_remark
      * @return int
      */
-    static function recordStoreCost($store_id,$cost_price, $cost_remark) {
+    static function recordStoreCost($store_id, $cost_price, $cost_remark)
+    {
         // 平台店铺不记录店铺费用
-        $param = array();
-        $param['cost_store_id'] = $store_id;
+        $param                   = array();
+        $param['cost_store_id']  = $store_id;
         $param['cost_seller_id'] = $store_id;
-        $param['cost_price'] = $cost_price;
-        $param['cost_remark'] = $cost_remark;
-        $param['cost_state'] = 0;
-        $param['cost_time'] = time();
-        return BModel::insertData('store_cost',$param);
+        $param['cost_price']     = $cost_price;
+        $param['cost_remark']    = $cost_remark;
+        $param['cost_state']     = 0;
+        $param['cost_time']      = time();
+        return BModel::insertData('store_cost', $param);
     }
 
     /**
@@ -399,17 +398,18 @@ class Voucher extends BModel
      * @param int $state
      * @return int
      */
-    static function recordSellerLog($store_id,$store_name,$content = '', $state = 1){
-        $seller_info = array();
-        $seller_info['log_content'] = $content;
-        $seller_info['log_time'] = time();
-        $seller_info['log_seller_id'] = $store_id;
+    static function recordSellerLog($store_id, $store_name, $content = '', $state = 1)
+    {
+        $seller_info                    = array();
+        $seller_info['log_content']     = $content;
+        $seller_info['log_time']        = time();
+        $seller_info['log_seller_id']   = $store_id;
         $seller_info['log_seller_name'] = $store_name;
-        $seller_info['log_store_id'] = $store_id;
-        $seller_info['log_seller_ip'] = '';
-        $seller_info['log_url'] = '';
-        $seller_info['log_state'] = $state;
-        return BModel::insertData('seller_log',$seller_info);
+        $seller_info['log_store_id']    = $store_id;
+        $seller_info['log_seller_ip']   = '';
+        $seller_info['log_url']         = '';
+        $seller_info['log_state']       = $state;
+        return BModel::insertData('seller_log', $seller_info);
     }
 
     /**
@@ -436,14 +436,12 @@ class Voucher extends BModel
      */
     static function getJieSuan($condition)
     {
-        $total=0;
-        $data=BModel::getTableAllData('order_bill',$condition,['ob_order_totals','ob_commis_totals','ob_order_return_totals','ob_commis_return_totals','ob_store_cost_totals']);
-        if($data)
-        {
-            $total=0;
-            foreach ($data as $v)
-            {
-                $total +=$v->ob_order_totals - $v->ob_commis_totals - $v->ob_order_return_totals + $v->ob_commis_return_totals - $v->ob_store_cost_totals;
+        $total = 0;
+        $data  = BModel::getTableAllData('order_bill', $condition, ['ob_order_totals', 'ob_commis_totals', 'ob_order_return_totals', 'ob_commis_return_totals', 'ob_store_cost_totals']);
+        if ($data) {
+            $total = 0;
+            foreach ($data as $v) {
+                $total += $v->ob_order_totals - $v->ob_commis_totals - $v->ob_order_return_totals + $v->ob_commis_return_totals - $v->ob_store_cost_totals;
             }
         }
         return $total;
@@ -456,9 +454,9 @@ class Voucher extends BModel
      * @param array $field
      * @return array
      */
-    static function getJieSuanOb($condition,$order,$limit,$field=['*'])
+    static function getJieSuanOb($condition, $order, $limit, $field = ['*'])
     {
-        $result= DB::table('order_bill')->where($condition)->orderBy($order,'desc')->limit($limit)->get($field)->toArray();
+        $result = DB::table('order_bill')->where($condition)->orderBy($order, 'desc')->limit($limit)->get($field)->toArray();
         return empty($result) ? array() : $result;
     }
 
@@ -467,18 +465,16 @@ class Voucher extends BModel
      * @param array $field
      * @return array
      */
-    static function getAllJiesuanByYear($condition,$store_id,$field=['*'])
+    static function getAllJiesuanByYear($condition, $store_id, $field = ['*'])
     {
-        $result=[];
-        $os_month_list=BModel::getTableAllData('order_statis',$condition,['os_month']);
-        if(!$os_month_list->isEmpty())
-        {
-            foreach ($os_month_list as $k=>$val)
-            {
-                $result[$k]=DB::table('order_bill')
-                    ->where('os_month',$val->os_month)
-                    ->where('ob_store_id',$store_id)
-                    ->orderBy('ob_no','desc')
+        $result        = [];
+        $os_month_list = BModel::getTableAllData('order_statis', $condition, ['os_month']);
+        if (!$os_month_list->isEmpty()) {
+            foreach ($os_month_list as $k => $val) {
+                $result[$k] = DB::table('order_bill')
+                    ->where('os_month', $val->os_month)
+                    ->where('ob_store_id', $store_id)
+                    ->orderBy('ob_no', 'desc')
                     ->first($field);
             }
 
