@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V3;
 
+use App\BModel;
 use App\Http\Controllers\BaseController as Base;
 use App\Http\Controllers\BaseController;
 use App\model\V3\Member;
@@ -38,10 +39,12 @@ class MemberController extends Base
      */
     function memberRegister(Request $request)
     {
-        $phone_number = $request->input('mobile');
-        $password     = $request->input('password');
-        $verify_code  = $request->input('verify_code');
-        if (empty($phone_number)) {
+        $phone_number  = $request->input('mobile');
+        $password      = $request->input('password');
+        $verify_code   = $request->input('verify_code');
+        $app_type      = $request->input('app_type');
+        $device_tokens = $request->input('device_tokens');
+        if (empty($phone_number) || empty($password) || empty($verify_code) || empty($app_type) || empty($device_tokens)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
         if (!preg_match("/^1[34578]{1}\d{9}$/", $phone_number)) {
@@ -69,9 +72,15 @@ class MemberController extends Base
                 'password' => md5($password),
                 'add_time' => time()
             );
-            $member_id         = Member::insertMemberRegTmpData($regtmp_data);
-            if ($member_id) {
-                return Base::jsonReturn(200, '注册成功',['member_id'=>$member_id]);
+            $res         = Member::insertMemberRegTmpData($regtmp_data);
+            $um_data     = array(
+                'app_type' => $app_type,
+                'device_tokens' => $device_tokens,
+                'member_id' => $member_id
+            );
+            BModel::insertData('umeng', $um_data);
+            if ($res) {
+                return Base::jsonReturn(200, '注册成功', ['member_id' => $member_id]);
             } else {
                 return Base::jsonReturn(2003, '注册失败');
             }

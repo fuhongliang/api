@@ -10,7 +10,7 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+Route::any('test', 'Controller@test');//商家注册
 Route::group(['namespace' => 'V3'], function () {
     Route::post('member_login', 'MemberController@login');
     Route::any('store_jingying/{store_id}', 'StoreController@storeJingYingData');//店铺经营
@@ -18,6 +18,7 @@ Route::group(['namespace' => 'V3'], function () {
     Route::any('get_echarts_', 'StoreController@getEcharts_');
     Route::post('get_sms', 'StoreController@getSMS');//获取验证码
     Route::post('member_register', 'MemberController@memberRegister');//商家注册
+
 });
 
 Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () {
