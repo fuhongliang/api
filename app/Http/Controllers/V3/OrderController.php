@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V3;
 
 use App\Http\Controllers\BaseController as Base;
+use App\Http\Controllers\UmengController;
 use App\model\V3\Order;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -27,6 +28,11 @@ class OrderController extends Base
         return Base::jsonReturn(200, '获取成功', $info);
     }
 
+    /**商家拒单
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function refuseOrder(Request $request)
     {
         $order_id      = $request->input('order_id');
@@ -42,6 +48,11 @@ class OrderController extends Base
         }
     }
 
+    /**接单
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function receiveOrder(Request $request)
     {
         $order_id = $request->input('order_id');

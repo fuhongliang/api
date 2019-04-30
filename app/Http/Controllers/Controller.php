@@ -11,9 +11,4 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    function test()
-    {
-
-        dd(UmengController::sendAndroidUnicast('AuLgLrFdSEcsGQVr84d48F2lxK4e5amZu0UuTJnAE4Nl'));
-    }
 }

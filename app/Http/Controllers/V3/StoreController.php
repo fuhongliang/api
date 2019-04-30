@@ -765,7 +765,7 @@ class StoreController extends Base
         $field                      = ['pdc_amount as amount', 'pdc_payment_state as payment_state', 'pdc_add_time as add_time', 'pdc_bank_no as bank_no'];
         $data                       = BModel::getTableAllData('pd_cash', $condition, $field);
         $result                     = [];
-        $result['list']             = $data;
+        $result['data']             = empty($data) ? null :$data;
         $result['balance']          = $available_predeposit;;
         $result['total_amount'] = BModel::getSum('pd_cash', $condition, 'pdc_amount');
         return Base::jsonReturn(200, '获取成功', $result);
