@@ -460,10 +460,10 @@ class Voucher extends BModel
         $result = DB::table('order_bill')->where($condition)->orderBy($order, 'desc')->limit($limit)->get($field);
         if (!$result->isEmpty()) {
             foreach ($result as $k => $v) {
-                $data['amount']   = $v->ob_order_totals - $v->ob_commis_totals - $v->ob_order_return_totals + $v->ob_commis_return_totals - $v->ob_store_cost_totals;
-                $data['state']    = $v->ob_state;
-                $data['ob_no']    = $v->ob_no;
-                $data['os_month'] = $v->os_month;
+                $data[$k]['amount']   = $v->ob_order_totals - $v->ob_commis_totals - $v->ob_order_return_totals + $v->ob_commis_return_totals - $v->ob_store_cost_totals;
+                $data[$k]['state']    = $v->ob_state;
+                $data[$k]['ob_no']    = $v->ob_no;
+                $data[$k]['os_month'] = $v->os_month;
             }
         }
         return $data;
