@@ -808,7 +808,7 @@ class StoreController extends Base
             $data['pdc_bank_no']       = $account_info->settlement_bank_account_number;
             $data['pdc_bank_user']     = $account_info->settlement_bank_account_name;
             $data['pdc_add_time']      = time();
-            $data['pdc_payment_state'] = 0;
+            $data['pdc_payment_state'] = '0';
             BModel::insertData('pd_cash', $data);
         });
         return Base::jsonReturn(200, '提现成功');
