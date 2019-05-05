@@ -672,6 +672,8 @@ class VoucherController extends Base
         $param['quota_starttime']  = $now;
         $param['quota_endtime']    = $now + $add_time;
         $param['quota_state']      = 1;
+        $param['quota_applyid' ]      = 0;
+
         BModel::insertData('voucher_quota', $param);
         $current_price = 20;
         Voucher::recordStoreCost($store_id, $current_price * $month, '购买代金券套餐');
