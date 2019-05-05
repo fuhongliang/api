@@ -657,7 +657,7 @@ class VoucherController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2001, '商家不存在');
         }
-        if (Voucher::checkQuoTaExist('voucher_quota', ['store_id' => $store_id])) {
+        if (Voucher::checkQuoTaExist('voucher_quota', ['quota_storeid' => $store_id])) {
             return Base::jsonReturn(2002, '已经过买过套餐');
         }
         $store_name                = Store::getStoreField(['store_id' => $store_id], 'store_name');
