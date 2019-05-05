@@ -792,9 +792,9 @@ class StoreController extends Base
 //            showDialog('支付密码错误','','error');
 //        }
         //验证金额是否足够
-        if (floatval($available_predeposit) < floatval($money)) {
-            return Base::jsonReturn(2001, '余额不足');
-        }
+//        if (floatval($available_predeposit) < floatval($money)) {
+//            return Base::jsonReturn(2001, '余额不足');
+//        }
         DB::transaction(function () use ($member_info, $money) {
             $account_info              = BModel::getTableFirstData('store_joinin', ['member_id' => $member_info->member_id], ['settlement_bank_account_name', 'settlement_bank_type', 'settlement_bank_account_number']);
             $pdc_sn                    = Store::makeSn($member_info->member_id);
@@ -802,7 +802,8 @@ class StoreController extends Base
             $data['pdc_sn']            = $pdc_sn;
             $data['pdc_member_id']     = $member_info->member_id;
             $data['pdc_member_name']   = $member_info->member_name;
-            $data['pdc_amount']        = $money;
+            $data['pdc_amount']        = 1;
+            //$data['pdc_amount']        = $money;
             $data['pdc_bank_name']     = $account_info->settlement_bank_type;
             $data['pdc_bank_no']       = $account_info->settlement_bank_account_number;
             $data['pdc_bank_user']     = $account_info->settlement_bank_account_name;
