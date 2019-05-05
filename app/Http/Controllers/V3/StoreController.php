@@ -875,10 +875,42 @@ class StoreController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
-
         $data      = BModel::getTableAllData('store_msg',['store_id'=>$store_id],['sm_id','sm_content']);
-
         if ($data) {
+            return Base::jsonReturn(200, '获取成功',$data);
+        } else {
+            return Base::jsonReturn(2001, '获取失败');
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function msgInfo(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        $sm_id = $request->input('sm_id');
+        if (!$store_id || !$sm_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000, '商家不存在');
+        }
+        $data      = BModel::getTableFieldFirstData('store_msg',['sm_id'=>$sm_id],['sm_id','sm_content','sm_addtime']);
+        $data->sm_addtime=date('Y-m-d H:i:s',$data->sm_addtime);
+        if ($data) {
+            $condition = array();
+            $condition['seller_id'] = $store_id;
+            $condition['sm_id'] = $sm_id;
+            $condition['read_time'] = time();
+
+            BModel::insertData('store_msg_read',$condition);
+
+            $update = array();
+            $sm_readids[] = $store_id;
+            $update['sm_readids'] = implode(',', $sm_readids).',';
+            BModel::upTableData('store_msg',['sm_id' => $sm_id],$update);
             return Base::jsonReturn(200, '获取成功',$data);
         } else {
             return Base::jsonReturn(2001, '获取失败');
