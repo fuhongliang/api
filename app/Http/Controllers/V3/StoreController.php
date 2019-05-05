@@ -739,7 +739,7 @@ class StoreController extends Base
         $field                = ['ob_state', 'ob_no', 'os_month', 'ob_order_totals', 'ob_commis_totals', 'ob_order_return_totals', 'ob_commis_return_totals', 'ob_store_cost_totals'];
         $data['list']         = Voucher::getAllJiesuanByYear($condition, $store_id, $field);
         $total_amount         = array_column($data['list'], 'amount');
-        $data['total_amount'] = array_sum($total_amount);
+        $data['total_amount'] = Base::ncPriceFormat(array_sum($total_amount));
         return Base::jsonReturn(200, '获取成功', $data);
     }
 
@@ -859,6 +859,29 @@ class StoreController extends Base
             return Base::jsonReturn(200, '提交成功');
         } else {
             return Base::jsonReturn(2001, '提交失败');
+        }
+    }
+
+    /**系统消息
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function msgList(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        if (!$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000, '商家不存在');
+        }
+
+        $data      = BModel::getTableAllData('store_msg',['store_id'=>$store_id],['sm_id','sm_content']);
+
+        if ($data) {
+            return Base::jsonReturn(200, '获取成功',$data);
+        } else {
+            return Base::jsonReturn(2001, '获取失败');
         }
     }
 

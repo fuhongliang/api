@@ -3,6 +3,8 @@
 namespace App\model\V3;
 
 use App\BModel;
+use App\Http\Controllers\BaseController;
+use Faker\Provider\Base;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -487,13 +489,14 @@ class Voucher extends BModel
                     ->first($field);
             }
 
+            foreach ($result as $k => $v) {
+                $data[$k]['amount']   =BaseController::ncPriceFormat( $v->ob_order_totals - $v->ob_commis_totals - $v->ob_order_return_totals + $v->ob_commis_return_totals - $v->ob_store_cost_totals);
+                $data[$k]['state']    = $v->ob_state;
+                $data[$k]['ob_no']    = $v->ob_no;
+                $data[$k]['os_month'] = substr($v->os_month,-2);
+            }
         }
-        foreach ($result as $k => $v) {
-            $data[$k]['amount']   = $v->ob_order_totals - $v->ob_commis_totals - $v->ob_order_return_totals + $v->ob_commis_return_totals - $v->ob_store_cost_totals;
-            $data[$k]['state']    = $v->ob_state;
-            $data[$k]['ob_no']    = $v->ob_no;
-            $data[$k]['os_month'] = substr($v->os_month,-2);
-        }
+
         return $data;
     }
 

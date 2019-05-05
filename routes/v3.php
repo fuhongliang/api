@@ -82,6 +82,7 @@ Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () 
     Route::post('all_store_jiesuan', 'StoreController@allStoreJieSuan');//所有结算
     Route::post('pd_cash_list', 'StoreController@cashList');//提现列表
     Route::post('pd_cash_add', 'StoreController@addCash');//提现
+    Route::post('msg_list', 'StoreController@msgList');//消息列表
 
     Route::post('store_joinin_step1', 'StoreController@joininStep1');//商家入驻第一步
     Route::post('store_joinin_step2', 'StoreController@joininStep2');//商家入驻第二步
