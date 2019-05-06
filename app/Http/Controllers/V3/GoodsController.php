@@ -347,7 +347,7 @@ class GoodsController extends Base
      * @param $type
      * @return \Illuminate\Http\JsonResponse
      */
-    function upImage(Request $request, $type)
+    function upImage(Request $request)
     {
         $image = $request->file('file');
 
