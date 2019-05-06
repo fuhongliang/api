@@ -355,9 +355,9 @@ class GoodsController extends Base
             return Base::jsonReturn(1000, '参数缺失');
         }
         $filesize = $image->getClientSize();
-        if ($filesize > 20480) {
-            return Base::jsonReturn(2000, '图片大小超过2M限制');
-        }
+//        if ($filesize > 20480) {
+//            return Base::jsonReturn(2000, '图片大小超过限制');
+//        }
         $entension = $image->getClientOriginalExtension();
         $allow_ext = ['png', 'jpg', 'jpeg'];
         if (!in_array($entension, $allow_ext)) {
