@@ -714,6 +714,10 @@ class StoreController extends Base
         $member_id         = BModel::getTableValue('store', ['store_id' => $store_id], 'member_id');
         $account           = BModel::getTableFieldFirstData('store_joinin', ['member_id' => $member_id], ['settlement_bank_type as bank_type', 'settlement_bank_account_number as account_number']);
         $data['account']   = empty($account) ? null : $account;
+        $data['message']   = array(
+            'addtime'=>date('Y-m-d H:i:s'),
+            'msg'=>'可为免费空位欺负你委屈而烦恼为妇女'
+        );
         return Base::jsonReturn(200, '获取成功', $data);
     }
 
@@ -938,6 +942,11 @@ class StoreController extends Base
             return Base::jsonReturn(2001, '获取失败');
         }
     }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     function gcList(Request $request)
     {
         $store_id = $request->input('store_id');
