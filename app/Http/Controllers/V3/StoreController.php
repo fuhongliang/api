@@ -917,6 +917,21 @@ class StoreController extends Base
             return Base::jsonReturn(2001, '获取失败');
         }
     }
-
+    function areaList(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        if (!$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000, '商家不存在');
+        }
+        $data      = Store::getAreaList();
+        if ($data) {
+            return Base::jsonReturn(200, '获取成功',$data);
+        } else {
+            return Base::jsonReturn(2001, '获取失败');
+        }
+    }
 
 }

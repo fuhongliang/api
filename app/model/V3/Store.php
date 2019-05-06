@@ -430,4 +430,17 @@ class Store extends BModel
             . sprintf('%03d', (float)microtime() * 1000)
             . sprintf('%03d', (int)$member_id % 1000);
     }
+    static function getAreaList()
+    {
+       $data= BModel::getTableAllData('area',['area_parent_id'=>0],['area_id','area_name as province'])->toArray();
+       foreach($data as $key=>&$val)
+       {
+           $val->children=BModel::getTableAllData('area',['area_parent_id'=>$val->area_id],['area_id','area_name as city'])->toArray();
+            foreach ($val->children as &$v)
+            {
+                $v->children=BModel::getTableAllData('area',['area_parent_id'=>$val->area_id],['area_id','area_name as city'])->toArray();
+            }
+       }
+       return $data;
+    }
 }

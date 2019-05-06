@@ -86,4 +86,7 @@ Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () 
     Route::post('msg_info', 'StoreController@msgInfo');//消息详情
     Route::post('store_joinin_step1', 'StoreController@joininStep1');//商家入驻第一步
     Route::post('store_joinin_step2', 'StoreController@joininStep2');//商家入驻第二步
+
+    Route::post('area_list', 'StoreController@areaList');//地区列表
+
 });
