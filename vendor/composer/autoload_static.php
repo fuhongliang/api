@@ -126,8 +126,13 @@ class ComposerStaticInit7f69e2e8817818ae449452c01cd56b34
             'Cron\\' => 5,
             'Carbon\\' => 7,
         ),
+        'B' => 
+        array (
+            'Barryvdh\\Cors\\' => 14,
+        ),
         'A' => 
         array (
+            'Asm89\\Stack\\' => 12,
             'App\\' => 4,
         ),
     );
@@ -335,6 +340,14 @@ class ComposerStaticInit7f69e2e8817818ae449452c01cd56b34
         array (
             0 => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon',
         ),
+        'Barryvdh\\Cors\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/barryvdh/laravel-cors/src',
+        ),
+        'Asm89\\Stack\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/asm89/stack-cors/src/Asm89/Stack',
+        ),
         'App\\' => 
         array (
             0 => __DIR__ . '/../..' . '/app',
@@ -380,6 +393,7 @@ class ComposerStaticInit7f69e2e8817818ae449452c01cd56b34
         'App\\Http\\Controllers\\BaseController' => __DIR__ . '/../..' . '/app/Http/Controllers/BaseController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\SMSController' => __DIR__ . '/../..' . '/app/Http/Controllers/SMSController.php',
+        'App\\Http\\Controllers\\UmengController' => __DIR__ . '/../..' . '/app/Http/Controllers/UmengController.php',
         'App\\Http\\Controllers\\V1\\GoodsController' => __DIR__ . '/../..' . '/app/Http/Controllers/V1/GoodsController.php',
         'App\\Http\\Controllers\\V1\\MemberController' => __DIR__ . '/../..' . '/app/Http/Controllers/V1/MemberController.php',
         'App\\Http\\Controllers\\V1\\OrderController' => __DIR__ . '/../..' . '/app/Http/Controllers/V1/OrderController.php',
@@ -425,6 +439,12 @@ class ComposerStaticInit7f69e2e8817818ae449452c01cd56b34
         'App\\model\\V3\\Store' => __DIR__ . '/../..' . '/app/model/V3/Store.php',
         'App\\model\\V3\\Token' => __DIR__ . '/../..' . '/app/model/V3/Token.php',
         'App\\model\\V3\\Voucher' => __DIR__ . '/../..' . '/app/model/V3/Voucher.php',
+        'Asm89\\Stack\\Cors' => __DIR__ . '/..' . '/asm89/stack-cors/src/Asm89/Stack/Cors.php',
+        'Asm89\\Stack\\CorsService' => __DIR__ . '/..' . '/asm89/stack-cors/src/Asm89/Stack/CorsService.php',
+        'Barryvdh\\Cors\\HandleCors' => __DIR__ . '/..' . '/barryvdh/laravel-cors/src/HandleCors.php',
+        'Barryvdh\\Cors\\HandlePreflight' => __DIR__ . '/..' . '/barryvdh/laravel-cors/src/HandlePreflight.php',
+        'Barryvdh\\Cors\\LumenServiceProvider' => __DIR__ . '/..' . '/barryvdh/laravel-cors/src/LumenServiceProvider.php',
+        'Barryvdh\\Cors\\ServiceProvider' => __DIR__ . '/..' . '/barryvdh/laravel-cors/src/ServiceProvider.php',
         'Carbon\\Carbon' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Carbon.php',
         'Carbon\\CarbonInterval' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/CarbonInterval.php',
         'Carbon\\Exceptions\\InvalidDateException' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Exceptions/InvalidDateException.php',
