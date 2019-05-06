@@ -350,7 +350,7 @@ class GoodsController extends Base
     function upImage(Request $request, $type)
     {
         $image = $request->file('file');
-        $token = $request->header('token');
+
         if (!$image) {
             return Base::jsonReturn(1000, '参数缺失');
         }
