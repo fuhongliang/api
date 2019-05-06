@@ -18,7 +18,7 @@ Route::group(['namespace' => 'V3'], function () {
     Route::any('get_echarts_', 'StoreController@getEcharts_');
     Route::post('get_sms', 'StoreController@getSMS');//获取验证码
     Route::post('member_register', 'MemberController@memberRegister');//商家注册
-
+    Route::post('image_upload', 'GoodsController@upImage');//文件上传
 });
 
 Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () {
@@ -64,7 +64,7 @@ Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () 
     Route::post('xianshi_goods_list', 'GoodsController@xianshiGoodsList');//折扣商品列表
     Route::post('xianshi_del', 'VoucherController@xianshiDel');//折扣删除
     Route::post('xianshi_info', 'VoucherController@xianshiInfo');//折扣详情
-    Route::post('image_upload', 'GoodsController@upImage');//文件上传
+
     Route::post('check_mobile', 'MemberController@checkMobile');//商家注册检测手机号
 
     ////
