@@ -430,6 +430,10 @@ class Store extends BModel
             . sprintf('%03d', (float)microtime() * 1000)
             . sprintf('%03d', (int)$member_id % 1000);
     }
+
+    /**
+     * @return array
+     */
     static function getAreaList()
     {
        $data= BModel::getTableAllData('area',['area_parent_id'=>0],['area_id','area_name as province'])->toArray();
@@ -443,4 +447,19 @@ class Store extends BModel
        }
        return $data;
     }
+    static function getGcList()
+    {
+        $data= BModel::getTableAllData('goods_class',['gc_parent_id'=>0],['gc_id','gc_name'])->toArray();
+        foreach($data as $key=>&$val)
+        {
+            $val->children=BModel::getTableAllData('goods_class',['gc_id'=>$val->gc_id],['gc_id','gc_name'])->toArray();
+            foreach ($val->children as &$v)
+            {
+                $v->children=BModel::getTableAllData('goods_class',['gc_id'=>$val->gc_id],['gc_id','gc_name'])->toArray();
+            }
+        }
+        return $data;
+    }
+
+
 }
