@@ -349,6 +349,9 @@ class GoodsController extends Base
      */
     function upImage(Request $request)
     {
+
+        header("Access-Control-Allow-Origin:*");
+
         $image = $request->file('file');
 
         if (!$image) {
