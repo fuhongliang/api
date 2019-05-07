@@ -460,6 +460,12 @@ class Store extends BModel
         }
         return $data;
     }
-
+    static function getmsgInfo($condition)
+    {
+        return DB::table('store_msg as a')
+            ->leftJoin('store_msg_tpl as b','a.smt_code','b.smt_code')
+            ->where($condition)
+            ->first(['a.sm_id','a.sm_content','a.sm_addtime','b.smt_name as sm_title']);
+    }
 
 }

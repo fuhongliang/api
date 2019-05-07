@@ -902,7 +902,7 @@ class StoreController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
-        $data      = BModel::getTableFieldFirstData('store_msg',['sm_id'=>$sm_id],['sm_id','sm_content','sm_addtime','sm_title']);
+        $data      =Store::getmsgInfo(['sm_id'=>$sm_id]);// BModel::getTableFieldFirstData('store_msg',['sm_id'=>$sm_id],['sm_id','sm_content','sm_addtime','sm_title']);
         $data->sm_addtime=date('Y-m-d H:i:s',$data->sm_addtime);
         if ($data) {
             if(BModel::getCount('store_msg_read',['sm_id'=>$sm_id])  == 0)
