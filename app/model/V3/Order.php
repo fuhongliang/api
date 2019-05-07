@@ -46,6 +46,7 @@ class Order extends BModel
         if ($order_info->isEmpty()) {
             return null;
         }
+
         return $order_info;
     }
 

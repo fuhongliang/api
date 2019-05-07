@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V3;
 use App\Http\Controllers\BaseController as Base;
 use App\Http\Controllers\UmengController;
 use App\model\V3\Order;
+use App\model\V3\Store;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -25,7 +26,9 @@ class OrderController extends Base
         }
         $fileds = ['order_id', 'order_sn', 'buyer_id', 'add_time'];
         $info   = Order::getNewOrder(['store_id' => $store_id, 'order_state' => 20], $fileds);
-        return Base::jsonReturn(200, '获取成功', $info);
+        $data['list']=$info;
+        $data['msg']=Store::getTableAllData('store_msg',['store_id'=>$store_id,'smt_code'=>'new_order'],['sm_id','sm_content']);
+        return Base::jsonReturn(200, '获取成功', $data);
     }
 
     /**商家拒单
