@@ -817,6 +817,10 @@ class StoreController extends Base
         });
         return Base::jsonReturn(200, '提现成功');
     }
+    function joinin_Step1()
+    {
+        return view('store.joinin_step1');
+    }
 
     /**入驻第一步
      * @param Request $request

@@ -19,6 +19,7 @@ Route::group(['namespace' => 'V3'], function () {
     Route::post('get_sms', 'StoreController@getSMS');//获取验证码
     Route::post('member_register', 'MemberController@memberRegister');//商家注册
     Route::post('image_upload', 'GoodsController@upImage');//文件上传
+    Route::get('joinin_step1', 'StoreController@joinin_Step1');//入驻第一步页面
 });
 
 Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () {
@@ -84,8 +85,11 @@ Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () 
     Route::post('pd_cash_add', 'StoreController@addCash');//提现
     Route::post('msg_list', 'StoreController@msgList');//消息列表
     Route::post('msg_info', 'StoreController@msgInfo');//消息详情
-    Route::post('store_joinin_step1', 'StoreController@joininStep1');//商家入驻第一步
-    Route::post('store_joinin_step2', 'StoreController@joininStep2');//商家入驻第二步
+
+
+
+    Route::post('store_joinin_step1', 'StoreController@joininStep1');//商家入驻第一步  保存数据
+    Route::post('store_joinin_step2', 'StoreController@joininStep2');//商家入驻第二步 保存数据
 
     Route::post('area_list', 'StoreController@areaList');//地区列表
     Route::post('gc_list', 'StoreController@gcList');//分类列表
