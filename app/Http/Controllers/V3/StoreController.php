@@ -12,8 +12,9 @@ use App\model\V3\Voucher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 use Overtrue\EasySms\EasySms;
-use Redis;
+
 class StoreController extends Base
 {
     public function addStoreGoodsClass(Request $request)
