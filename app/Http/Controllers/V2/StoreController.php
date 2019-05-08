@@ -388,9 +388,7 @@ class StoreController extends Base
 
         //店铺收藏量 商品数量
         $store_collect_data= Store::getStoreInfo(['store_id'=>$store_id],['store_collect']);
-        $where["store_id"] = [$store_id];
-        $where["goods_stcid"] = ['notnull'];
-        $goods_num=Goods::getGoodsCount($where);
+        $goods_num=Goods::getGoodsCount(['store_id'=>$store_id]);
         $data2 =DB::table('order')
             ->where('store_id',$store_id)
             ->whereBetween('add_time',[$beginToday,$endToday])

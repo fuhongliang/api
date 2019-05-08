@@ -167,10 +167,10 @@ class Voucher extends BModel
      */
     static function getBundlingInfo($store_id,$bundling_id)
     {
+
         $data=self::getBundling(['bl_id'=>$bundling_id],['bl_id','bl_name','bl_discount_price as bl_price','bl_state']);
         $data->goods_list=self::getBundlingGoods(['a.bl_id'=>$bundling_id],['a.goods_id','a.goods_name','a.goods_image as img_name','a.bl_goods_price as goods_price','b.goods_price as goods_origin_price']);
-        $data->img_path="http://47.111.27.189:2000/storage/shop/store/goods/".$store_id;
-
+        $data->img_path=getenv("GOODS_IMAGE").$store_id;
         return $data;
     }
 
@@ -354,7 +354,10 @@ class Voucher extends BModel
     {
         $data=self::getXianshiData(['xianshi_id'=>$xianshi_id],['xianshi_id','xianshi_name','xianshi_title','xianshi_explain','start_time','end_time','lower_limit']);
         $data->goods_list=self::getXianshiGoodsData(['xianshi_id'=>$xianshi_id],['goods_id','goods_name','goods_image as img_name','xianshi_price','goods_price']);
-        $data->img_path="http://47.111.27.189:2000/storage/shop/store/goods/".$store_id;
+        foreach ($data->goods_list as &$v)
+        {
+            $v->img_path=getenv("GOODS_IMAGE").$store_id;
+        }
         return $data;
     }
 

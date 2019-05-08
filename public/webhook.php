@@ -1,6 +1,6 @@
 <?php
 
-$cmd = "cd /data/wwwroot/api &&sudo git pull origin v2";
+$cmd = "cd /data/wwwroot/api &&sudo git pull origin v3";
 $res = shell_exec($cmd);
 if($res)
 {

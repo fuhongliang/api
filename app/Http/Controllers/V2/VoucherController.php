@@ -173,7 +173,7 @@ class VoucherController extends Base
         $bl_discount_price = $request->input('discount_price');
         $goods_list = $request->input('goods_list');
         $bundling_id = $request->input('bundling_id');
-        $state = $request->input('state');
+        $state = $request->input('bl_state');
         if (!$store_id || !$bundling_name || !$bl_discount_price || !$goods_list) {
             return Base::jsonReturn(1000, '参数缺失');
         }
@@ -479,6 +479,11 @@ class VoucherController extends Base
                 $result[$k]['start_time']=$v->start_time;
                 $result[$k]['end_time']=$v->end_time;
                 $result[$k]['state']=$v->state;
+                if($v->end_time <= time())
+                {
+                    $result[$k]['state']=0;
+                    Voucher::upXianShiData(['xianshi_id'=>$v->xianshi_id],['state'=>0]);
+                }
                 $result[$k]['lower_limit']=$v->lower_limit;
             }
             return Base::jsonReturn(200,  '获取成功',$result);
