@@ -740,6 +740,7 @@ class StoreController extends Base
         } else {
             $condition['os_year'] = '2019';
         }
+
         $field                = ['ob_state', 'ob_no', 'os_month', 'ob_order_totals', 'ob_commis_totals', 'ob_order_return_totals', 'ob_commis_return_totals', 'ob_store_cost_totals'];
         $data['list']         = Voucher::getAllJiesuanByYear($condition, $store_id, $field);
         $total_amount         = array_column($data['list'], 'amount');
@@ -935,13 +936,6 @@ class StoreController extends Base
      */
     function areaList(Request $request)
     {
-        $store_id = $request->input('store_id');
-        if (!$store_id) {
-            return Base::jsonReturn(1000, '参数缺失');
-        }
-        if (!Base::checkStoreExist($store_id)) {
-            return Base::jsonReturn(2000, '商家不存在');
-        }
         $data      = Store::getAreaList();
         if ($data) {
             return Base::jsonReturn(200, '获取成功',$data);
@@ -956,13 +950,6 @@ class StoreController extends Base
      */
     function gcList(Request $request)
     {
-        $store_id = $request->input('store_id');
-        if (!$store_id) {
-            return Base::jsonReturn(1000, '参数缺失');
-        }
-        if (!Base::checkStoreExist($store_id)) {
-            return Base::jsonReturn(2000, '商家不存在');
-        }
         $data      = Store::getGcList();
         if ($data) {
             return Base::jsonReturn(200, '获取成功',$data);
