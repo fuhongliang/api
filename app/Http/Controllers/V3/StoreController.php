@@ -971,4 +971,34 @@ class StoreController extends Base
         }
     }
 
+    /**更换头像
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    static function changeAvator(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        $avator = $request->input('avator');
+        if (!$store_id || !$avator) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000, '商家不存在');
+        }
+        $member_info          = BModel::getTableFirstData('store', ['store_id' => $store_id], ['member_id', 'member_name']);
+        $data      = Store::upTableData('store',['store_id'=>$store_id],['store_avatar'=>$avator]);
+        if ($data) {
+            $field = ['a.store_id', 'a.store_name', 'a.store_phone', 'a.store_avatar',
+                'a.area_info', 'a.store_address', 'a.work_start_time', 'a.work_end_time',
+                'a.store_state', 'a.store_description', 'a.work_start_time', 'a.work_end_time',
+                'b.business_licence_number_electronic',
+                'c.member_id', 'c.member_name', 'c.member_mobile'];
+            $data  = Store::getStoreAndJoinInfo(['a.member_id' => $member_info->member_id], $field);
+            $data->business_licence_number_electronic = getenv('WEB_URL') . 'upload/shop/store_joinin/06075408577995264.png';
+            $data->token                              = Base::makeToken($data->store_id, $member_info->member_name);
+            return Base::jsonReturn(200, '获取成功',$data);
+        } else {
+            return Base::jsonReturn(2001, '获取失败');
+        }
+    }
 }
