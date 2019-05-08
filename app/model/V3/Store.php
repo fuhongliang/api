@@ -6,7 +6,7 @@ use App\BModel;
 use App\Http\Controllers\BaseController as Base;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-
+use Redis;
 class Store extends BModel
 {
     /**
@@ -436,13 +436,13 @@ class Store extends BModel
      */
     static function getAreaList()
     {
-       $data= BModel::getTableAllData('area',['area_parent_id'=>0],['area_id','area_name as province'])->toArray();
+       $data= BModel::getTableAllData('area',['area_parent_id'=>0],['area_id as id','area_name as province'])->toArray();
        foreach($data as $key=>&$val)
        {
-           $val->children=BModel::getTableAllData('area',['area_parent_id'=>$val->area_id],['area_id','area_name as city'])->toArray();
+           $val->children=BModel::getTableAllData('area',['area_parent_id'=>$val->id],['area_id as id','area_name as city'])->toArray();
             foreach ($val->children as &$v)
             {
-                $v->children=BModel::getTableAllData('area',['area_parent_id'=>$val->area_id],['area_id','area_name as city'])->toArray();
+                $v->children=BModel::getTableAllData('area',['area_parent_id'=>$val->id],['area_id as id','area_name as area'])->toArray();
             }
        }
        return $data;

@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Overtrue\EasySms\EasySms;
-
+use Redis;
 class StoreController extends Base
 {
     public function addStoreGoodsClass(Request $request)
@@ -947,7 +947,12 @@ class StoreController extends Base
      */
     function areaList(Request $request)
     {
-        $data = Store::getAreaList();
+        $data = Redis::get('arealist');
+        if(!$data)
+        {
+            $data = Store::getAreaList();
+            Redis::set('arealist', $data);
+        }
         if ($data) {
             return Base::jsonReturn(200, '获取成功', $data);
         } else {
