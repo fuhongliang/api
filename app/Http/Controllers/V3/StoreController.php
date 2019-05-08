@@ -741,21 +741,19 @@ class StoreController extends Base
         } else {
             $condition['os_year'] = '2019';
         }
-        $os_month=BModel::getTableAllData('order_statis',$condition,['os_month']);
-        if($os_month->isEmpty())
-        {
-            $data=null;
-        }else{
-            $os_month_list=[];
-            $months=$os_month->toArray();
-            foreach ($months as $v)
-            {
-                $os_month_list[]=$v->os_month;
+        $os_month = BModel::getTableAllData('order_statis', $condition, ['os_month']);
+        if ($os_month->isEmpty()) {
+            $data = null;
+        } else {
+            $os_month_list = [];
+            $months        = $os_month->toArray();
+            foreach ($months as $v) {
+                $os_month_list[] = $v->os_month;
             }
-            $field        = ['ob_state', 'ob_no', 'os_month', 'ob_order_totals', 'ob_commis_totals', 'ob_order_return_totals', 'ob_commis_return_totals', 'ob_store_cost_totals'];
-            $data['list'] = Voucher::getAllJiesuanByYear($condition, $store_id, $field);
-            $data['y_jiesuan'] = Voucher::getJieSuan(['ob_store_id' => $store_id, 'ob_state' => 4,'os_month'=>['in', $os_month_list]]);//已结算
-            $data['d_jiesuan'] = Voucher::getJieSuan(['ob_store_id' => $store_id, 'ob_state' => ['in', [1, 2, 3]],'os_month'=>['in', $os_month_list]]);//未结算
+            $field             = ['ob_state', 'ob_no', 'os_month', 'ob_order_totals', 'ob_commis_totals', 'ob_order_return_totals', 'ob_commis_return_totals', 'ob_store_cost_totals'];
+            $data['list']      = Voucher::getAllJiesuanByYear($condition, $store_id, $field);
+            $data['y_jiesuan'] = Voucher::getJieSuan(['ob_store_id' => $store_id, 'ob_state' => 4, 'os_month' => ['in', $os_month_list]]);//已结算
+            $data['d_jiesuan'] = Voucher::getJieSuan(['ob_store_id' => $store_id, 'ob_state' => ['in', [1, 2, 3]], 'os_month' => ['in', $os_month_list]]);//未结算
         }
         return Base::jsonReturn(200, '获取成功', $data);
     }
@@ -948,17 +946,12 @@ class StoreController extends Base
      */
     function areaList(Request $request)
     {
-        $data = Redis::get('arealist');
-        if(!$data)
-        {
+        if (!$data = json_decode(Redis::get('arealist'))) {
             $data = Store::getAreaList();
-            Redis::set('arealist', $data);
+            Redis::set('arealist', json_encode($data));
         }
-        if ($data) {
-            return Base::jsonReturn(200, '获取成功', $data);
-        } else {
-            return Base::jsonReturn(2001, '获取失败');
-        }
+
+        return Base::jsonReturn(200, '获取成功', $data);
     }
 
     /**

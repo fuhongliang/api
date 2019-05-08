@@ -447,6 +447,7 @@ class Store extends BModel
        }
        return $data;
     }
+
     static function getGcList()
     {
         $data= BModel::getTableAllData('goods_class',['gc_parent_id'=>0],['gc_id','gc_name'])->toArray();
