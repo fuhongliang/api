@@ -754,7 +754,7 @@ class StoreController extends Base
             $field        = ['ob_state', 'ob_no', 'os_month', 'ob_order_totals', 'ob_commis_totals', 'ob_order_return_totals', 'ob_commis_return_totals', 'ob_store_cost_totals'];
             $data['list'] = Voucher::getAllJiesuanByYear($condition, $store_id, $field);
             $data['y_jiesuan'] = Voucher::getJieSuan(['ob_store_id' => $store_id, 'ob_state' => 4,'os_month'=>['in', $os_month_list]]);//已结算
-            $data['w_jiesuan'] = Voucher::getJieSuan(['ob_store_id' => $store_id, 'ob_state' => ['in', [1, 2, 3]],'os_month'=>['in', $os_month_list]]);//未结算
+            $data['d_jiesuan'] = Voucher::getJieSuan(['ob_store_id' => $store_id, 'ob_state' => ['in', [1, 2, 3]],'os_month'=>['in', $os_month_list]]);//未结算
         }
         return Base::jsonReturn(200, '获取成功', $data);
     }
