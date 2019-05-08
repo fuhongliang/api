@@ -715,8 +715,8 @@ class StoreController extends Base
         $account           = BModel::getTableFieldFirstData('store_joinin', ['member_id' => $member_id], ['settlement_bank_type as bank_type', 'settlement_bank_account_number as account_number']);
         $data['account']   = empty($account) ? null : $account;
         $data['message']   = array(
-            'addtime'=>date('Y-m-d H:i:s'),
-            'msg'=>'可为免费空位欺负你委屈而烦恼为妇女'
+            'addtime' => date('Y-m-d H:i:s'),
+            'msg' => '可为免费空位欺负你委屈而烦恼为妇女'
         );
         return Base::jsonReturn(200, '获取成功', $data);
     }
@@ -740,11 +740,22 @@ class StoreController extends Base
         } else {
             $condition['os_year'] = '2019';
         }
-
-        $field                = ['ob_state', 'ob_no', 'os_month', 'ob_order_totals', 'ob_commis_totals', 'ob_order_return_totals', 'ob_commis_return_totals', 'ob_store_cost_totals'];
-        $data['list']         = Voucher::getAllJiesuanByYear($condition, $store_id, $field);
-        $total_amount         = array_column($data['list'], 'amount');
-        $data['total_amount'] = Base::ncPriceFormat(array_sum($total_amount));
+        $os_month=BModel::getTableAllData('order_statis',$condition,['os_month']);
+        if($os_month->isEmpty())
+        {
+            $data=null;
+        }else{
+            $os_month_list=[];
+            $months=$os_month->toArray();
+            foreach ($months as $v)
+            {
+                $os_month_list[]=$v->os_month;
+            }
+            $field        = ['ob_state', 'ob_no', 'os_month', 'ob_order_totals', 'ob_commis_totals', 'ob_order_return_totals', 'ob_commis_return_totals', 'ob_store_cost_totals'];
+            $data['list'] = Voucher::getAllJiesuanByYear($condition, $store_id, $field);
+            $data['y_jiesuan'] = Voucher::getJieSuan(['ob_store_id' => $store_id, 'ob_state' => 4,'os_month'=>['in', $os_month_list]]);//已结算
+            $data['w_jiesuan'] = Voucher::getJieSuan(['ob_store_id' => $store_id, 'ob_state' => ['in', [1, 2, 3]],'os_month'=>['in', $os_month_list]]);//未结算
+        }
         return Base::jsonReturn(200, '获取成功', $data);
     }
 
@@ -770,7 +781,7 @@ class StoreController extends Base
         $field                      = ['pdc_amount as amount', 'pdc_payment_state as payment_state', 'pdc_add_time as add_time', 'pdc_bank_no as bank_no'];
         $data                       = BModel::getTableAllData('pd_cash', $condition, $field);
         $result                     = [];
-        $result['data']             = empty($data) ? null :$data;
+        $result['data']             = empty($data) ? null : $data;
         $result['balance']          = $available_predeposit;;
         $result['total_amount'] = BModel::getSum('pd_cash', $condition, 'pdc_amount');
         return Base::jsonReturn(200, '获取成功', $result);
@@ -801,13 +812,13 @@ class StoreController extends Base
 //            return Base::jsonReturn(2001, '余额不足');
 //        }
         DB::transaction(function () use ($member_info, $money) {
-            $account_info              = BModel::getTableFirstData('store_joinin', ['member_id' => $member_info->member_id], ['settlement_bank_account_name', 'settlement_bank_type', 'settlement_bank_account_number']);
-            $pdc_sn                    = Store::makeSn($member_info->member_id);
-            $data                      = array();
-            $data['pdc_sn']            = $pdc_sn;
-            $data['pdc_member_id']     = $member_info->member_id;
-            $data['pdc_member_name']   = $member_info->member_name;
-            $data['pdc_amount']        = 1;
+            $account_info            = BModel::getTableFirstData('store_joinin', ['member_id' => $member_info->member_id], ['settlement_bank_account_name', 'settlement_bank_type', 'settlement_bank_account_number']);
+            $pdc_sn                  = Store::makeSn($member_info->member_id);
+            $data                    = array();
+            $data['pdc_sn']          = $pdc_sn;
+            $data['pdc_member_id']   = $member_info->member_id;
+            $data['pdc_member_name'] = $member_info->member_name;
+            $data['pdc_amount']      = 1;
             //$data['pdc_amount']        = $money;
             $data['pdc_bank_name']     = $account_info->settlement_bank_type;
             $data['pdc_bank_no']       = $account_info->settlement_bank_account_number;
@@ -818,6 +829,7 @@ class StoreController extends Base
         });
         return Base::jsonReturn(200, '提现成功');
     }
+
     function joinin_Step1()
     {
         return view('store.joinin_step1');
@@ -864,7 +876,7 @@ class StoreController extends Base
         $member_id                         = $request->input('member_id');
         $param['paying_money_certificate'] = $request->input('paying_money_certificate');
         $param['paying_amount']            = $request->input('paying_amount');
-        $res = BModel::upTableData('store_joinin', ['member_id' => $member_id], $param);
+        $res                               = BModel::upTableData('store_joinin', ['member_id' => $member_id], $param);
         if ($res) {
             return Base::jsonReturn(200, '提交成功');
         } else {
@@ -885,9 +897,9 @@ class StoreController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
-        $data      = BModel::getTableAllData('store_msg',['store_id'=>$store_id],['sm_id','sm_content']);
+        $data = BModel::getTableAllData('store_msg', ['store_id' => $store_id], ['sm_id', 'sm_content']);
         if ($data) {
-            return Base::jsonReturn(200, '获取成功',$data);
+            return Base::jsonReturn(200, '获取成功', $data);
         } else {
             return Base::jsonReturn(2001, '获取失败');
         }
@@ -900,31 +912,30 @@ class StoreController extends Base
     public function msgInfo(Request $request)
     {
         $store_id = $request->input('store_id');
-        $sm_id = $request->input('sm_id');
+        $sm_id    = $request->input('sm_id');
         if (!$store_id || !$sm_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
-        $data      =Store::getmsgInfo(['sm_id'=>$sm_id]);// BModel::getTableFieldFirstData('store_msg',['sm_id'=>$sm_id],['sm_id','sm_content','sm_addtime','sm_title']);
-        $data->sm_addtime=date('Y-m-d H:i:s',$data->sm_addtime);
+        $data             = Store::getmsgInfo(['sm_id' => $sm_id]);// BModel::getTableFieldFirstData('store_msg',['sm_id'=>$sm_id],['sm_id','sm_content','sm_addtime','sm_title']);
+        $data->sm_addtime = date('Y-m-d H:i:s', $data->sm_addtime);
         if ($data) {
-            if(BModel::getCount('store_msg_read',['sm_id'=>$sm_id])  == 0)
-            {
-                $condition = array();
+            if (BModel::getCount('store_msg_read', ['sm_id' => $sm_id]) == 0) {
+                $condition              = array();
                 $condition['seller_id'] = $store_id;
-                $condition['sm_id'] = $sm_id;
+                $condition['sm_id']     = $sm_id;
                 $condition['read_time'] = time();
 
-                BModel::insertData('store_msg_read',$condition);
+                BModel::insertData('store_msg_read', $condition);
 
-                $update = array();
-                $sm_readids[] = $store_id;
-                $update['sm_readids'] = implode(',', $sm_readids).',';
-                BModel::upTableData('store_msg',['sm_id' => $sm_id],$update);
+                $update               = array();
+                $sm_readids[]         = $store_id;
+                $update['sm_readids'] = implode(',', $sm_readids) . ',';
+                BModel::upTableData('store_msg', ['sm_id' => $sm_id], $update);
             }
-            return Base::jsonReturn(200, '获取成功',$data);
+            return Base::jsonReturn(200, '获取成功', $data);
         } else {
             return Base::jsonReturn(2001, '获取失败');
         }
@@ -936,9 +947,9 @@ class StoreController extends Base
      */
     function areaList(Request $request)
     {
-        $data      = Store::getAreaList();
+        $data = Store::getAreaList();
         if ($data) {
-            return Base::jsonReturn(200, '获取成功',$data);
+            return Base::jsonReturn(200, '获取成功', $data);
         } else {
             return Base::jsonReturn(2001, '获取失败');
         }
@@ -950,9 +961,9 @@ class StoreController extends Base
      */
     function gcList(Request $request)
     {
-        $data      = Store::getGcList();
+        $data = Store::getGcList();
         if ($data) {
-            return Base::jsonReturn(200, '获取成功',$data);
+            return Base::jsonReturn(200, '获取成功', $data);
         } else {
             return Base::jsonReturn(2001, '获取失败');
         }
@@ -965,25 +976,25 @@ class StoreController extends Base
     static function changeAvator(Request $request)
     {
         $store_id = $request->input('store_id');
-        $avator = $request->input('avator');
+        $avator   = $request->input('avator');
         if (!$store_id || !$avator) {
             return Base::jsonReturn(1000, '参数缺失');
         }
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
-        $member_info          = BModel::getTableFirstData('store', ['store_id' => $store_id], ['member_id', 'member_name']);
-        $data      = Store::upTableData('store',['store_id'=>$store_id],['store_avatar'=>$avator]);
+        $member_info = BModel::getTableFirstData('store', ['store_id' => $store_id], ['member_id', 'member_name']);
+        $data        = Store::upTableData('store', ['store_id' => $store_id], ['store_avatar' => $avator]);
         if ($data) {
-            $field = ['a.store_id', 'a.store_name', 'a.store_phone', 'a.store_avatar',
+            $field                                    = ['a.store_id', 'a.store_name', 'a.store_phone', 'a.store_avatar',
                 'a.area_info', 'a.store_address', 'a.work_start_time', 'a.work_end_time',
                 'a.store_state', 'a.store_description', 'a.work_start_time', 'a.work_end_time',
                 'b.business_licence_number_electronic',
                 'c.member_id', 'c.member_name', 'c.member_mobile'];
-            $data  = Store::getStoreAndJoinInfo(['a.member_id' => $member_info->member_id], $field);
+            $data                                     = Store::getStoreAndJoinInfo(['a.member_id' => $member_info->member_id], $field);
             $data->business_licence_number_electronic = getenv('WEB_URL') . 'upload/shop/store_joinin/06075408577995264.png';
             $data->token                              = Base::makeToken($data->store_id, $member_info->member_name);
-            return Base::jsonReturn(200, '获取成功',$data);
+            return Base::jsonReturn(200, '获取成功', $data);
         } else {
             return Base::jsonReturn(2001, '获取失败');
         }
