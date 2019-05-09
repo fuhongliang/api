@@ -24,10 +24,10 @@ class OrderController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
-        $fileds = ['order_id', 'order_sn', 'buyer_id', 'add_time'];
-        $info   = Order::getNewOrder(['store_id' => $store_id, 'order_state' => 20], $fileds);
-        $data['list']=$info;
-        $data['msg']=Store::getTableAllData('store_msg',['store_id'=>$store_id,'smt_code'=>'new_order'],['sm_id','sm_content']);
+        $fileds       = ['order_id', 'order_sn', 'buyer_id', 'add_time'];
+        $info         = Order::getNewOrder(['store_id' => $store_id, 'order_state' => 20], $fileds);
+        $data['list'] = $info;
+        $data['msg']  = Store::getTableAllData('store_msg', ['store_id' => $store_id, 'smt_code' => 'new_order'], ['sm_id', 'sm_content']);
         return Base::jsonReturn(200, '获取成功', $data);
     }
 
