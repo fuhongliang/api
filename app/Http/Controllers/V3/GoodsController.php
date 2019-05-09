@@ -113,7 +113,9 @@ class GoodsController extends Base
             return Base::jsonReturn(2000, '商家不存在');
         }
         if (!$goods_storage) {
-            $goods_storage = 999999999;
+            $goods['is_much'] = 2;
+        } else {
+            $goods['goods_storage'] = intval($goods_storage);
         }
         $bind_class = Store::getStoreBindClass(['store_id' => $store_id], ['class_1', 'class_2', 'class_3']);
 
@@ -188,12 +190,13 @@ class GoodsController extends Base
         $common_array['goods_selltime']  = time();
         $common_id                       = Goods::addGoodsCommon($common_array);
 /////  商品信息
-        $goods                           = array();
-        $goods['goods_commonid']         = $common_id;
-        $goods['goods_name']             = $common_array['goods_name'];
-        $goods['goods_jingle']           = $common_array['goods_jingle'];
-        $goods['store_id']               = $common_array['store_id'];
-        $goods['store_name']             = '';
+        $goods                   = array();
+        $goods['goods_commonid'] = $common_id;
+        $goods['goods_name']     = $common_array['goods_name'];
+        $goods['goods_jingle']   = $common_array['goods_jingle'];
+        $goods['store_id']       = $common_array['store_id'];
+        $goods['store_name']     = '';
+
         $goods['gc_id']                  = $common_array['gc_id'];
         $goods['gc_id_1']                = $common_array['gc_id_1'];
         $goods['gc_id_2']                = $common_array['gc_id_2'];
@@ -205,7 +208,6 @@ class GoodsController extends Base
         $goods['goods_serial']           = $common_array['goods_serial'];
         $goods['goods_storage_alarm']    = $common_array['goods_storage_alarm'];
         $goods['goods_spec']             = serialize(null);
-        $goods['goods_storage']          = intval($goods_storage);
         $goods['goods_image']            = $common_array['goods_image'];
         $goods['goods_state']            = $common_array['goods_state'];
         $goods['goods_verify']           = $common_array['goods_verify'];
@@ -314,8 +316,12 @@ class GoodsController extends Base
             $goods_array['goods_marketprice'] = $origin_price;
             $goods_comm['goods_marketprice']  = $origin_price;
         }
+
         if ($goods_storage) {
-            $goods_array['goods_storage'] = $goods_storage;
+            $goods_array['goods_storage'] = intval($goods_storage);
+            $goods_array['is_much'] = 1;
+        } else {
+            $goods_array['is_much'] = 2;
         }
         if ($sell_time) {
             $goods_comm['goods_sale_time'] = serialize($sell_time);
