@@ -573,7 +573,12 @@ class StoreController extends Base
         if (!preg_match("/^1[34578]{1}\d{9}$/", $phone_number)) {
             return Base::jsonReturn(1000, '手机号格式不正确');
         }
-        $code = rand('1000', '9999');
+        if(Redis::get($phone_number))
+        {
+            $code=Redis::get($phone_number);
+        }else{
+            $code = rand('1000', '9999');
+        }
         $res  = SMSController::sendSms($phone_number, $code);
 
         if ($res->Code == 'OK') {
