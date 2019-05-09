@@ -126,7 +126,7 @@ class MemberController extends Base
                 $old_token=Redis::get($data->store_id);
                 if($old_token)
                 {
-                   BModel::delData('token',['token'=>$old_token]);
+                   BModel::delData('token',['store_id'=>$data->store_id]);
                 }
                 Redis::setex($data->store_id,60*60*24*7,$data->token);
                 return Base::jsonReturn(200, '获取成功', $data);
