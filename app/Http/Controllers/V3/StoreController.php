@@ -577,7 +577,7 @@ class StoreController extends Base
         $res  = SMSController::sendSms($phone_number, $code);
 
         if ($res->Code == 'OK') {
-            Cache::put($phone_number, $code, 300);
+            Redis::setex($phone_number, 300,$code);
             return Base::jsonReturn(200, '发送成功');
         } else {
             return Base::jsonReturn(2000, '发送失败');

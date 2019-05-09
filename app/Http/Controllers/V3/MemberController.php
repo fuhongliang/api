@@ -11,6 +11,7 @@ use App\model\V3\Token;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Redis;
 
 class MemberController extends Base
 {
@@ -53,7 +54,8 @@ class MemberController extends Base
         if (!Member::checkStorePhoneExist(['store_phone' => $phone_number]) || !Member::checkStoreJoinPhoneExist(['contacts_phone' => $phone_number]) || !Member::checkStoreRegTmpExist(['mobile_phone' => $phone_number])) {
             return Base::jsonReturn(2001, '手机号已存在申请记录');
         }
-        $code = Cache::get($phone_number);
+        $code = Redis::get($phone_number);
+
         if (!$verify_code || $code !== $verify_code) {
             return Base::jsonReturn(2002, '验证码错误');
         } else {
