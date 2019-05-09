@@ -782,7 +782,6 @@ class StoreController extends Base
         $member_id            = BModel::getTableValue('store', ['store_id' => $store_id], 'member_id');
         $available_predeposit = BModel::getTableValue('member', ['member_id' => $member_id], 'available_predeposit');
         $time=explode('-',$keyword);
-
         $yue=$time[1];
         $nian=$time[0];
         $begin_time = mktime(0,0,0,$yue,1,$nian);
