@@ -7,6 +7,7 @@ use App\Http\Controllers\BaseController as Base;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Redis;
+
 class Store extends BModel
 {
     /**
@@ -436,37 +437,60 @@ class Store extends BModel
      */
     static function getAreaList()
     {
-       $data= BModel::getTableAllData('area',['area_parent_id'=>0],['area_id as id','area_name as province'])->toArray();
-       foreach($data as $key=>&$val)
-       {
-           $val->children=BModel::getTableAllData('area',['area_parent_id'=>$val->id],['area_id as id','area_name as city'])->toArray();
-            foreach ($val->children as &$v)
-            {
-                $v->children=BModel::getTableAllData('area',['area_parent_id'=>$val->id],['area_id as id','area_name as area'])->toArray();
-            }
-       }
-       return $data;
-    }
-
-    static function getGcList()
-    {
-        $data= BModel::getTableAllData('goods_class',['gc_parent_id'=>0],['gc_id','gc_name'])->toArray();
-        foreach($data as $key=>&$val)
-        {
-            $val->children=BModel::getTableAllData('goods_class',['gc_id'=>$val->gc_id],['gc_id','gc_name'])->toArray();
-            foreach ($val->children as &$v)
-            {
-                $v->children=BModel::getTableAllData('goods_class',['gc_id'=>$val->gc_id],['gc_id','gc_name'])->toArray();
+        $data = BModel::getTableAllData('area', ['area_parent_id' => 0], ['area_id as id', 'area_name as province'])->toArray();
+        foreach ($data as $key => &$val) {
+            $val->children = BModel::getTableAllData('area', ['area_parent_id' => $val->id], ['area_id as id', 'area_name as city'])->toArray();
+            foreach ($val->children as &$v) {
+                $v->children = BModel::getTableAllData('area', ['area_parent_id' => $val->id], ['area_id as id', 'area_name as area'])->toArray();
             }
         }
         return $data;
     }
+
+    static function getGcList()
+    {
+        $data = BModel::getTableAllData('goods_class', ['gc_parent_id' => 0], ['gc_id', 'gc_name'])->toArray();
+        foreach ($data as $key => &$val) {
+            $val->children = BModel::getTableAllData('goods_class', ['gc_id' => $val->gc_id], ['gc_id', 'gc_name'])->toArray();
+            foreach ($val->children as &$v) {
+                $v->children = BModel::getTableAllData('goods_class', ['gc_id' => $val->gc_id], ['gc_id', 'gc_name'])->toArray();
+            }
+        }
+        return $data;
+    }
+
     static function getmsgInfo($condition)
     {
         return DB::table('store_msg as a')
-            ->leftJoin('store_msg_tpl as b','a.smt_code','b.smt_code')
+            ->leftJoin('store_msg_tpl as b', 'a.smt_code', 'b.smt_code')
             ->where($condition)
-            ->first(['a.sm_id','a.sm_content','a.sm_addtime','b.smt_name as sm_title']);
+            ->first(['a.sm_id', 'a.sm_content', 'a.sm_addtime', 'b.smt_name as sm_title']);
+    }
+
+    static function msgList($condition, $page)
+    {
+        $result = [];
+        $skip   = ($page - 1) * 10;
+        $count=BModel::getCount('store_msg',$condition);
+        $total=intval(ceil($count/10));
+        if($page>$total)
+        {
+            return $result;
+        }
+        $data   = DB::table('store_msg')
+            ->where($condition)
+            ->orderBy('sm_id', 'desc')
+            ->skip($skip)
+            ->take(10)
+            ->get(['sm_id', 'sm_content', 'sm_addtime']);
+        if (!$data->isEmpty()) {
+            foreach ($data as $k => $v) {
+                $result[$k]['sm_id']      = $v->sm_id;
+                $result[$k]['sm_content'] = $v->sm_content;
+                $result[$k]['sm_addtime'] = date('Y-m-d H:i:s', $v->sm_addtime);
+            }
+        }
+        return $result;
     }
 
 }

@@ -160,17 +160,17 @@ class StoreController extends Base
                 'a.area_info', 'a.store_address', 'a.store_workingtime', 'b.business_licence_number_electronic']);
         $data['store_zizhi'] = config('data_host') . 'upload/shop/store_joinin/' . $data['store_zizhi'];
 
-        $field               = ['a.store_id', 'a.store_name', 'a.store_avatar', 'a.work_start_time', 'a.auto_receive_order','a.work_end_time', 'c.member_id', 'c.member_mobile'];
-        $result              = Store::getStoreAndJoinInfo(['a.store_id' => $store_id], $field);
+        $field  = ['a.store_id', 'a.store_name', 'a.store_avatar', 'a.work_start_time', 'a.auto_receive_order', 'a.work_end_time', 'c.member_id', 'c.member_mobile'];
+        $result = Store::getStoreAndJoinInfo(['a.store_id' => $store_id], $field);
 
-        $data['store_id']        = $result->store_id;
-        $data['store_name']      = $result->store_name;
-        $data['store_avatar']    = $result->store_avatar;
-        $data['work_start_time'] = $result->work_start_time;
-        $data['work_end_time']   = $result->work_end_time;
-        $data['member_id']       = $result->member_id;
-        $data['member_mobile']   = $result->member_mobile;
-        $data['auto_receive_order']   = $result->auto_receive_order;
+        $data['store_id']           = $result->store_id;
+        $data['store_name']         = $result->store_name;
+        $data['store_avatar']       = $result->store_avatar;
+        $data['work_start_time']    = $result->work_start_time;
+        $data['work_end_time']      = $result->work_end_time;
+        $data['member_id']          = $result->member_id;
+        $data['member_mobile']      = $result->member_mobile;
+        $data['auto_receive_order'] = $result->auto_receive_order;
         return Base::jsonReturn(200, '获取成功', $data);
     }
 
@@ -861,9 +861,9 @@ class StoreController extends Base
         $param['business_licence_number_electronic'] = $request->input('business_licence_number_electronic');
         $param['sc_id']                              = $request->input('sc_id');
         $param['joinin_state']                       = 10;
-        if (!Member::getMemberInfo(['member_id' => $member_id])->isEmpty()) {
-            return Base::jsonReturn(2000, '店铺已存在');
-        }
+//        if (!Member::getMemberInfo(['member_id' => $member_id])->isEmpty()) {
+//            return Base::jsonReturn(2000, '店铺已存在');
+//        }
         $ins_id = BModel::insertData('store_joinin', $param);
         if ($ins_id) {
             return Base::jsonReturn(200, '提交成功');
@@ -896,18 +896,16 @@ class StoreController extends Base
     public function msgList(Request $request)
     {
         $store_id = $request->input('store_id');
+        $page     = $request->input('page');
         if (!$store_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
-        $data = BModel::getTableAllData('store_msg', ['store_id' => $store_id], ['sm_id', 'sm_content']);
-        if ($data) {
-            return Base::jsonReturn(200, '获取成功', $data);
-        } else {
-            return Base::jsonReturn(2001, '获取失败');
-        }
+        $page = !$page ? 1 : $page;
+        $data = Store::msgList(['store_id' => $store_id], $page);
+        return Base::jsonReturn(200, '获取成功', $data);
     }
 
     /**
@@ -1019,7 +1017,7 @@ class StoreController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
-        $res=BModel::upTableData('store',['store_id'=>$store_id],["auto_receive_order"=>intval($is_open)]);
+        $res = BModel::upTableData('store', ['store_id' => $store_id], ["auto_receive_order" => intval($is_open)]);
         if ($res) {
             return Base::jsonReturn(200, '设置成功');
         } else {

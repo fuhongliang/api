@@ -123,12 +123,11 @@ class MemberController extends Base
                     'store_id' => $data->store_id
                 );
                 Token::addToken($token_data);
-//                $old_token=Redis::get($data->store_id);
-//                if($old_token)
-//                {
-//                   BModel::delData('token',['token'=>$old_token]);
-//                }
-//                Redis::setex($data->store_id,60*60*24*7,$data->token);
+                $old_token = Redis::get($data->store_id);
+                if ($old_token) {
+                    BModel::delData('token', ['token' => $old_token]);
+                }
+                Redis::setex($data->store_id, 60 * 60 * 24 * 7, $data->token);
                 return Base::jsonReturn(200, '获取成功', $data);
             } else {
                 return Base::jsonReturn(1001, '账号或密码错误');
