@@ -27,7 +27,7 @@ class checkToken
         } else {
             $token = Token::getTokenField(['token' => $token], ['token', 'expire_time', 'store_id']);
             if (empty($token) || !Store::getStoreInfo(['store_id' => $token->store_id])) {
-                return Base::jsonReturn(3001, 'token伪造');
+                return Base::jsonReturn(3001, '账号已在其他设备登录');
             } else {
                 $time = time();
                 if ($time > $token->expire_time) {
@@ -35,6 +35,7 @@ class checkToken
                 }
             }
         }
+
         return $next($request);
     }
 }

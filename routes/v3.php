@@ -10,9 +10,7 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::any('/',function(){
-    return 66;
-});
+
 Route::group(['namespace' => 'V3'], function () {
     Route::post('member_login', 'MemberController@login');
     Route::any('store_jingying/{store_id}', 'StoreController@storeJingYingData');//店铺经营
