@@ -178,9 +178,12 @@ class Store extends BModel
                     }
                 }
                 foreach ($ids as $k => $goods_id) {
-                    $fields         = ['a.goods_id', 'a.goods_name', 'a.goods_price', 'a.goods_marketprice', 'b.goods_body as goods_desc', 'b.goods_sale_time', 'a.goods_state', 'a.goods_storage', 'a.goods_image as img_name'];
+                    $fields         = ['a.goods_id', 'a.goods_name', 'a.goods_price', 'a.goods_marketprice', 'b.goods_body as goods_desc', 'b.goods_sale_time', 'a.goods_state','is_much', 'a.goods_storage', 'a.goods_image as img_name'];
                     $goods_info[$k] = Goods::getGoodsInfo(['goods_id' => $goods_id], $fields);
-                    //$goods_info[$k]->img_path=getenv("GOODS_IMAGE").$store_id;
+                    if($goods_info[$k]->is_much ==2)
+                    {
+                        $goods_info[$k]->goods_storage="库存无限";
+                    }
                     $goods_info[$k]->goods_sale_time = unserialize($goods_info[$k]->goods_sale_time);
                     if (array_key_exists($goods_id, $xianshi)) {
                         $goods_info[$k]->xianshi_price = $xianshi[$goods_id];
