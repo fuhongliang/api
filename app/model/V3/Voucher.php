@@ -478,28 +478,32 @@ class Voucher extends BModel
      */
     static function getAllJiesuanByYear($condition, $store_id, $field = ['*'])
     {
-        $data        = [];
+        $data          = $result = [];
         $os_month_list = BModel::getTableAllData('order_statis', $condition, ['os_month']);
         if (!$os_month_list->isEmpty()) {
             foreach ($os_month_list as $k => $val) {
-                $result[$k] = DB::table('order_bill')
+                $res = DB::table('order_bill')
                     ->where('os_month', $val->os_month)
                     ->where('ob_store_id', $store_id)
                     ->orderBy('ob_no', 'desc')
                     ->first($field);
+                if ($res) {
+                    $result[$k] = $res;
+                }
             }
+            if ($result) {
+                foreach ($result as $k => $v) {
 
-            foreach ($result as $k => $v) {
-                $data[$k]['amount']   =BaseController::ncPriceFormat( $v->ob_order_totals - $v->ob_commis_totals - $v->ob_order_return_totals + $v->ob_commis_return_totals - $v->ob_store_cost_totals);
-                $data[$k]['state']    = $v->ob_state;
-                $data[$k]['ob_no']    = $v->ob_no;
-                $data[$k]['os_month'] = substr($v->os_month,-2);
+                    $data[$k]['amount']   = BaseController::ncPriceFormat($v->ob_order_totals - $v->ob_commis_totals - $v->ob_order_return_totals + $v->ob_commis_return_totals - $v->ob_store_cost_totals);
+                    $data[$k]['state']    = $v->ob_state;
+                    $data[$k]['ob_no']    = $v->ob_no;
+                    $data[$k]['os_month'] = substr($v->os_month, -2);
+                }
             }
         }
 
         return $data;
     }
-
 
 
 }
