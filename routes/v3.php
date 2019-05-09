@@ -70,7 +70,6 @@ Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () 
     Route::post('xianshi_info', 'VoucherController@xianshiInfo');//折扣详情
 
 
-
     ////
     Route::post('add_xianshi_quota', 'VoucherController@addXianshiQuoTa');//购买限时折扣套餐
     Route::post('add_mansong_quota', 'VoucherController@addManSongQuoTa');//购买满送套餐
@@ -96,7 +95,6 @@ Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () 
 
 
     Route::post('auto_receive_order', 'StoreController@autoReceiveOrder');//设置自动接单
-
 
 
 });

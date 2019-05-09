@@ -471,13 +471,12 @@ class Store extends BModel
     {
         $result = [];
         $skip   = ($page - 1) * 10;
-        $count=BModel::getCount('store_msg',$condition);
-        $total=intval(ceil($count/10));
-        if($page>$total)
-        {
+        $count  = BModel::getCount('store_msg', $condition);
+        $total  = intval(ceil($count / 10));
+        if ($page > $total) {
             return $result;
         }
-        $data   = DB::table('store_msg')
+        $data = DB::table('store_msg')
             ->where($condition)
             ->orderBy('sm_id', 'desc')
             ->skip($skip)
