@@ -159,7 +159,8 @@ class StoreController extends Base
             ['a.store_state', 'a.store_description', 'a.store_label', 'a.store_phone',
                 'a.area_info', 'a.store_address', 'a.store_workingtime', 'b.business_licence_number_electronic']);
         $data['store_zizhi'] = config('data_host') . 'upload/shop/store_joinin/' . $data['store_zizhi'];
-        $field               = ['a.store_id', 'a.store_name', 'a.store_avatar', 'a.work_start_time', 'a.work_end_time', 'c.member_id', 'c.member_mobile'];
+
+        $field               = ['a.store_id', 'a.store_name', 'a.store_avatar', 'a.work_start_time', 'a.auto_receive_order','a.work_end_time', 'c.member_id', 'c.member_mobile'];
         $result              = Store::getStoreAndJoinInfo(['a.store_id' => $store_id], $field);
 
         $data['store_id']        = $result->store_id;
@@ -169,6 +170,7 @@ class StoreController extends Base
         $data['work_end_time']   = $result->work_end_time;
         $data['member_id']       = $result->member_id;
         $data['member_mobile']   = $result->member_mobile;
+        $data['auto_receive_order']   = $result->auto_receive_order;
         return Base::jsonReturn(200, '获取成功', $data);
     }
 
@@ -573,16 +575,15 @@ class StoreController extends Base
         if (!preg_match("/^1[34578]{1}\d{9}$/", $phone_number)) {
             return Base::jsonReturn(1000, '手机号格式不正确');
         }
-        if(Redis::get($phone_number))
-        {
-            $code=Redis::get($phone_number);
-        }else{
+        if (Redis::get($phone_number)) {
+            $code = Redis::get($phone_number);
+        } else {
             $code = rand('1000', '9999');
         }
-        $res  = SMSController::sendSms($phone_number, $code);
+        $res = SMSController::sendSms($phone_number, $code);
 
         if ($res->Code == 'OK') {
-            Redis::setex($phone_number, 300,$code);
+            Redis::setex($phone_number, 300, $code);
             return Base::jsonReturn(200, '发送成功');
         } else {
             return Base::jsonReturn(2000, '发送失败');
@@ -1001,6 +1002,28 @@ class StoreController extends Base
             return Base::jsonReturn(200, '获取成功', $data);
         } else {
             return Base::jsonReturn(2001, '获取失败');
+        }
+    }
+
+    /**设置自动接单
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    static function autoReceiveOrder(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        $is_open  = $request->input('is_open');
+        if (!$store_id || !$is_open) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000, '商家不存在');
+        }
+        $res=BModel::upTableData('store',['store_id'=>$store_id],["auto_receive_order"=>intval($is_open)]);
+        if ($res) {
+            return Base::jsonReturn(200, '设置成功');
+        } else {
+            return Base::jsonReturn(2001, '设置失败');
         }
     }
 }

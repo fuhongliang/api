@@ -56,11 +56,13 @@ class Order extends BModel
             $order_info = DB::table('order')
                 ->where($condition)
                 ->whereIn('order_state', [25, 30, 35])
+                ->orderBy('payment_time', 'desc')
                 ->get($fields);
         } else {
             $order_info = DB::table('order')
                 ->where($condition)
                 ->where('order_state', $order_state)
+                ->orderBy('payment_time', 'desc')
                 ->get($fields);
         }
 

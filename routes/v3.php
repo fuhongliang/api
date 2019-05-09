@@ -95,5 +95,8 @@ Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () 
     Route::post('store_joinin_step2', 'StoreController@joininStep2');//商家入驻第二步 保存数据
 
 
+    Route::post('auto_receive_order', 'StoreController@autoReceiveOrder');//设置自动接单
+
+
 
 });
