@@ -24,6 +24,7 @@ Route::group(['namespace' => 'V3'], function () {
     Route::get('joinin_step1', 'StoreController@joinin_Step1');//入驻第一步页面
     Route::post('area_list', 'StoreController@areaList');//地区列表
     Route::post('gc_list', 'StoreController@gcList');//分类列表
+    Route::post('check_mobile', 'MemberController@checkMobile');//商家注册检测手机号
 });
 
 Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () {
@@ -70,7 +71,7 @@ Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () 
     Route::post('xianshi_del', 'VoucherController@xianshiDel');//折扣删除
     Route::post('xianshi_info', 'VoucherController@xianshiInfo');//折扣详情
 
-    Route::post('check_mobile', 'MemberController@checkMobile');//商家注册检测手机号
+
 
     ////
     Route::post('add_xianshi_quota', 'VoucherController@addXianshiQuoTa');//购买限时折扣套餐
