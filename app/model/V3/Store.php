@@ -492,4 +492,17 @@ class Store extends BModel
         return $result;
     }
 
+    static function cashList($member_id,$begin_time,$end_time,$field)
+    {
+       return  DB::table('pd_cash')
+           ->where('pdc_member_id',$member_id)
+           ->whereBetween('pdc_add_time',[$begin_time,$end_time])
+           ->orderBy('pdc_id','desc')
+           ->get($field);
+    }
+
+    static function getCashSum($member_id,$begin_time,$end_time,$field)
+    {
+        return   DB::table('pd_cash')->where('pdc_member_id',$member_id)->whereBetween('pdc_add_time',[$begin_time,$end_time])->sum($field);
+    }
 }

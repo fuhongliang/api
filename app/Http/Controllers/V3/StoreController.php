@@ -781,14 +781,19 @@ class StoreController extends Base
         }
         $member_id            = BModel::getTableValue('store', ['store_id' => $store_id], 'member_id');
         $available_predeposit = BModel::getTableValue('member', ['member_id' => $member_id], 'available_predeposit');
+        $time=explode('-',$keyword);
 
-        $condition['pdc_member_id'] = $member_id;
-        $field                      = ['pdc_amount as amount', 'pdc_payment_state as payment_state', 'pdc_add_time as add_time', 'pdc_bank_no as bank_no'];
-        $data                       = BModel::getTableAllData('pd_cash', $condition, $field);
-        $result                     = [];
-        $result['data']             = empty($data) ? null : $data;
-        $result['balance']          = $available_predeposit;;
-        $result['total_amount'] = BModel::getSum('pd_cash', $condition, 'pdc_amount');
+        $yue=$time[1];
+        $nian=$time[0];
+        $begin_time = mktime(0,0,0,$yue,1,$nian);
+        $end_time = mktime(23,59,59,($yue+1),0,$nian);
+
+        $field             = ['pdc_amount as amount', 'pdc_payment_state as payment_state', 'pdc_add_time as add_time', 'pdc_bank_no as bank_no'];
+        $data              = Store::cashList($member_id,$begin_time,$end_time , $field);
+        $result            = [];
+        $result['data']    = empty($data) ? null : $data;
+        $result['balance'] = $available_predeposit;;
+        $result['total_amount'] = Store::getCashSum($member_id,$begin_time,$end_time,'pdc_amount');
         return Base::jsonReturn(200, '获取成功', $result);
     }
 

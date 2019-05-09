@@ -113,7 +113,7 @@ class BModel extends Model
      */
     static function getSum($table,$condition,$field)
     {
-        return  DB::table($table)->where($condition)->sum($field);
+        return   DB::table($table)->where($condition)->sum($field);
     }
 
 }
