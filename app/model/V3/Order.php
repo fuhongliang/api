@@ -68,6 +68,7 @@ class Order extends BModel
         if (empty($order_info)) {
             return array();
         }
+        dd($order_info);
         foreach ($order_info as &$data) {
             $total_price  = $commis_price = $goods_pay_price = 0;
             $order_common = self::getOrderCommonInfo(array('order_id' => $data->order_id));
@@ -102,9 +103,6 @@ class Order extends BModel
             $data->commis_price    = BaseController::ncPriceFormat($commis_price);
             $data->goods_pay_price = BaseController::ncPriceFormat($total_price - $commis_price);
             unset($data);
-        }
-        if ($order_info->isEmpty()) {
-            return null;
         }
         return $order_info;
     }
