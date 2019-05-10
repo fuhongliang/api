@@ -3,6 +3,7 @@
 namespace App\model\V3;
 
 use App\BModel;
+use App\Http\Controllers\BaseController;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -99,9 +100,9 @@ class Order extends BModel
                 $data->order_state = "已完成";
             }
             $data->add_time        = date('Y-m-d H:i:s', $data->add_time);
-            $data->total_price     = $total_price;
-            $data->commis_price    = ROUND($commis_price, 2);
-            $data->goods_pay_price = $total_price - $commis_price;
+            $data->total_price     = BaseController::ncPriceFormat($total_price);
+            $data->commis_price    = BaseController::ncPriceFormat($commis_price);
+            $data->goods_pay_price = BaseController::ncPriceFormat($total_price - $commis_price);
             unset($data);
         }
         if ($order_info->isEmpty()) {
