@@ -781,18 +781,18 @@ class StoreController extends Base
         }
         $member_id            = BModel::getTableValue('store', ['store_id' => $store_id], 'member_id');
         $available_predeposit = BModel::getTableValue('member', ['member_id' => $member_id], 'available_predeposit');
-        $time=explode('-',$keyword);
-        $yue=$time[1];
-        $nian=$time[0];
-        $begin_time = mktime(0,0,0,$yue,1,$nian);
-        $end_time = mktime(23,59,59,($yue+1),0,$nian);
+        $time                 = explode('-', $keyword);
+        $yue                  = $time[1];
+        $nian                 = $time[0];
+        $begin_time           = mktime(0, 0, 0, $yue, 1, $nian);
+        $end_time             = mktime(23, 59, 59, ($yue + 1), 0, $nian);
 
         $field             = ['pdc_amount as amount', 'pdc_payment_state as payment_state', 'pdc_add_time as add_time', 'pdc_bank_no as bank_no'];
-        $data              = Store::cashList($member_id,$begin_time,$end_time , $field);
+        $data              = Store::cashList($member_id, $begin_time, $end_time, $field);
         $result            = [];
         $result['data']    = empty($data) ? null : $data;
         $result['balance'] = $available_predeposit;;
-        $result['total_amount'] = Store::getCashSum($member_id,$begin_time,$end_time,'pdc_amount');
+        $result['total_amount'] = Store::getCashSum($member_id, $begin_time, $end_time, 'pdc_amount');
         return Base::jsonReturn(200, '获取成功', $result);
     }
 
@@ -803,8 +803,8 @@ class StoreController extends Base
     public function addCash(Request $request)
     {
         $store_id = $request->input('store_id');
-        $money    = $request->input('money');
-        if (!$store_id || !$money) {
+        $money    = Base::ncPriceFormat($request->input('money'));
+        if (!$store_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
         if (!Base::checkStoreExist($store_id)) {
@@ -817,18 +817,20 @@ class StoreController extends Base
 //            showDialog('支付密码错误','','error');
 //        }
         //验证金额是否足够
-//        if (floatval($available_predeposit) < floatval($money)) {
-//            return Base::jsonReturn(2001, '余额不足');
-//        }
+        if ($money <= Base::ncPriceFormat(0)) {
+            return Base::jsonReturn(2002, '提现金额不能为0');
+        }
+        if (floatval($available_predeposit) < floatval($money)) {
+            return Base::jsonReturn(2001, '余额不足');
+        }
         DB::transaction(function () use ($member_info, $money) {
-            $account_info            = BModel::getTableFirstData('store_joinin', ['member_id' => $member_info->member_id], ['settlement_bank_account_name', 'settlement_bank_type', 'settlement_bank_account_number']);
-            $pdc_sn                  = Store::makeSn($member_info->member_id);
-            $data                    = array();
-            $data['pdc_sn']          = $pdc_sn;
-            $data['pdc_member_id']   = $member_info->member_id;
-            $data['pdc_member_name'] = $member_info->member_name;
-            $data['pdc_amount']      = 1;
-            //$data['pdc_amount']        = $money;
+            $account_info              = BModel::getTableFirstData('store_joinin', ['member_id' => $member_info->member_id], ['settlement_bank_account_name', 'settlement_bank_type', 'settlement_bank_account_number']);
+            $pdc_sn                    = Store::makeSn($member_info->member_id);
+            $data                      = array();
+            $data['pdc_sn']            = $pdc_sn;
+            $data['pdc_member_id']     = $member_info->member_id;
+            $data['pdc_member_name']   = $member_info->member_name;
+            $data['pdc_amount']        = $money;
             $data['pdc_bank_name']     = $account_info->settlement_bank_type;
             $data['pdc_bank_no']       = $account_info->settlement_bank_account_number;
             $data['pdc_bank_user']     = $account_info->settlement_bank_account_name;
