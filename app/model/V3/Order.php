@@ -44,9 +44,7 @@ class Order extends BModel
             $data->goods_pay_price = $total_price - $commis_price;
             unset($data);
         }
-        if ($order_info->isEmpty()) {
-            return null;
-        }
+
 
         return $order_info;
     }
