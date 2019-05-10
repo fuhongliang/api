@@ -167,9 +167,6 @@ class MemberController extends Base
                         //第二部已提交，待审核页面
                     } elseif ($joinin_state == 31) {
                         //缴费审核失败页面
-                    } elseif ($joinin_state == 40) {
-                        $joinin_url = "http://47.111.27.189:2000/#/enters";
-                        //缴费审核成功页面
                     }
                 }
                 $data->joinin_url = $joinin_url;
