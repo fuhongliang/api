@@ -391,6 +391,7 @@ class StoreController extends Base
         $data = DB::table('order')
             ->where('store_id', $store_id)
             ->whereBetween('add_time', [$stime, $etime])
+            ->where('order_state',40)
             ->first(
                 array(
                     DB::raw('COUNT(*) as ordernum'),
@@ -404,6 +405,7 @@ class StoreController extends Base
         $data2                       = DB::table('order')
             ->where('store_id', $store_id)
             ->whereBetween('add_time', [$beginToday, $endToday])
+            ->where('order_state',40)
             ->first(
                 array(
                     DB::raw('COUNT(*) as ordernum'),
