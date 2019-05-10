@@ -343,9 +343,18 @@ class VoucherController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
-        $list = Voucher::getManSongList(['store_id' => $store_id]);
+        $where              = [
+            ['store_id', '=', $store_id],
+            ['end_time', '>', time()],
+        ];
+        $mansong_quota_list = BModel::getTableFirstData('p_mansong_quota', $where);
+        if ($mansong_quota_list->isEmpty()) {
+            return Base::jsonReturn(2000, '你还没有购买套餐');
+        }
+        $list   = Voucher::getManSongList(['store_id' => $store_id]);
+        $result = array();
         if (!empty($list)) {
-            $result = array();
+
             foreach ($list as $k => $v) {
                 $result[$k]['mansong_id']   = $v->mansong_id;
                 $result[$k]['mansong_name'] = $v->mansong_name;
@@ -358,10 +367,9 @@ class VoucherController extends Base
                 }
                 $result[$k]['rule'] = Voucher::getManSongRuleList(['mansong_id' => $v->mansong_id], ['price', 'discount']);
             }
-            return Base::jsonReturn(200, '获取成功', $result);
-        } else {
-            return Base::jsonReturn(200, '获取成功');
+
         }
+        return Base::jsonReturn(200, '获取成功', $result);
     }
 
     public function mansongDel(Request $request)
