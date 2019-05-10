@@ -68,7 +68,7 @@ class Order extends BModel
         if (empty($order_info)) {
             return array();
         }
-        dd($order_info);
+
         foreach ($order_info as &$data) {
             $total_price  = $commis_price = $goods_pay_price = 0;
             $order_common = self::getOrderCommonInfo(array('order_id' => $data->order_id));
@@ -81,10 +81,11 @@ class Order extends BModel
             //取商品列表
             $params                   = ['goods_name', 'goods_price', 'goods_num', 'commis_rate', 'goods_pay_price'];
             $order_goods_list         = self::getOrderGoodsList(array('order_id' => $data->order_id), $params);
+
             $data->extend_order_goods = $order_goods_list;
             foreach ($order_goods_list as $v) {
-                $total_price  = $v->goods_pay_price;
-                $commis_price += $v->goods_pay_price * $v->goods_num * ($v->commis_rate / 100);
+                $total_price  += $v->goods_pay_price;
+                $commis_price += BaseController::ncPriceFormat(BaseController::ncPriceFormat($v->goods_pay_price)*$v->goods_num*(intval($v->commis_rate)/100));
             }
 
             $data->delivery['name']  = "三爷";
