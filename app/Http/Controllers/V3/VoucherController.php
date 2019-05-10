@@ -218,9 +218,17 @@ class VoucherController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
-        $list = Voucher::getBundlingData(['store_id' => $store_id], ['bl_id', 'bl_name', 'bl_state']);
+        $where     = [
+            ['store_id', '=', $store_id],
+            ['bl_quota_endtime', '>', time()],
+        ];
+        $quotainfo = Voucher::getBundlingQuotaInfo($where);
+        if (empty($quotainfo)) {
+            return Base::jsonReturn(2000, '你还没有购买代金券套餐');
+        }
+        $list   = Voucher::getBundlingData(['store_id' => $store_id], ['bl_id', 'bl_name', 'bl_state']);
+        $result = array();
         if (!empty($list)) {
-            $result = array();
             foreach ($list as $k => $v) {
                 $result[$k]['bl_id']    = $v->bl_id;
                 $result[$k]['bl_name']  = $v->bl_name;
@@ -228,10 +236,9 @@ class VoucherController extends Base
                 $total_price            = Voucher::getBundlingGoodsTotalPrice(['bl_id' => $v->bl_id]);
                 $result[$k]['price']    = $total_price->price;
             }
-            return Base::jsonReturn(200, '查询成功', $result);
-        } else {
-            return Base::jsonReturn(200, '查询成功');
+
         }
+        return Base::jsonReturn(200, '查询成功', $result);
     }
 
     /** 删除优惠套装
@@ -672,7 +679,7 @@ class VoucherController extends Base
         $param['quota_starttime']  = $now;
         $param['quota_endtime']    = $now + $add_time;
         $param['quota_state']      = 1;
-        $param['quota_applyid' ]      = 0;
+        $param['quota_applyid']    = 0;
 
         BModel::insertData('voucher_quota', $param);
         $current_price = 20;

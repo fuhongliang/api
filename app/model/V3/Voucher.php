@@ -30,6 +30,14 @@ class Voucher extends BModel
 
     /**
      * @param $condition
+     * @return Model|\Illuminate\Database\Query\Builder|object|null
+     */
+    static function getBundlingQuotaInfo($condition)
+    {
+        return BModel::getTableFirstData('p_bundling_quota', $condition);
+    }
+    /**
+     * @param $condition
      * @param array $field
      * @return mixed
      */
