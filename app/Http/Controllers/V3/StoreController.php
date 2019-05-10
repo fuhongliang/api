@@ -777,7 +777,7 @@ class StoreController extends Base
     {
         $store_id = $request->input('store_id');
         $keyword  = $request->input('keyword');
-        if (!$store_id) {
+        if (!$store_id || !$keyword) {
             return Base::jsonReturn(1000, '参数缺失');
         }
 
