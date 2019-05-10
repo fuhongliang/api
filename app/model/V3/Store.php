@@ -456,7 +456,7 @@ class Store extends BModel
         foreach ($data as $key => &$val) {
             $val->children = BModel::getTableAllData('goods_class', ['gc_parent_id' => $val->gc_id], ['gc_id', 'gc_name'])->toArray();
             foreach ($val->children as &$v) {
-                $v->children = BModel::getTableAllData('goods_class', ['gc_parent_id' => $val->gc_id], ['gc_id', 'gc_name'])->toArray();
+                $v->children = BModel::getTableAllData('goods_class', ['gc_parent_id' => $v->gc_id], ['gc_id', 'gc_name'])->toArray();
             }
         }
         return $data;
