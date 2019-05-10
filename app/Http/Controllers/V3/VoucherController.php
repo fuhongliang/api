@@ -348,13 +348,13 @@ class VoucherController extends Base
             ['end_time', '>', time()],
         ];
         $mansong_quota_list = BModel::getTableFirstData('p_mansong_quota', $where);
-        if ($mansong_quota_list->isEmpty()) {
+        dd($mansong_quota_list);
+        if ($mansong_quota_list) {
             return Base::jsonReturn(2000, '你还没有购买套餐');
         }
         $list   = Voucher::getManSongList(['store_id' => $store_id]);
         $result = array();
         if (!empty($list)) {
-
             foreach ($list as $k => $v) {
                 $result[$k]['mansong_id']   = $v->mansong_id;
                 $result[$k]['mansong_name'] = $v->mansong_name;
