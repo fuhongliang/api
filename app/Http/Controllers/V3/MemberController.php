@@ -82,29 +82,29 @@ class MemberController extends Base
             );
             BModel::insertData('umeng', $um_data);
             if ($res) {
-                $joinin_url = "";
-                if (BModel::getCount('store_joinin', ['member_id' => $member_id]) == 0) {
-                    //从来没申请过，开始入住
-                    $joinin_url = "http://47.111.27.189:2000";
-                } else {
-                    $joinin_state = BModel::getTableValue('store_joinin', ['member_id' => $member_id], 'joinin_state');
-                    if ($joinin_state == 10) {
-                        $joinin_url = "http://47.111.27.189:2000/#/checks";
-                        //已经提交申请，待审核
-                    } elseif ($joinin_state == 20) {
-                        $joinin_url = "http://47.111.27.189:2000/#/application";
-                    } elseif ($joinin_state == 30) {
-                        $joinin_url = "http://47.111.27.189:2000/#/checkf";
-                    } elseif ($joinin_state == 11) {
-                        //第二部已提交，待审核页面
-                    } elseif ($joinin_state == 31) {
-                        //缴费审核失败页面
-                    } elseif ($joinin_state == 40) {
-                        $joinin_url = "http://47.111.27.189:2000/#/enters";
-                        //缴费审核成功页面
-                    }
-                }
-                return Base::jsonReturn(200, '注册成功', ['member_id' => $member_id, 'joinin_url' => $joinin_url]);
+//                $joinin_url = "";
+//                if (BModel::getCount('store_joinin', ['member_id' => $member_id]) == 0) {
+//                    //从来没申请过，开始入住
+//                    $joinin_url = "http://47.111.27.189:2000";
+//                } else {
+//                    $joinin_state = BModel::getTableValue('store_joinin', ['member_id' => $member_id], 'joinin_state');
+//                    if ($joinin_state == 10) {
+//                        $joinin_url = "http://47.111.27.189:2000/#/checks";
+//                        //已经提交申请，待审核
+//                    } elseif ($joinin_state == 20) {
+//                        $joinin_url = "http://47.111.27.189:2000/#/application";
+//                    } elseif ($joinin_state == 30) {
+//                        $joinin_url = "http://47.111.27.189:2000/#/checkf";
+//                    } elseif ($joinin_state == 11) {
+//                        //第二部已提交，待审核页面
+//                    } elseif ($joinin_state == 31) {
+//                        //缴费审核失败页面
+//                    } elseif ($joinin_state == 40) {
+//                        $joinin_url = "http://47.111.27.189:2000/#/enters";
+//                        //缴费审核成功页面
+//                    }
+//                }
+                return Base::jsonReturn(200, '注册成功', ['member_id' => $member_id]);
             } else {
                 return Base::jsonReturn(2003, '注册失败');
             }
@@ -150,6 +150,29 @@ class MemberController extends Base
 //                    BModel::delData('token', ['token' => $old_token]);
 //                }
 //                Redis::setex($data->store_id, 60 * 60 * 24 * 7, $data->token);
+                $joinin_url = "";
+                if (BModel::getCount('store_joinin', ['member_id' => $member_id]) == 0) {
+                    //从来没申请过，开始入住
+                    $joinin_url = "http://47.111.27.189:2000";
+                } else {
+                    $joinin_state = BModel::getTableValue('store_joinin', ['member_id' => $member_id], 'joinin_state');
+                    if ($joinin_state == 10) {
+                        $joinin_url = "http://47.111.27.189:2000/#/checks";
+                        //已经提交申请，待审核
+                    } elseif ($joinin_state == 20) {
+                        $joinin_url = "http://47.111.27.189:2000/#/application";
+                    } elseif ($joinin_state == 30) {
+                        $joinin_url = "http://47.111.27.189:2000/#/checkf";
+                    } elseif ($joinin_state == 11) {
+                        //第二部已提交，待审核页面
+                    } elseif ($joinin_state == 31) {
+                        //缴费审核失败页面
+                    } elseif ($joinin_state == 40) {
+                        $joinin_url = "http://47.111.27.189:2000/#/enters";
+                        //缴费审核成功页面
+                    }
+                }
+                $data->joinin_url = $joinin_url;
                 return Base::jsonReturn(200, '获取成功', $data);
             } else {
                 return Base::jsonReturn(1001, '账号或密码错误');
