@@ -90,11 +90,7 @@ class Order extends BModel
             $data->delivery['name']  = "三爷";
             $data->delivery['phone'] = "13124154747";
             if ($order_state == 25) {
-                if ($data->order_state == 35) {
                     $data->order_state = "配送中";
-                } else {
-                    $data->order_state = "待配送";
-                }
             }
             if ($order_state == 0) {
                 $data->order_state = "已取消";
