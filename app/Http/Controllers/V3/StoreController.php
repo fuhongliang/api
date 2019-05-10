@@ -388,30 +388,48 @@ class StoreController extends Base
 
         // 30天 下单量和销售金额
 
-        $ordernum_30 = DB::table('order')
-            ->where('store_id', $store_id)
-            ->whereBetween('add_time', [$stime, $etime])
-            ->where('order_state', 40)
-            ->count();
+        $data_30     = DB::table('order as a')
+            ->leftJoin('order_goods as b','a.order_id','b.order_id')
+            ->where('a.store_id', $store_id)
+            ->whereBetween('a.add_time', [$stime, $etime])
+            ->where('a.order_state', 40)
+            ->get(['a.order_id','b.goods_pay_price','b.commis_rate']);
+        $money_30=0;
+        $order_ids_30=[];
+        if(!$data_30->isEmpty())
+        {
+            foreach ($data_30 as $k=>$v)
+            {
+                $money_30 += Base::ncPriceFormat(Base::ncPriceFormat($v->goods_pay_price)*(1-intval($v->commis_rate)/100));
+                array_push($order_ids_30,$v->order_id);
+            }
+        }
 
         //店铺收藏量 商品数量
         $store_collect_data = BModel::getTableValue('store',['store_id' => $store_id], 'store_collect');
         $goods_num          = BModel::getCount('goods',['store_id' => $store_id]);
 
-        $today_ordernum     = DB::table('order')
-            ->where('store_id', $store_id)
-            ->whereBetween('add_time', [$beginToday, $endToday])
-            ->where('order_state', 40)
-            ->count();
-
-
-
-        dd($today_orders->toArray());
+        $today_data     = DB::table('order as a')
+            ->leftJoin('order_goods as b','a.order_id','b.order_id')
+            ->where('a.store_id', $store_id)
+            ->whereBetween('a.add_time', [$beginToday, $endToday])
+            ->where('a.order_state', 40)
+            ->get(['a.order_id','b.goods_pay_price','b.commis_rate']);
+        $today_money=0;
+        $order_ids=[];
+        if(!$today_data->isEmpty())
+        {
+            foreach ($today_data as $k=>$v)
+            {
+                $today_money += Base::ncPriceFormat(Base::ncPriceFormat($v->goods_pay_price)*(1-intval($v->commis_rate)/100));
+                array_push($order_ids,$v->order_id);
+            }
+        }
         $result                   = array();
-        $result['today_ordernum'] = $today_ordernum;
-        //$result['today_orderamount'] = $data2->orderamount;
-        $result['30_ordernum'] = $ordernum_30;
-        //$result['30_orderamount']    = $data->orderamount;
+        $result['today_ordernum'] = count(array_unique($order_ids));
+        $result['today_orderamount'] = $today_money;
+        $result['30_ordernum'] = count(array_unique($order_ids_30));
+        $result['30_orderamount']    = $money_30;
         $result['store_collect'] = $store_collect_data;
         $result['goods_num']     = $goods_num;
         $result['jingying_url']  = 'http://47.111.27.189:2000/v3/store_jingying/' . $store_id;
