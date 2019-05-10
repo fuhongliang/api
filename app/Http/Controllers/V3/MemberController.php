@@ -151,11 +151,11 @@ class MemberController extends Base
 //                }
 //                Redis::setex($data->store_id, 60 * 60 * 24 * 7, $data->token);
                 $joinin_url = "";
-                if (BModel::getCount('store_joinin', ['member_id' => $member_id]) == 0) {
+                if (BModel::getCount('store_joinin', ['member_id' => $memberInfo->member_id]) == 0) {
                     //从来没申请过，开始入住
                     $joinin_url = "http://47.111.27.189:2000";
                 } else {
-                    $joinin_state = BModel::getTableValue('store_joinin', ['member_id' => $member_id], 'joinin_state');
+                    $joinin_state = BModel::getTableValue('store_joinin', ['member_id' => $memberInfo->member_id], 'joinin_state');
                     if ($joinin_state == 10) {
                         $joinin_url = "http://47.111.27.189:2000/#/checks";
                         //已经提交申请，待审核
