@@ -457,6 +457,11 @@ class VoucherController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
+        $xianshi_quota_list = Voucher::getXianShiInfo(['store_id' => $store_id]);
+        if (empty($xianshi_quota_list)) {
+            return Base::jsonReturn(2000, '你还没有购买套餐');
+        }
+
         $list = Voucher::getXianshiList(['store_id' => $store_id]);
         if (!empty($list)) {
             $result = array();
