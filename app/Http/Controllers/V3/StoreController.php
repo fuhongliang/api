@@ -242,10 +242,9 @@ class StoreController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2001, '商家不存在');
         }
-        $end_time= str_replace(':','',$work_end_time);
-        $start_time= str_replace(':','',$work_start_time);
-        if(intval($start_time)>intval($end_time))
-        {
+        $end_time   = str_replace(':', '', $work_end_time);
+        $start_time = str_replace(':', '', $work_start_time);
+        if (intval($start_time) > intval($end_time)) {
             return Base::jsonReturn(2002, '开始时间应小于结束时间');
         }
         $res = Store::setWorkState(['store_id' => $store_id], ['work_start_time' => $work_start_time, 'work_end_time' => $work_end_time]);
