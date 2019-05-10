@@ -892,6 +892,7 @@ class StoreController extends Base
         }
         $member_name=BModel::getTableValue('member',['member_id'=>$param['member_id']],'member_name');
         $param['member_name']=$member_name;
+        $param['sc_name']=BModel::getTableValue('store_class',['sc_id'=>$param['sc_id']],'sc_name');
         $ins_id = BModel::insertData('store_joinin', $param);
         if ($ins_id) {
             return Base::jsonReturn(200, '提交成功');
