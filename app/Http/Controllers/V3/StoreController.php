@@ -388,38 +388,33 @@ class StoreController extends Base
 
         // 30天 下单量和销售金额
 
-        $data = DB::table('order')
+        $ordernum_30 = DB::table('order')
             ->where('store_id', $store_id)
             ->whereBetween('add_time', [$stime, $etime])
-            ->where('order_state',40)
-            ->first(
-                array(
-                    DB::raw('COUNT(*) as ordernum'),
-                    DB::raw('IFNULL(SUM(order_amount),0) as orderamount')
-                )
-            );
+            ->where('order_state', 40)
+            ->count();
 
         //店铺收藏量 商品数量
-        $store_collect_data          = Store::getStoreInfo(['store_id' => $store_id], ['store_collect']);
-        $goods_num                   = Goods::getGoodsCount(['store_id' => $store_id]);
-        $data2                       = DB::table('order')
+        $store_collect_data = BModel::getTableValue('store',['store_id' => $store_id], 'store_collect');
+        $goods_num          = BModel::getCount('goods',['store_id' => $store_id]);
+
+        $today_ordernum     = DB::table('order')
             ->where('store_id', $store_id)
             ->whereBetween('add_time', [$beginToday, $endToday])
-            ->where('order_state',40)
-            ->first(
-                array(
-                    DB::raw('COUNT(*) as ordernum'),
-                    DB::raw('IFNULL(SUM(order_amount),0) as orderamount')
-                )
-            );
-        $result                      = array();
-        $result['today_ordernum']    = $data2->ordernum;
-        $result['today_orderamount'] = $data2->orderamount;
-        $result['30_ordernum']       = $data->ordernum;
-        $result['30_orderamount']    = $data->orderamount;
-        $result['store_collect']     = $store_collect_data->store_collect;
-        $result['goods_num']         = $goods_num;
-        $result['jingying_url']      = 'http://47.111.27.189:2000/v3/store_jingying/' . $store_id;
+            ->where('order_state', 40)
+            ->count();
+
+
+
+        dd($today_orders->toArray());
+        $result                   = array();
+        $result['today_ordernum'] = $today_ordernum;
+        //$result['today_orderamount'] = $data2->orderamount;
+        $result['30_ordernum'] = $ordernum_30;
+        //$result['30_orderamount']    = $data->orderamount;
+        $result['store_collect'] = $store_collect_data;
+        $result['goods_num']     = $goods_num;
+        $result['jingying_url']  = 'http://47.111.27.189:2000/v3/store_jingying/' . $store_id;
         return Base::jsonReturn(200, '获取成功', $result);
     }
 

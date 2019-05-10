@@ -27,7 +27,7 @@ Route::group(['namespace' => 'V3'], function () {
     Route::post('store_joinin_step2', 'StoreController@joininStep2');//商家入驻第二步 保存数据
 });
 
-Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () {
+Route::group(['namespace' => 'V3', 'middleware' => []], function () {
     Route::post('get_neworder', 'OrderController@getNewOrder');//获取新订单
     Route::post('refuse_order', 'OrderController@refuseOrder');//拒单
     Route::post('receive_order', 'OrderController@receiveOrder');//接单
