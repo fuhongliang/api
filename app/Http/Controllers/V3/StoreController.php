@@ -869,7 +869,7 @@ class StoreController extends Base
     public function joininStep1(Request $request)
     {
         $param['member_id']                          = $request->input('member_id');
-        $param['company_name']                       = $request->input('company_name');
+        $param['store_name']                       = $request->input('company_name');
         $param['contacts_name']                      = $request->input('contacts_name');
         $param['contacts_phone']                     = $request->input('contacts_phone');
         $param['company_address']                    = $request->input('company_address');
