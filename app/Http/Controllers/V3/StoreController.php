@@ -917,6 +917,16 @@ class StoreController extends Base
             return Base::jsonReturn(2001, '提交失败');
         }
     }
+    static function joininMessage(Request $request)
+    {
+        $member_id= $request->input('member_id');
+        if (!$member_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        $data = BModel::getTableValue('store_joinin',['member_id'=>$member_id],'joinin_message');
+        return Base::jsonReturn(200, '获取成功', $data);
+    }
+
 
     /**系统消息
      * @param Request $request

@@ -25,6 +25,7 @@ Route::group(['namespace' => 'V3'], function () {
     Route::post('check_mobile', 'MemberController@checkMobile');//商家注册检测手机号
     Route::post('store_joinin_step1', 'StoreController@joininStep1');//商家入驻第一步  保存数据
     Route::post('store_joinin_step2', 'StoreController@joininStep2');//商家入驻第二步 保存数据
+    Route::post('joinin_message', 'StoreController@joininMessage');//入驻审核意见
 });
 
 Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () {
@@ -91,6 +92,8 @@ Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () 
     Route::post('msg_info', 'StoreController@msgInfo');//消息详情
 
     Route::post('change_avator', 'StoreController@changeAvator');//店铺换头像
+
+
 
 
 
