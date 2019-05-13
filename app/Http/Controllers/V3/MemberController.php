@@ -51,7 +51,7 @@ class MemberController extends Base
         if (!preg_match("/^1[34578]{1}\d{9}$/", $phone_number)) {
             return Base::jsonReturn(2000, '手机号格式不正确');
         }
-        if (!Member::checkStorePhoneExist(['store_phone' => $phone_number]) || !Member::checkStoreJoinPhoneExist(['contacts_phone' => $phone_number]) || !Member::checkStoreRegTmpExist(['mobile_phone' => $phone_number])) {
+        if (BModel::getCount('store_register_tmp',['mobile_phone'=>$phone_number])>0) {
             return Base::jsonReturn(2001, '手机号已存在申请记录');
         }
         $code = Redis::get($phone_number);
