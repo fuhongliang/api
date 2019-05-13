@@ -26,6 +26,7 @@ Route::group(['namespace' => 'V3'], function () {
     Route::post('store_joinin_step1', 'StoreController@joininStep1');//商家入驻第一步  保存数据
     Route::post('store_joinin_step2', 'StoreController@joininStep2');//商家入驻第二步 保存数据
     Route::post('joinin_message', 'StoreController@joininMessage');//入驻审核意见
+    Route::post('store_grade', 'StoreController@storeGrade');//店铺等级
 });
 
 Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () {
