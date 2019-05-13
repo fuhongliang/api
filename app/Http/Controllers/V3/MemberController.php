@@ -63,7 +63,7 @@ class MemberController extends Base
                 'member_name' => '未设置',
                 'member_passwd' => md5($password),
                 'member_email' => '',
-                'member_mobile'=>$phone_number,
+                'member_mobile' => $phone_number,
                 'member_time' => time(),
                 'member_login_time' => time(),
                 'member_old_login_time' => time()
@@ -98,7 +98,9 @@ class MemberController extends Base
                         $joinin_url = "http://47.111.27.189:2000/#/checkf/" . $member_id;
                     } elseif ($joinin_state == 11) {
                         //第二部已提交，待审核页面
+                        $joinin_url = "http://47.111.27.189:2000/#/pwait/" . $member_id;
                     } elseif ($joinin_state == 31) {
+                        $joinin_url = " http://47.111.27.189:2000/#/pfailed/" . $member_id;
                         //缴费审核失败页面
                     }
                 }
@@ -167,7 +169,9 @@ class MemberController extends Base
                         $joinin_url = "http://47.111.27.189:2000/#/checkf/" . $memberInfo->member_id;
                     } elseif ($joinin_state == 11) {
                         //第二部已提交，待审核页面
+                        $joinin_url = "http://47.111.27.189:2000/#/pwait/" . $memberInfo->member_id;
                     } elseif ($joinin_state == 31) {
+                        $joinin_url = " http://47.111.27.189:2000/#/pfailed/" . $memberInfo->member_id;
                         //缴费审核失败页面
                     }
                 }

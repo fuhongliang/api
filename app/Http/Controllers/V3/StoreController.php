@@ -388,51 +388,47 @@ class StoreController extends Base
 
         // 30天 下单量和销售金额
 
-        $data_30     = DB::table('order as a')
-            ->leftJoin('order_goods as b','a.order_id','b.order_id')
+        $data_30      = DB::table('order as a')
+            ->leftJoin('order_goods as b', 'a.order_id', 'b.order_id')
             ->where('a.store_id', $store_id)
             ->whereBetween('a.add_time', [$stime, $etime])
             ->where('a.order_state', 40)
-            ->get(['a.order_id','b.goods_pay_price','b.commis_rate']);
-        $money_30=0;
-        $order_ids_30=[];
-        if(!$data_30->isEmpty())
-        {
-            foreach ($data_30 as $k=>$v)
-            {
-                $money_30 += Base::ncPriceFormat(Base::ncPriceFormat($v->goods_pay_price)*(1-intval($v->commis_rate)/100));
-                array_push($order_ids_30,$v->order_id);
+            ->get(['a.order_id', 'b.goods_pay_price', 'b.commis_rate']);
+        $money_30     = 0;
+        $order_ids_30 = [];
+        if (!$data_30->isEmpty()) {
+            foreach ($data_30 as $k => $v) {
+                $money_30 += Base::ncPriceFormat(Base::ncPriceFormat($v->goods_pay_price) * (1 - intval($v->commis_rate) / 100));
+                array_push($order_ids_30, $v->order_id);
             }
         }
 
         //店铺收藏量 商品数量
-        $store_collect_data = BModel::getTableValue('store',['store_id' => $store_id], 'store_collect');
-        $goods_num          = BModel::getCount('goods',['store_id' => $store_id]);
+        $store_collect_data = BModel::getTableValue('store', ['store_id' => $store_id], 'store_collect');
+        $goods_num          = BModel::getCount('goods', ['store_id' => $store_id]);
 
-        $today_data     = DB::table('order as a')
-            ->leftJoin('order_goods as b','a.order_id','b.order_id')
+        $today_data  = DB::table('order as a')
+            ->leftJoin('order_goods as b', 'a.order_id', 'b.order_id')
             ->where('a.store_id', $store_id)
             ->whereBetween('a.add_time', [$beginToday, $endToday])
             ->where('a.order_state', 40)
-            ->get(['a.order_id','b.goods_pay_price','b.commis_rate']);
-        $today_money=0;
-        $order_ids=[];
-        if(!$today_data->isEmpty())
-        {
-            foreach ($today_data as $k=>$v)
-            {
-                $today_money += Base::ncPriceFormat(Base::ncPriceFormat($v->goods_pay_price)*(1-intval($v->commis_rate)/100));
-                array_push($order_ids,$v->order_id);
+            ->get(['a.order_id', 'b.goods_pay_price', 'b.commis_rate']);
+        $today_money = 0;
+        $order_ids   = [];
+        if (!$today_data->isEmpty()) {
+            foreach ($today_data as $k => $v) {
+                $today_money += Base::ncPriceFormat(Base::ncPriceFormat($v->goods_pay_price) * (1 - intval($v->commis_rate) / 100));
+                array_push($order_ids, $v->order_id);
             }
         }
-        $result                   = array();
-        $result['today_ordernum'] = count(array_unique($order_ids));
+        $result                      = array();
+        $result['today_ordernum']    = count(array_unique($order_ids));
         $result['today_orderamount'] = $today_money;
-        $result['30_ordernum'] = count(array_unique($order_ids_30));
+        $result['30_ordernum']       = count(array_unique($order_ids_30));
         $result['30_orderamount']    = $money_30;
-        $result['store_collect'] = $store_collect_data;
-        $result['goods_num']     = $goods_num;
-        $result['jingying_url']  = 'http://47.111.27.189:2000/v3/store_jingying/' . $store_id;
+        $result['store_collect']     = $store_collect_data;
+        $result['goods_num']         = $goods_num;
+        $result['jingying_url']      = 'http://47.111.27.189:2000/v3/store_jingying/' . $store_id;
         return Base::jsonReturn(200, '获取成功', $result);
     }
 
@@ -887,13 +883,13 @@ class StoreController extends Base
         $param['business_licence_number_electronic'] = $request->input('business_licence_number_electronic');
         $param['sc_id']                              = $request->input('sc_id');
         $param['joinin_state']                       = 10;
-        if (BModel::getCount('store_joinin',['member_id'=>$param['member_id']])>0) {
+        if (BModel::getCount('store_joinin', ['member_id' => $param['member_id']]) > 0) {
             return Base::jsonReturn(2000, '店铺已存在申请记录');
         }
-        $member_name=BModel::getTableValue('member',['member_id'=>$param['member_id']],'member_name');
-        $param['member_name']=$member_name;
-        $param['sc_name']=BModel::getTableValue('store_class',['sc_id'=>$param['sc_id']],'sc_name');
-        $ins_id = BModel::insertData('store_joinin', $param);
+        $member_name          = BModel::getTableValue('member', ['member_id' => $param['member_id']], 'member_name');
+        $param['member_name'] = $member_name;
+        $param['sc_name']     = BModel::getTableValue('store_class', ['sc_id' => $param['sc_id']], 'sc_name');
+        $ins_id               = BModel::insertData('store_joinin', $param);
         if ($ins_id) {
             return Base::jsonReturn(200, '提交成功');
         } else {
@@ -910,6 +906,7 @@ class StoreController extends Base
         $member_id                         = $request->input('member_id');
         $param['paying_money_certificate'] = $request->input('paying_money_certificate');
         $param['paying_amount']            = $request->input('paying_amount');
+        $param['joinin_state']             = 11;
         $res                               = BModel::upTableData('store_joinin', ['member_id' => $member_id], $param);
         if ($res) {
             return Base::jsonReturn(200, '提交成功');
@@ -917,13 +914,14 @@ class StoreController extends Base
             return Base::jsonReturn(2001, '提交失败');
         }
     }
+
     static function joininMessage(Request $request)
     {
-        $member_id= $request->input('member_id');
+        $member_id = $request->input('member_id');
         if (!$member_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        $data = BModel::getTableValue('store_joinin',['member_id'=>$member_id],'joinin_message');
+        $data = BModel::getTableValue('store_joinin', ['member_id' => $member_id], 'joinin_message');
         return Base::jsonReturn(200, '获取成功', $data);
     }
 
