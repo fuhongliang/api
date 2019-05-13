@@ -888,10 +888,10 @@ class StoreController extends Base
         $param['sg_name']                            = "白金店铺";
         $param['joinin_state']                       = 10;
         $param['paying_amount']                      = 1000;
-        $store_class_ids[]                           = $request->input('store_class_ids').',';
-        $store_class_names[]                         = $request->input('store_class_names').',';
+        $store_class_ids[]                           = $request->input('store_class_ids') . ',';
+        $store_class_names[]                         = $request->input('store_class_names') . ',';
 
-        $param['store_class_commis_rates']           = BModel::getTableValue('goods_class', ['gc_id' => $param['sc_id']], 'commis_rate');
+        $param['store_class_commis_rates'] = BModel::getTableValue('goods_class', ['gc_id' => $param['sc_id']], 'commis_rate');
         if (BModel::getCount('store_joinin', ['member_id' => $param['member_id']]) > 0) {
             return Base::jsonReturn(2000, '店铺已存在申请记录');
         }
@@ -913,7 +913,10 @@ class StoreController extends Base
     {
         $member_id                         = $request->input('member_id');
         $param['paying_money_certificate'] = $request->input('paying_money_certificate');
+        $param['sg_id']                    = 1;
+        $param['sg_name']                  = "系统默认";
         $param['paying_amount']            = $request->input('paying_amount');
+        $param['sg_info']                  = ["sg_price" => $param['paying_amount']];
         $param['joinin_state']             = 11;
         $res                               = BModel::upTableData('store_joinin', ['member_id' => $member_id], $param);
         if ($res) {
@@ -1075,7 +1078,7 @@ class StoreController extends Base
      */
     static function storeGrade()
     {
-        $data=DB::table('store_grade')->get(['sg_id','sg_name','sg_price']);
-        return Base::jsonReturn(200, '获取成功',$data->isEmpty()? null : $data->toArray());
+        $data = DB::table('store_grade')->get(['sg_id', 'sg_name', 'sg_price']);
+        return Base::jsonReturn(200, '获取成功', $data->isEmpty() ? null : $data->toArray());
     }
 }
