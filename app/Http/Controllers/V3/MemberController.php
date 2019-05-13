@@ -101,8 +101,11 @@ class MemberController extends Base
                         //缴费审核失败页面
                     }
                 }
-
-                return Base::jsonReturn(200, '注册成功', ['joinin_url' => $joinin_url]);
+                $res_data = array(
+                    'member_id' => $member_id,
+                    'joinin_url' => $joinin_url
+                );
+                return Base::jsonReturn(200, '注册成功', $res_data);
             } else {
                 return Base::jsonReturn(2003, '注册失败');
             }
