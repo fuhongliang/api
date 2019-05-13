@@ -132,20 +132,21 @@ class MemberController extends Base
         $storeInfo = BModel::getTableFirstData('store_register_tmp',['mobile_phone'=>$member_name]);
         if ($storeInfo) {
             if (md5($member_passwd) == $storeInfo->password) {
-                $field                                    = ['a.store_id', 'a.store_name', 'a.store_phone', 'a.store_avatar',
-                    'a.area_info', 'a.store_address', 'a.work_start_time', 'a.work_end_time',
-                    'a.store_state', 'a.store_description', 'a.work_start_time', 'a.work_end_time',
-                    'b.business_licence_number_electronic',
-                    'c.member_id', 'c.member_name', 'c.member_mobile'];
-                $data                                     = Store::getStoreAndJoinInfo(['a.member_id' => $storeInfo->member_id], $field);
-                $data->business_licence_number_electronic = '';
-                $data->token                              = Base::makeToken($data->store_id, $member_name);
+//                $field                                    = ['a.store_id', 'a.store_name', 'a.store_phone', 'a.store_avatar',
+//                    'a.area_info', 'a.store_address', 'a.work_start_time', 'a.work_end_time',
+//                    'a.store_state', 'a.store_description', 'a.work_start_time', 'a.work_end_time',
+//                    'b.business_licence_number_electronic',
+//                    'c.member_id', 'c.member_name', 'c.member_mobile'];
+//                $data                                     = Store::getStoreAndJoinInfo(['a.member_id' => $storeInfo->member_id], $field);
+
+                $data                                     = BModel::getTableFirstData('store_register_tmp',['member_id' => $storeInfo->member_id]);
+                $data->business_licence_number_electronic = 'upload/shop/store_joinin/06075408577995264.png';
+                $data->token                              = Base::makeToken($member_name);
                 $token_data                               = array(
                     'member_id' => $storeInfo->member_id,
                     'token' => $data->token,
                     'add_time' => time(),
-                    'expire_time' => time() + 24 * 5 * 3600,
-                    'store_id' => $data->store_id
+                    'expire_time' => time() + 24 * 5 * 3600
                 );
                 Token::addToken($token_data);
 //                $old_token = Redis::get($data->store_id);

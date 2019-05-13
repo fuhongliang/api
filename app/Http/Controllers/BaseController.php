@@ -48,9 +48,9 @@ class BaseController extends Controller
      * @param $member_name
      * @return mixed
      */
-    static function makeToken($store_id, $member_name)
+    static function makeToken($member_name)
     {
-        return Crypt::encryptString(serialize($store_id));
+        return Crypt::encryptString(serialize($member_name));
     }
 
 
