@@ -76,6 +76,7 @@ class OrderController extends Base
         //order_state 订单状态：0(已取消)10(默认):未付款;20:已付款;25:商家已接单;30:已发货;35骑手已接单40:已收货;
         $order_state = $request->input('order_state');
         $store_id    = $request->input('store_id');
+        $page        = $request->input('page');
         if (!$store_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
@@ -84,7 +85,7 @@ class OrderController extends Base
         }
         $fileds = ['order_id', 'order_sn', 'buyer_id', 'add_time', 'order_state'];
 
-        $info = Order::getOrderList(['store_id' => $store_id], $fileds, $order_state);
+        $info = Order::getOrderList(['store_id' => $store_id], $fileds, $order_state,$page);
         return Base::jsonReturn(200, '获取成功', $info);
     }
 }
