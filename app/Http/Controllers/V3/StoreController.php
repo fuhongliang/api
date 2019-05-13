@@ -887,7 +887,7 @@ class StoreController extends Base
         $param['business_licence_number_electronic'] = $request->input('business_licence_number_electronic');
         $param['sc_id']                              = $request->input('sc_id');
         $param['joinin_state']                       = 10;
-        if (BModel::getCount('store_joinin',['member_id'=>$param['member_id']])==1) {
+        if (BModel::getCount('store_joinin',['member_id'=>$param['member_id']])>0) {
             return Base::jsonReturn(2000, '店铺已存在申请记录');
         }
         $member_name=BModel::getTableValue('member',['member_id'=>$param['member_id']],'member_name');
