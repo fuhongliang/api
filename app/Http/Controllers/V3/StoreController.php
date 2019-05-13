@@ -887,9 +887,10 @@ class StoreController extends Base
         $param['sg_id']                              = 2;
         $param['sg_name']                            = "白金店铺";
         $param['joinin_state']                       = 10;
-        $param['paying_amount']                       = 1000;
-        $store_class_ids[]                           = "959,961,979,";
-        $store_class_names[]                         = "发的发,哇,瓦尔德,";
+        $param['paying_amount']                      = 1000;
+        $store_class_ids[]                           = $request->input('store_class_ids').',';
+        $store_class_names[]                         = $request->input('store_class_names').',';
+
         $param['store_class_commis_rates']           = BModel::getTableValue('goods_class', ['gc_id' => $param['sc_id']], 'commis_rate');
         if (BModel::getCount('store_joinin', ['member_id' => $param['member_id']]) > 0) {
             return Base::jsonReturn(2000, '店铺已存在申请记录');
