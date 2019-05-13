@@ -63,6 +63,7 @@ class MemberController extends Base
                 'member_name' => '未设置',
                 'member_passwd' => md5($password),
                 'member_email' => '',
+                'member_mobile'=>$phone_number,
                 'member_time' => time(),
                 'member_login_time' => time(),
                 'member_old_login_time' => time()
