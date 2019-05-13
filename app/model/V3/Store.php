@@ -508,21 +508,4 @@ class Store extends BModel
         return DB::table('pd_cash')->where('pdc_member_id', $member_id)->whereBetween('pdc_add_time', [$begin_time, $end_time])->sum($field);
     }
 
-    static function getGcinfo()
-    {
-        $result = [];
-        $data   = DB::table('goods_class')->where('gc_id', 276)->first(['gc_id', 'gc_parent_id', 'gc_name']);
-        if ($data) {
-            $result[$data->gc_id] = $data->gc_name;
-            $data_2               = DB::table('goods_class')->where('gc_id', $data->gc_parent_id)->first(['gc_id', 'gc_parent_id', 'gc_name']);
-            if ($data_2) {
-                $result[$data_2->gc_id] = $data_2->gc_name;
-                $data_3                 = DB::table('goods_class')->where('gc_id', $data_2->gc_parent_id)->first(['gc_id', 'gc_parent_id', 'gc_name']);
-                if ($data_3) {
-                    $result[$data_3->gc_id] = $data_3->gc_name;
-                }
-            }
-        }
-        return $result;
-    }
 }

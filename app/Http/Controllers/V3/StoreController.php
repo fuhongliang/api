@@ -868,10 +868,6 @@ class StoreController extends Base
      */
     public function joininStep1(Request $request)
     {
-        dd(serialize(array_keys(Store::getGcinfo())));
-        dd(unserialize('a:1:{i:0;s:12:"256,258,265,";}'));
-
-
         $param['member_id']                          = $request->input('member_id');
         $param['store_name']                         = $request->input('company_name');
         $param['contacts_name']                      = $request->input('contacts_name');
