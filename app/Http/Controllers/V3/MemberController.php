@@ -138,7 +138,7 @@ class MemberController extends Base
                     'b.business_licence_number_electronic',
                     'c.member_id', 'c.member_name', 'c.member_mobile'];
                 $data                                     = Store::getStoreAndJoinInfo(['a.member_id' => $storeInfo->member_id], $field);
-                $data->business_licence_number_electronic = getenv('WEB_URL') . 'upload/shop/store_joinin/06075408577995264.png';
+                $data->business_licence_number_electronic = 'upload/shop/store_joinin/06075408577995264.png';
                 $data->token                              = Base::makeToken($data->store_id, $member_name);
                 $token_data                               = array(
                     'member_id' => $storeInfo->member_id,
