@@ -885,11 +885,9 @@ class StoreController extends Base
         $param['business_licence_number_electronic'] = $request->input('business_licence_number_electronic');
         $param['sc_id']                              = 2;
         $param['sg_id']                              = 2;
-        $param['sg_name']                            = "白金店铺";
         $param['joinin_state']                       = 10;
-        $param['paying_amount']                      = 1000;
-        $store_class_ids[]                           = $request->input('store_class_ids') . ',';
-        $store_class_names[]                         = $request->input('store_class_names') . ',';
+        $store_class_ids[]                           = "959,961,979,";//$request->input('store_class_ids') . ',';
+        $store_class_names[]                         = "玩具乐器,DIY玩具,绘画工具,";//$request->input('store_class_names') . ',';
 
         $param['store_class_commis_rates'] = BModel::getTableValue('goods_class', ['gc_id' => $param['sc_id']], 'commis_rate');
         if (BModel::getCount('store_joinin', ['member_id' => $param['member_id']]) > 0) {
