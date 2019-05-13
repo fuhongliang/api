@@ -149,11 +149,11 @@ class MemberController extends Base
                     'expire_time' => time() + 24 * 5 * 3600
                 );
                 Token::addToken($token_data);
-//                $old_token = Redis::get($data->store_id);
-//                if ($old_token) {
-//                    BModel::delData('token', ['token' => $old_token]);
-//                }
-//                Redis::setex($data->store_id, 60 * 60 * 24 * 7, $data->token);
+                $old_token = Redis::get($data->member_id);
+                if ($old_token) {
+                    BModel::delData('token', ['token' => $old_token]);
+                }
+                Redis::setex($data->member_id, 60 * 60 * 24 * 7, $data->token);
                 $joinin_url = "";
                 if (BModel::getCount('store_joinin', ['member_id' => $storeInfo->member_id]) == 0) {
                     //从来没申请过，开始入住
