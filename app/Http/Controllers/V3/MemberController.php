@@ -137,11 +137,11 @@ class MemberController extends Base
                     'a.store_state', 'a.store_description', 'a.work_start_time', 'a.work_end_time',
                     'b.business_licence_number_electronic',
                     'c.member_id', 'c.member_name', 'c.member_mobile'];
-                $data                                     = Store::getStoreAndJoinInfo(['a.member_id' => $memberInfo->member_id], $field);
+                $data                                     = Store::getStoreAndJoinInfo(['a.member_id' => $storeInfo->member_id], $field);
                 $data->business_licence_number_electronic = getenv('WEB_URL') . 'upload/shop/store_joinin/06075408577995264.png';
                 $data->token                              = Base::makeToken($data->store_id, $member_name);
                 $token_data                               = array(
-                    'member_id' => $memberInfo->member_id,
+                    'member_id' => $storeInfo->member_id,
                     'token' => $data->token,
                     'add_time' => time(),
                     'expire_time' => time() + 24 * 5 * 3600,
@@ -154,23 +154,23 @@ class MemberController extends Base
 //                }
 //                Redis::setex($data->store_id, 60 * 60 * 24 * 7, $data->token);
                 $joinin_url = "";
-                if (BModel::getCount('store_joinin', ['member_id' => $memberInfo->member_id]) == 0) {
+                if (BModel::getCount('store_joinin', ['member_id' => $storeInfo->member_id]) == 0) {
                     //从来没申请过，开始入住
-                    $joinin_url = "http://47.111.27.189:2000/#/" . $memberInfo->member_id;
+                    $joinin_url = "http://47.111.27.189:2000/#/" . $storeInfo->member_id;
                 } else {
-                    $joinin_state = BModel::getTableValue('store_joinin', ['member_id' => $memberInfo->member_id], 'joinin_state');
+                    $joinin_state = BModel::getTableValue('store_joinin', ['member_id' => $storeInfo->member_id], 'joinin_state');
                     if ($joinin_state == 10) {
-                        $joinin_url = "http://47.111.27.189:2000/#/checks/" . $memberInfo->member_id;
+                        $joinin_url = "http://47.111.27.189:2000/#/checks/" . $storeInfo->member_id;
                         //已经提交申请，待审核
                     } elseif ($joinin_state == 20) {
-                        $joinin_url = "http://47.111.27.189:2000/#/application/" . $memberInfo->member_id;
+                        $joinin_url = "http://47.111.27.189:2000/#/application/" . $storeInfo->member_id;
                     } elseif ($joinin_state == 30) {
-                        $joinin_url = "http://47.111.27.189:2000/#/checkf/" . $memberInfo->member_id;
+                        $joinin_url = "http://47.111.27.189:2000/#/checkf/" . $storeInfo->member_id;
                     } elseif ($joinin_state == 11) {
                         //第二部已提交，待审核页面
-                        $joinin_url = "http://47.111.27.189:2000/#/pwait/" . $memberInfo->member_id;
+                        $joinin_url = "http://47.111.27.189:2000/#/pwait/" . $storeInfo->member_id;
                     } elseif ($joinin_state == 31) {
-                        $joinin_url = " http://47.111.27.189:2000/#/pfailed/" . $memberInfo->member_id;
+                        $joinin_url = " http://47.111.27.189:2000/#/pfailed/" . $storeInfo->member_id;
                         //缴费审核失败页面
                     }
                 }
