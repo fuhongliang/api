@@ -868,8 +868,12 @@ class StoreController extends Base
      */
     public function joininStep1(Request $request)
     {
+        dd(serialize(array_keys(Store::getGcinfo())));
+        dd(unserialize('a:1:{i:0;s:12:"256,258,265,";}'));
+
+
         $param['member_id']                          = $request->input('member_id');
-        $param['store_name']                       = $request->input('company_name');
+        $param['store_name']                         = $request->input('company_name');
         $param['contacts_name']                      = $request->input('contacts_name');
         $param['contacts_phone']                     = $request->input('contacts_phone');
         $param['company_address']                    = $request->input('company_address');
@@ -883,6 +887,16 @@ class StoreController extends Base
         $param['business_licence_number_electronic'] = $request->input('business_licence_number_electronic');
         $param['sc_id']                              = $request->input('sc_id');
         $param['joinin_state']                       = 10;
+        $province                                    = $request->input('province');
+        $city                                        = $request->input('city');
+        $country                                     = $request->input('country');
+        $store_class_ids                             = json_decode($request->input('store_class_ids'));
+        $store_class_names                           = json_decode($request->input('store_class_names'));
+        $param['company_address']                    = $province . $city . $country;
+        $param['company_address']                    = serialize(array($store_class_ids));
+        $param['store_class_names']                  = serialize(array($store_class_names));
+        $param['store_class_commis_rates']           = BModel::getTableValue('goods_class', ['gc_id' => $param['sc_id']], 'commis_rate');
+
         if (BModel::getCount('store_joinin', ['member_id' => $param['member_id']]) > 0) {
             return Base::jsonReturn(2000, '店铺已存在申请记录');
         }

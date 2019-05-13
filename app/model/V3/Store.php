@@ -178,11 +178,10 @@ class Store extends BModel
                     }
                 }
                 foreach ($ids as $k => $goods_id) {
-                    $fields         = ['a.goods_id', 'a.goods_name', 'a.goods_price', 'a.goods_marketprice', 'b.goods_body as goods_desc', 'b.goods_sale_time', 'a.goods_state','is_much', 'a.goods_storage', 'a.goods_image as img_name'];
+                    $fields         = ['a.goods_id', 'a.goods_name', 'a.goods_price', 'a.goods_marketprice', 'b.goods_body as goods_desc', 'b.goods_sale_time', 'a.goods_state', 'is_much', 'a.goods_storage', 'a.goods_image as img_name'];
                     $goods_info[$k] = Goods::getGoodsInfo(['goods_id' => $goods_id], $fields);
-                    if($goods_info[$k]->is_much ==2)
-                    {
-                        $goods_info[$k]->goods_storage="库存无限";
+                    if ($goods_info[$k]->is_much == 2) {
+                        $goods_info[$k]->goods_storage = "库存无限";
                     }
                     $goods_info[$k]->goods_sale_time = unserialize($goods_info[$k]->goods_sale_time);
                     if (array_key_exists($goods_id, $xianshi)) {
@@ -495,17 +494,35 @@ class Store extends BModel
         return $result;
     }
 
-    static function cashList($member_id,$begin_time,$end_time,$field)
+    static function cashList($member_id, $begin_time, $end_time, $field)
     {
-       return  DB::table('pd_cash')
-           ->where('pdc_member_id',$member_id)
-           ->whereBetween('pdc_add_time',[$begin_time,$end_time])
-           ->orderBy('pdc_id','desc')
-           ->get($field);
+        return DB::table('pd_cash')
+            ->where('pdc_member_id', $member_id)
+            ->whereBetween('pdc_add_time', [$begin_time, $end_time])
+            ->orderBy('pdc_id', 'desc')
+            ->get($field);
     }
 
-    static function getCashSum($member_id,$begin_time,$end_time,$field)
+    static function getCashSum($member_id, $begin_time, $end_time, $field)
     {
-        return   DB::table('pd_cash')->where('pdc_member_id',$member_id)->whereBetween('pdc_add_time',[$begin_time,$end_time])->sum($field);
+        return DB::table('pd_cash')->where('pdc_member_id', $member_id)->whereBetween('pdc_add_time', [$begin_time, $end_time])->sum($field);
+    }
+
+    static function getGcinfo()
+    {
+        $result = [];
+        $data   = DB::table('goods_class')->where('gc_id', 276)->first(['gc_id', 'gc_parent_id', 'gc_name']);
+        if ($data) {
+            $result[$data->gc_id] = $data->gc_name;
+            $data_2               = DB::table('goods_class')->where('gc_id', $data->gc_parent_id)->first(['gc_id', 'gc_parent_id', 'gc_name']);
+            if ($data_2) {
+                $result[$data_2->gc_id] = $data_2->gc_name;
+                $data_3                 = DB::table('goods_class')->where('gc_id', $data_2->gc_parent_id)->first(['gc_id', 'gc_parent_id', 'gc_name']);
+                if ($data_3) {
+                    $result[$data_3->gc_id] = $data_3->gc_name;
+                }
+            }
+        }
+        return $result;
     }
 }
