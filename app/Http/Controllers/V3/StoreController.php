@@ -869,45 +869,39 @@ class StoreController extends Base
     public function joininStep1(Request $request)
     {
 
-        $param['member_id']                          = 6;
+        $param['member_id']                          = $request->input('member_id');
+        $param['company_name']                       = $request->input('company_name');
         $param['store_name']                         = $request->input('company_name');
-//        $param['contacts_name']                      = $request->input('contacts_name');
-//        $param['contacts_phone']                     = $request->input('contacts_phone');
-//        $param['company_address']                    = $request->input('company_address');
-//        $param['company_address_detail']             = $request->input('company_address_detail');
-//        $param['face_img']                           = $request->input('face_img');
-//        $param['store_img']                          = $request->input('store_img');
-//        $param['logo_img']                           = $request->input('logo_img');
-//        $param['business_sphere']                    = $request->input('business_sphere');
-//        $param['business_licence_number']            = $request->input('business_licence_number');
-//        $param['ID_card']                            = $request->input('ID_card');
-//       //$param['business_licence_number_electronic'] = $request->input('business_licence_number_electronic');
-//       // $param['sc_id']                              = $request->input('sc_id');
-//        $param['joinin_state']                       = 10;
-
-
-
-        $store_class_ids[]                             = "959,961,979,";
-        $store_class_names[]                           = "发的发,哇,瓦尔德,";
-
-      //  $param['store_class_commis_rates']           = BModel::getTableValue('goods_class', ['gc_id' => $param['sc_id']], 'commis_rate');
-
-//        if (BModel::getCount('store_joinin', ['member_id' => $param['member_id']]) > 0) {
-//            return Base::jsonReturn(2000, '店铺已存在申请记录');
-//        }
-//        $param['store_class_ids']                    = serialize($store_class_ids);
-//        $param['store_class_names']                  = serialize($store_class_names);
- //       $member_name          = BModel::getTableValue('member', ['member_id' => $param['member_id']], 'member_name');
-
-       // $param['member_name'] = $member_name;
-       // $param['sc_name']     = BModel::getTableValue('goods_class', ['sc_id' => $param['sc_id']], 'sc_name');
-
-        $ins_id               =DB::table('store_joinin')->insertGetId(['member_id'=>888]);
-        if ($ins_id) {
-            return Base::jsonReturn(200, '提交成功');
-        } else {
-            return Base::jsonReturn(2001, '提交失败');
+        $param['contacts_name']                      = $request->input('contacts_name');
+        $param['contacts_phone']                     = $request->input('contacts_phone');
+        $param['company_address']                    = $request->input('company_address');
+        $param['company_address_detail']             = $request->input('company_address_detail');
+        $param['face_img']                           = $request->input('face_img');
+        $param['store_img']                          = $request->input('store_img');
+        $param['logo_img']                           = $request->input('logo_img');
+        $param['business_sphere']                    = $request->input('business_sphere');
+        $param['business_licence_number']            = $request->input('business_licence_number');
+        $param['ID_card']                            = $request->input('ID_card');
+        $param['business_licence_number_electronic'] = $request->input('business_licence_number_electronic');
+        $param['sc_id']                              = 2;
+        $param['sg_id']                              = 2;
+        $param['sg_name']                            = "白金店铺";
+        $param['joinin_state']                       = 10;
+        $param['paying_amount']                       = 1000;
+        $store_class_ids[]                           = "959,961,979,";
+        $store_class_names[]                         = "发的发,哇,瓦尔德,";
+        $param['store_class_commis_rates']           = BModel::getTableValue('goods_class', ['gc_id' => $param['sc_id']], 'commis_rate');
+        if (BModel::getCount('store_joinin', ['member_id' => $param['member_id']]) > 0) {
+            return Base::jsonReturn(2000, '店铺已存在申请记录');
         }
+        $param['store_class_ids']   = serialize($store_class_ids);
+        $param['store_class_names'] = serialize($store_class_names);
+        $member_name                = BModel::getTableValue('member', ['member_id' => $param['member_id']], 'member_name');
+        $param['member_name']       = $member_name;
+        $param['seller_name']       = $member_name;
+        //$param['sc_name']           = BModel::getTableValue('goods_class', ['sc_id' => $param['sc_id']], 'sc_name');
+        DB::table('store_joinin')->insertGetId($param);
+        return Base::jsonReturn(200, '提交成功');
     }
 
     /**第二步
