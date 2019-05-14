@@ -764,9 +764,8 @@ class StoreController extends Base
             $condition['os_year'] = '2019';
         }
         $os_month = BModel::getTableAllData('order_statis', $condition, ['os_month']);
-        $result            = [];
         if ($os_month->isEmpty()) {
-            $data['list']      = null;
+            $data['list']      = [];
             $data['y_jiesuan'] = 0;//已结算
             $data['d_jiesuan'] = 0;//未结算
         } else {
