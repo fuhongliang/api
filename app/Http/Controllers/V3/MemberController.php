@@ -139,7 +139,7 @@ class MemberController extends Base
 //                    'c.member_id', 'c.member_name', 'c.member_mobile'];
 //                $data                                     = Store::getStoreAndJoinInfo(['a.member_id' => $storeInfo->member_id], $field);
                 $member_id                                = $memberInfo->member_id;
-                $data                                     = BModel::getTableFirstData('member', ['member_id' => $member_id]);
+                $data                                     = BModel::getTableFirstData('member', ['member_id' => $member_id],['member_id','member_name']);
                 $data->business_licence_number_electronic = 'upload/shop/store_joinin/06075408577995264.png';
                 $data->token                              = Base::makeToken($member_name);
                 $token_data                               = array(
