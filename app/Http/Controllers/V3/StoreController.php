@@ -916,6 +916,7 @@ class StoreController extends Base
         $param['paying_amount']            = BModel::getTableValue('store_grade',['sg_id'=>1],'sg_price');
         $param['sg_info']                  = serialize(["sg_price" => $param['paying_amount']]);
         $param['joinin_state']             = 11;
+
         $res                               = BModel::upTableData('store_joinin', ['member_id' => $member_id], $param);
         if ($res) {
             return Base::jsonReturn(200, '提交成功');
