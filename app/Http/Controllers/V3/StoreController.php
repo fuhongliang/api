@@ -301,7 +301,7 @@ class StoreController extends Base
         if (strlen(trim($new_passwd)) < 6) {
             return Base::jsonReturn(2002, '密码最少6位');
         }
-        $code = Cache::get($phone_number);
+        $code = Redis::get($phone_number);
         if (!$code || $code !== $verify_code) {
             return Base::jsonReturn(2003, '验证码错误');
         } else {
