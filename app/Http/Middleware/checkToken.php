@@ -25,7 +25,7 @@ class checkToken
         if (!$token) {
             return Base::jsonReturn(3000, 'token缺失');
         } else {
-            $token = Token::getTokenField(['token' => $token], ['token', 'expire_time', 'store_id']);
+            $token = Token::getTokenField(['token' => $token], ['token', 'expire_time']);
             if (empty($token)) {
                 return Base::jsonReturn(3001, '账号已在其他设备登录');
             } else {
