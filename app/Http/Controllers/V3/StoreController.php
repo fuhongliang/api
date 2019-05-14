@@ -914,7 +914,7 @@ class StoreController extends Base
         $param['sg_id']                    = 1;
         $param['sg_name']                  = "系统默认";
         $param['paying_amount']            = BModel::getTableValue('store_grade',['sg_id'=>1],'sg_price');
-        $param['sg_info']                  = ["sg_price" => $paying_amount];
+        $param['sg_info']                  = ["sg_price" => $param['paying_amount']];
         $param['joinin_state']             = 11;
         $res                               = BModel::upTableData('store_joinin', ['member_id' => $member_id], $param);
         if ($res) {
