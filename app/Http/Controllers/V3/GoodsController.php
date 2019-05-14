@@ -234,7 +234,7 @@ class GoodsController extends Base
         $goods['is_presell']             = $common_array['is_presell'];
         $goods['is_own_shop']            = $common_array['is_own_shop'];
         $goods['goods_stcid']            = $class_id;
-        dd($goods);
+
         $goods_id                        = Goods::addGoods($goods);
         if ($goods_id) {
             return Base::jsonReturn(200, '添加成功');
