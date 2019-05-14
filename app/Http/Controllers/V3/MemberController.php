@@ -126,6 +126,8 @@ class MemberController extends Base
     {
         $member_name   = $request->input('member_name');
         $member_passwd = $request->input('member_passwd');
+        $app_type      = $request->input('app_type');
+        $device_tokens = $request->input('device_tokens');
         if (empty($member_name) || empty($member_passwd)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
@@ -178,6 +180,12 @@ class MemberController extends Base
                         return Base::jsonReturn(200, '获取成功', $data);
                     }
                 }
+                $um_data = array(
+                    'app_type' => $app_type,
+                    'device_tokens' => $device_tokens,
+                    'member_id' => $member_id
+                );
+                BModel::insertData('umeng', $um_data);
                 return Base::jsonReturn(200, '获取成功', ['joinin_url' => $joinin_url]);
 
             } else {
