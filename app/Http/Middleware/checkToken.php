@@ -27,7 +27,7 @@ class checkToken
         } else {
             $token = Token::getTokenField(['token' => $token], ['token', 'expire_time']);
             if (empty($token)) {
-                return Base::jsonReturn(3001, '账号已在其他设备登录');
+                return Base::jsonReturn(3001, 'token失效或账号已在其他设备登录');
             } else {
                 $time = time();
                 if ($time > $token->expire_time) {
