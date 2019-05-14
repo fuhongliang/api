@@ -998,10 +998,10 @@ class StoreController extends Base
      */
     function areaList(Request $request)
     {
-        if (!$data = json_decode(Redis::get('arealist'))) {
+       // if (!$data = json_decode(Redis::get('arealist'))) {
             $data = Store::getAreaList();
-            Redis::set('arealist', json_encode($data));
-        }
+       //     Redis::set('arealist', json_encode($data));
+     //   }
 
         return Base::jsonReturn(200, '获取成功', $data);
     }
