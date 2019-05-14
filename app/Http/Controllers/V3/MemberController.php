@@ -51,7 +51,7 @@ class MemberController extends Base
         if (!preg_match("/^1[34578]{1}\d{9}$/", $phone_number)) {
             return Base::jsonReturn(2000, '手机号格式不正确');
         }
-        if (BModel::getCount('store_register_tmp',['mobile_phone'=>$phone_number])>0) {
+        if (BModel::getCount('store_register_tmp', ['mobile_phone' => $phone_number]) > 0) {
             return Base::jsonReturn(2001, '手机号已存在申请记录');
         }
         $code = Redis::get($phone_number);
@@ -69,20 +69,20 @@ class MemberController extends Base
                 'member_old_login_time' => time()
             );
             $member_id   = Member::MemberRegister($member_data);
-            $regtmp_data = array(
-                'member_id' => $member_id,
-                'mobile_phone' => $phone_number,
-                'password' => md5($password),
-                'add_time' => time()
-            );
-            $res         = Member::insertMemberRegTmpData($regtmp_data);
-            $um_data     = array(
+//            $regtmp_data = array(
+//                'member_id' => $member_id,
+//                'mobile_phone' => $phone_number,
+//                'password' => md5($password),
+//                'add_time' => time()
+//            );
+//            $res         = Member::insertMemberRegTmpData($regtmp_data);
+            $um_data = array(
                 'app_type' => $app_type,
                 'device_tokens' => $device_tokens,
                 'member_id' => $member_id
             );
             BModel::insertData('umeng', $um_data);
-            if ($res) {
+            if ($member_id) {
                 $joinin_url = "";
                 if (BModel::getCount('store_joinin', ['member_id' => $member_id]) == 0) {
                     //从来没申请过，开始入住
@@ -129,49 +129,49 @@ class MemberController extends Base
         if (empty($member_name) || empty($member_passwd)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        $storeInfo = BModel::getTableFirstData('store_register_tmp',['mobile_phone'=>$member_name]);
-        if ($storeInfo) {
-            if (md5($member_passwd) == $storeInfo->password) {
+        $memberInfo = BModel::getTableFirstData('member', ['member_mobile' => $member_name]);
+        if ($memberInfo) {
+            if (md5($member_passwd) == $memberInfo->password) {
 //                $field                                    = ['a.store_id', 'a.store_name', 'a.store_phone', 'a.store_avatar',
 //                    'a.area_info', 'a.store_address', 'a.work_start_time', 'a.work_end_time',
 //                    'a.store_state', 'a.store_description', 'a.work_start_time', 'a.work_end_time',
 //                    'b.business_licence_number_electronic',
 //                    'c.member_id', 'c.member_name', 'c.member_mobile'];
 //                $data                                     = Store::getStoreAndJoinInfo(['a.member_id' => $storeInfo->member_id], $field);
-
-                $data                                     = BModel::getTableFirstData('store_register_tmp',['member_id' => $storeInfo->member_id]);
+                $member_id                                = $memberInfo->member_id;
+                $data                                     = BModel::getTableFirstData('member', ['member_id' => $member_id]);
                 $data->business_licence_number_electronic = 'upload/shop/store_joinin/06075408577995264.png';
                 $data->token                              = Base::makeToken($member_name);
                 $token_data                               = array(
-                    'member_id' => $storeInfo->member_id,
+                    'member_id' => $member_id,
                     'token' => $data->token,
                     'add_time' => time(),
                     'expire_time' => time() + 24 * 5 * 3600
                 );
                 Token::addToken($token_data);
-                $old_token = Redis::get($data->member_id);
+                $old_token = Redis::get($member_id);
                 if ($old_token) {
                     BModel::delData('token', ['token' => $old_token]);
                 }
                 Redis::setex($data->member_id, 60 * 60 * 24 * 7, $data->token);
                 $joinin_url = "";
-                if (BModel::getCount('store_joinin', ['member_id' => $storeInfo->member_id]) == 0) {
+                if (BModel::getCount('store_joinin', ['member_id' => $member_id]) == 0) {
                     //从来没申请过，开始入住
-                    $joinin_url = "http://47.111.27.189:2000/#/" . $storeInfo->member_id;
+                    $joinin_url = "http://47.111.27.189:2000/#/" . $member_id;
                 } else {
-                    $joinin_state = BModel::getTableValue('store_joinin', ['member_id' => $storeInfo->member_id], 'joinin_state');
+                    $joinin_state = BModel::getTableValue('store_joinin', ['member_id' => $member_id], 'joinin_state');
                     if ($joinin_state == 10) {
-                        $joinin_url = "http://47.111.27.189:2000/#/checks/" . $storeInfo->member_id;
+                        $joinin_url = "http://47.111.27.189:2000/#/checks/" . $member_id;
                         //已经提交申请，待审核
                     } elseif ($joinin_state == 20) {
-                        $joinin_url = "http://47.111.27.189:2000/#/application/" . $storeInfo->member_id;
+                        $joinin_url = "http://47.111.27.189:2000/#/application/" . $member_id;
                     } elseif ($joinin_state == 30) {
-                        $joinin_url = "http://47.111.27.189:2000/#/checkf/" . $storeInfo->member_id;
+                        $joinin_url = "http://47.111.27.189:2000/#/checkf/" . $member_id;
                     } elseif ($joinin_state == 11) {
                         //第二部已提交，待审核页面
-                        $joinin_url = "http://47.111.27.189:2000/#/pwait/" . $storeInfo->member_id;
+                        $joinin_url = "http://47.111.27.189:2000/#/pwait/" . $member_id;
                     } elseif ($joinin_state == 31) {
-                        $joinin_url = " http://47.111.27.189:2000/#/pfailed/" . $storeInfo->member_id;
+                        $joinin_url = " http://47.111.27.189:2000/#/pfailed/" . $member_id;
                         //缴费审核失败页面
                     }
                 }
@@ -181,7 +181,7 @@ class MemberController extends Base
                 return Base::jsonReturn(1001, '账号或密码错误');
             }
         } else {
-            return Base::jsonReturn(1003, '你还不是商家');
+            return Base::jsonReturn(1003, '用户不存在');
         }
     }
 }
