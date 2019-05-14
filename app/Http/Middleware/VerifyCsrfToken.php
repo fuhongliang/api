@@ -12,6 +12,6 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        'joininStep1','joininStep2'
+        'store_joinin_step1','store_joinin_step2'
     ];
 }
