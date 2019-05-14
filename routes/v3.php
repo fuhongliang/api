@@ -93,6 +93,7 @@ Route::group(['namespace' => 'V3', 'middleware' => ['checktoken']], function () 
     Route::post('msg_info', 'StoreController@msgInfo');//消息详情
 
     Route::post('change_avator', 'StoreController@changeAvator');//店铺换头像
+    Route::post('member_logout', 'StoreController@memberLogout');//退出登录
 
 
 

@@ -1081,4 +1081,26 @@ class StoreController extends Base
         $data = DB::table('store_grade')->get(['sg_id', 'sg_name', 'sg_price']);
         return Base::jsonReturn(200, '获取成功', $data->isEmpty() ? null : $data->toArray());
     }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    static function memberLogout(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        if (!$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!Base::checkStoreExist($store_id)) {
+            return Base::jsonReturn(2000, '商家不存在');
+        }
+        $member_id=BModel::getTableValue('store',['store_id'=>$store_id],'member_id');
+        $res =BModel::delData('umeng',['member_id'=>$member_id]);
+        if ($res) {
+            return Base::jsonReturn(200, '退出成功');
+        } else {
+            return Base::jsonReturn(2001, '退出失败');
+        }
+    }
 }
