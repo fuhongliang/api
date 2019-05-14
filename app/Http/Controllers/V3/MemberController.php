@@ -161,7 +161,6 @@ class MemberController extends Base
                         $data  = Store::getStoreAndJoinInfo(['a.member_id' => $member_id], $field);
 
                         //$data                                     = BModel::getTableFieldFirstData('member', ['member_id' => $member_id],['member_id','member_name']);
-                        $data->business_licence_number_electronic = 'upload/shop/store_joinin/06075408577995264.png';
                         $data->token                              = Base::makeToken($member_name);
                         $token_data                               = array(
                             'member_id' => $member_id,
