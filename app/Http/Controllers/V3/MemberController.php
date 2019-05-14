@@ -158,7 +158,7 @@ class MemberController extends Base
                             'a.store_state', 'a.store_description', 'a.work_start_time', 'a.work_end_time',
                             'b.business_licence_number_electronic',
                             'c.member_id', 'c.member_name', 'c.member_mobile'];
-                        $data      = Store::getStoreAndJoinInfo(['a.member_id' => $storeInfo->member_id], $field);
+                        $data      = Store::getStoreAndJoinInfo(['a.member_id' => $member_id], $field);
 
                         //$data                                     = BModel::getTableFieldFirstData('member', ['member_id' => $member_id],['member_id','member_name']);
                         $data->business_licence_number_electronic = 'upload/shop/store_joinin/06075408577995264.png';
