@@ -113,11 +113,9 @@ class GoodsController extends Base
             return Base::jsonReturn(2000, '商家不存在');
         }
         if (!$goods_storage) {
-            $goods_storage    = 0;
             $goods['is_much'] = 2;
         } else {
             $goods_storage    = intval($goods_storage);
-            $goods['is_much'] = 1;
         }
 
         $bind_class = Store::getStoreBindClass(['store_id' => $store_id], ['class_1', 'class_2', 'class_3']);
