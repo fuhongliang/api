@@ -35,7 +35,6 @@ class checkToken
                 }
             }
         }
-
         return $next($request);
     }
 }
