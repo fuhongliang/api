@@ -114,6 +114,7 @@ class GoodsController extends Base
         }
         if (!$goods_storage) {
             $goods['is_much'] = 2;
+            $goods_storage    = 0
         } else {
             $goods_storage    = intval($goods_storage);
         }
