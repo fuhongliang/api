@@ -443,7 +443,7 @@ class Store extends BModel
         foreach ($data as $key => &$val) {
             $val->children = BModel::getTableAllData('area', ['area_parent_id' => $val->id], ['area_id as id', 'area_name as city'])->toArray();
             foreach ($val->children as &$v) {
-                $v->children = BModel::getTableAllData('area', ['area_parent_id' => $val->id], ['area_id as id', 'area_name as area'])->toArray();
+                $v->children = BModel::getTableAllData('area', ['area_parent_id' => $v->id], ['area_id as id', 'area_name as area'])->toArray();
             }
         }
         return $data;
