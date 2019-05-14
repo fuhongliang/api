@@ -112,12 +112,7 @@ class GoodsController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
-        if (!$goods_storage) {
-            $goods['is_much'] = 2;
-            $goods_storage    = 0;
-        } else {
-            $goods_storage    = intval($goods_storage);
-        }
+
 
         $bind_class = Store::getStoreBindClass(['store_id' => $store_id], ['class_1', 'class_2', 'class_3']);
 
@@ -198,6 +193,12 @@ class GoodsController extends Base
         $goods['goods_jingle']   = $common_array['goods_jingle'];
         $goods['store_id']       = $common_array['store_id'];
         $goods['store_name']     = '';
+        if (!$goods_storage) {
+            $goods['is_much'] = 2;
+            $goods_storage    = 0;
+        } else {
+            $goods_storage    = intval($goods_storage);
+        }
 
         $goods['gc_id']                  = $common_array['gc_id'];
         $goods['gc_id_1']                = $common_array['gc_id_1'];
@@ -233,6 +234,7 @@ class GoodsController extends Base
         $goods['is_presell']             = $common_array['is_presell'];
         $goods['is_own_shop']            = $common_array['is_own_shop'];
         $goods['goods_stcid']            = $class_id;
+        dd($goods);
         $goods_id                        = Goods::addGoods($goods);
         if ($goods_id) {
             return Base::jsonReturn(200, '添加成功');
