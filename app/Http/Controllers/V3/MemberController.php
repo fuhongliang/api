@@ -128,7 +128,7 @@ class MemberController extends Base
         $member_passwd = $request->input('member_passwd');
         $app_type      = $request->input('app_type');
         $device_tokens = $request->input('device_tokens');
-        if (empty($member_name) || empty($member_passwd)) {
+        if (empty($member_name) || empty($member_passwd)|| empty($app_type) || empty($device_tokens)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
         $memberInfo = BModel::getTableFirstData('member', ['member_mobile' => $member_name]);
