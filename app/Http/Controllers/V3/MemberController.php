@@ -28,9 +28,6 @@ class MemberController extends Base
         if (!preg_match("/^1[34578]{1}\d{9}$/", $phone_number)) {
             return Base::jsonReturn(1000, '手机号格式不正确');
         }
-        if (!Member::checkStorePhoneExist(['store_phone' => $phone_number]) || !Member::checkStoreJoinPhoneExist(['contacts_phone' => $phone_number]) || !Member::checkStoreRegTmpExist(['mobile_phone' => $phone_number])) {
-            return Base::jsonReturn(1001, '手机号已存在申请记录');
-        }
         return Base::jsonReturn(200, '可以注册');
     }
 
