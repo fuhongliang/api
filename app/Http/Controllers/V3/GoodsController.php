@@ -112,6 +112,10 @@ class GoodsController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
+        if(!$goods_storage)
+        {
+            $goods['is_much']           =2;
+        }
 
         $bind_class = Store::getStoreBindClass(['store_id' => $store_id], ['class_1', 'class_2', 'class_3']);
 
@@ -209,7 +213,7 @@ class GoodsController extends Base
         $goods['goods_verify']           = $common_array['goods_verify'];
         $goods['goods_addtime']          = time();
         $goods['goods_edittime']         = time();
-        $goods['goods_storage']          = !empty($goods_storage) ? intval($goods_storage) : 200;
+        $goods['goods_storage']          = !empty($goods_storage) ? intval($goods_storage) : 999;
         $goods['areaid_1']               = $common_array['areaid_1'];
         $goods['areaid_2']               = $common_array['areaid_2'];
         $goods['color_id']               = 0;
