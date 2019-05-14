@@ -115,6 +115,7 @@ class GoodsController extends Base
         if (!$goods_storage) {
             $goods['is_much'] = 2;
         } else {
+            $goods['is_much'] = 1;
             $goods['goods_storage'] = intval($goods_storage);
         }
         $bind_class = Store::getStoreBindClass(['store_id' => $store_id], ['class_1', 'class_2', 'class_3']);
