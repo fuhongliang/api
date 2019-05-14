@@ -153,12 +153,12 @@ class MemberController extends Base
                         $joinin_url = " http://47.111.27.189:2000/#/pfailed/" . $member_id;
                         //缴费审核失败页面
                     } elseif ($joinin_state == 40) {
-                        $field     = ['a.store_id', 'a.store_name', 'a.store_phone', 'a.store_avatar',
+                        $field = ['a.store_id', 'a.store_name', 'a.store_phone', 'a.store_avatar',
                             'a.area_info', 'a.store_address', 'a.work_start_time', 'a.work_end_time',
                             'a.store_state', 'a.store_description', 'a.work_start_time', 'a.work_end_time',
                             'b.business_licence_number_electronic',
                             'c.member_id', 'c.member_name', 'c.member_mobile'];
-                        $data      = Store::getStoreAndJoinInfo(['a.member_id' => $member_id], $field);
+                        $data  = Store::getStoreAndJoinInfo(['a.member_id' => $member_id], $field);
 
                         //$data                                     = BModel::getTableFieldFirstData('member', ['member_id' => $member_id],['member_id','member_name']);
                         $data->business_licence_number_electronic = 'upload/shop/store_joinin/06075408577995264.png';
@@ -178,9 +178,8 @@ class MemberController extends Base
                         $data->joinin_url = '';
                         return Base::jsonReturn(200, '获取成功', $data);
                     }
-
                 }
-                return Base::jsonReturn(200, '获取成功', ['joinin_url'=>$joinin_url]);
+                return Base::jsonReturn(200, '获取成功', ['joinin_url' => $joinin_url]);
 
             } else {
                 return Base::jsonReturn(1001, '账号或密码错误');
