@@ -131,7 +131,7 @@ class MemberController extends Base
         }
         $memberInfo = BModel::getTableFirstData('member', ['member_mobile' => $member_name]);
         if ($memberInfo) {
-            if (md5($member_passwd) == $memberInfo->password) {
+            if (md5($member_passwd) == $memberInfo->member_passwd) {
 //                $field                                    = ['a.store_id', 'a.store_name', 'a.store_phone', 'a.store_avatar',
 //                    'a.area_info', 'a.store_address', 'a.work_start_time', 'a.work_end_time',
 //                    'a.store_state', 'a.store_description', 'a.work_start_time', 'a.work_end_time',
