@@ -136,6 +136,12 @@ class MemberController extends Base
             $member_id = $memberInfo->member_id;
             if (md5($member_passwd) == $memberInfo->member_passwd) {
                 $joinin_url = "";
+                $um_data = array(
+                    'app_type' => $app_type,
+                    'device_tokens' => $device_tokens,
+                    'member_id' => $member_id
+                );
+                BModel::insertData('umeng', $um_data);
                 if (BModel::getCount('store_joinin', ['member_id' => $member_id]) == 0) {
                     //从来没申请过，开始入住
                     $joinin_url = "http://47.111.27.189:2000/#/" . $member_id;
@@ -180,12 +186,7 @@ class MemberController extends Base
                         return Base::jsonReturn(200, '获取成功', $data);
                     }
                 }
-                $um_data = array(
-                    'app_type' => $app_type,
-                    'device_tokens' => $device_tokens,
-                    'member_id' => $member_id
-                );
-                BModel::insertData('umeng', $um_data);
+
                 return Base::jsonReturn(200, '获取成功', ['joinin_url' => $joinin_url]);
 
             } else {
