@@ -8,6 +8,7 @@ use Overtrue\EasySms\EasySms;
 
 class BaseController extends Controller
 {
+
     /**
      * @param $store_id
      * @return bool
