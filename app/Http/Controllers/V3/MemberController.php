@@ -131,6 +131,7 @@ class MemberController extends Base
         }
         $memberInfo = BModel::getTableFirstData('member', ['member_mobile' => $member_name]);
         if ($memberInfo) {
+            $member_id = $memberInfo->member_id;
             if (md5($member_passwd) == $memberInfo->member_passwd) {
                 $joinin_url = "";
                 if (BModel::getCount('store_joinin', ['member_id' => $member_id]) == 0) {
@@ -158,7 +159,7 @@ class MemberController extends Base
                             'b.business_licence_number_electronic',
                             'c.member_id', 'c.member_name', 'c.member_mobile'];
                         $data      = Store::getStoreAndJoinInfo(['a.member_id' => $storeInfo->member_id], $field);
-                        $member_id = $memberInfo->member_id;
+
                         //$data                                     = BModel::getTableFieldFirstData('member', ['member_id' => $member_id],['member_id','member_name']);
                         $data->business_licence_number_electronic = 'upload/shop/store_joinin/06075408577995264.png';
                         $data->token                              = Base::makeToken($member_name);
@@ -174,10 +175,13 @@ class MemberController extends Base
                             BModel::delData('token', ['token' => $old_token]);
                         }
                         Redis::setex($data->member_id, 60 * 60 * 24 * 7, $data->token);
+                        $data->joinin_url = '';
+                        return Base::jsonReturn(200, '获取成功', $data);
                     }
+
                 }
-                $data->joinin_url = $joinin_url;
-                return Base::jsonReturn(200, '获取成功', $data);
+                return Base::jsonReturn(200, '获取成功', ['joinin_url'=>$joinin_url]);
+
             } else {
                 return Base::jsonReturn(1001, '账号或密码错误');
             }
