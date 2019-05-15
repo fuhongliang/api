@@ -193,7 +193,7 @@ class MemberController extends Base
                 return Base::jsonReturn(1001, '账号或密码错误');
             }
         } else {
-            return Base::jsonReturn(1003, '用户不存在');
+            return Base::jsonReturn(1003, '用户不存在',['joinin_url' => '']);
         }
     }
 }
