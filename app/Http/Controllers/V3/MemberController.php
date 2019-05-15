@@ -60,7 +60,7 @@ class MemberController extends Base
             return Base::jsonReturn(2002, '验证码错误');
         } else {
             $member_data = array(
-                'member_name' => '未设置',
+                'member_name' => '未设置_'.time(),
                 'member_passwd' => md5($password),
                 'member_email' => '',
                 'member_mobile' => $phone_number,
