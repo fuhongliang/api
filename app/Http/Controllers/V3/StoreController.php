@@ -1043,7 +1043,6 @@ class StoreController extends Base
                 'b.business_licence_number_electronic',
                 'c.member_id', 'c.member_name', 'c.member_mobile'];
             $data                                     = Store::getStoreAndJoinInfo(['a.member_id' => $member_info->member_id], $field);
-            $data->business_licence_number_electronic = getenv('WEB_URL') . 'upload/shop/store_joinin/06075408577995264.png';
             $data->token                              = Base::makeToken($data->store_id, $member_info->member_name);
             return Base::jsonReturn(200, '获取成功', $data);
         } else {

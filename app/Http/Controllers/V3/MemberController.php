@@ -86,21 +86,21 @@ class MemberController extends Base
                 $joinin_url = "";
                 if (BModel::getCount('store_joinin', ['member_id' => $member_id]) == 0) {
                     //从来没申请过，开始入住
-                    $joinin_url = "http://47.111.27.189:2000/#/" . $member_id;
+                    $joinin_url = getenv('HOST_URL')."/#/" . $member_id;
                 } else {
                     $joinin_state = BModel::getTableValue('store_joinin', ['member_id' => $member_id], 'joinin_state');
                     if ($joinin_state == 10) {
-                        $joinin_url = "http://47.111.27.189:2000/#/checks/" . $member_id;
+                        $joinin_url = getenv('HOST_URL')."/#/checks/" . $member_id;
                         //已经提交申请，待审核
                     } elseif ($joinin_state == 20) {
-                        $joinin_url = "http://47.111.27.189:2000/#/application/" . $member_id;
+                        $joinin_url = getenv('HOST_URL')."/#/application/" . $member_id;
                     } elseif ($joinin_state == 30) {
-                        $joinin_url = "http://47.111.27.189:2000/#/checkf/" . $member_id;
+                        $joinin_url = getenv('HOST_URL')."/#/checkf/" . $member_id;
                     } elseif ($joinin_state == 11) {
                         //第二部已提交，待审核页面
-                        $joinin_url = "http://47.111.27.189:2000/#/pwait/" . $member_id;
+                        $joinin_url = getenv('HOST_URL')."/#/pwait/" . $member_id;
                     } elseif ($joinin_state == 31) {
-                        $joinin_url = " http://47.111.27.189:2000/#/pfailed/" . $member_id;
+                        $joinin_url = getenv('HOST_URL')."/#/pfailed/" . $member_id;
                         //缴费审核失败页面
                     }
                 }
@@ -144,21 +144,21 @@ class MemberController extends Base
                 BModel::insertData('umeng', $um_data);
                 if (BModel::getCount('store_joinin', ['member_id' => $member_id]) == 0) {
                     //从来没申请过，开始入住
-                    $joinin_url = "http://47.111.27.189:2000/#/" . $member_id;
+                    $joinin_url = getenv('HOST_URL')."/#/" . $member_id;
                 } else {
                     $joinin_state = BModel::getTableValue('store_joinin', ['member_id' => $member_id], 'joinin_state');
                     if ($joinin_state == 10) {
-                        $joinin_url = "http://47.111.27.189:2000/#/checks/" . $member_id;
+                        $joinin_url = getenv('HOST_URL')."/#/checks/" . $member_id;
                         //已经提交申请，待审核
                     } elseif ($joinin_state == 20) {
-                        $joinin_url = "http://47.111.27.189:2000/#/application/" . $member_id;
+                        $joinin_url = getenv('HOST_URL')."/#/application/" . $member_id;
                     } elseif ($joinin_state == 30) {
-                        $joinin_url = "http://47.111.27.189:2000/#/checkf/" . $member_id;
+                        $joinin_url = getenv('HOST_URL')."/#/checkf/" . $member_id;
                     } elseif ($joinin_state == 11) {
                         //第二部已提交，待审核页面
-                        $joinin_url = "http://47.111.27.189:2000/#/pwait/" . $member_id;
+                        $joinin_url = getenv('HOST_URL')."/#/pwait/" . $member_id;
                     } elseif ($joinin_state == 31) {
-                        $joinin_url = " http://47.111.27.189:2000/#/pfailed/" . $member_id;
+                        $joinin_url = getenv('HOST_URL')."/#/pfailed/" . $member_id;
                         //缴费审核失败页面
                     } elseif ($joinin_state == 40) {
                         $field = ['a.store_id', 'a.store_name', 'a.store_phone', 'a.store_avatar',
