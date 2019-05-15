@@ -116,8 +116,6 @@ class MemberController extends Base
 
 
     }
-
-
     /** 用户登录
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
