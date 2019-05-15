@@ -12,7 +12,7 @@ class Order extends BModel
 
     static function getNewOrder($condition, $fields = ['*'])
     {
-        $order_info = BModel::getTableAllData('order', $condition, $fields);
+        $order_info = DB::table('order')->where($condition)->orderBy('payment_time','desc')->get($fields);
         if (empty($order_info)) {
             return array();
         }
