@@ -34,6 +34,10 @@ class VoucherController extends Base
         if (!$store_id || !$voucher_t_title || !$voucher_t_price || !$limit || !$describe || !$enddate || !$total || !$eachlimit) {
             return Base::jsonReturn(1000, '参数缺失');
         }
+        if(intval($limit)<0 || intval($limit)>999999)
+        {
+            return Base::jsonReturn(2000, '使用条件金额不正确');
+        }
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
