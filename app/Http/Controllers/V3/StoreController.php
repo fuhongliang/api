@@ -428,7 +428,7 @@ class StoreController extends Base
         $result['30_orderamount']    = $money_30;
         $result['store_collect']     = $store_collect_data;
         $result['goods_num']         = $goods_num;
-        $result['jingying_url']      =getenv('HOST_URL')."/#/manage/" . $store_id;
+        $result['jingying_url']      = getenv('HOST_URL') . "/#/manage/" . $store_id;
         return Base::jsonReturn(200, '获取成功', $result);
     }
 
@@ -889,8 +889,12 @@ class StoreController extends Base
         $param['joinin_state']                       = 10;
         $store_class_ids[]                           = "959,961,979,";//$request->input('store_class_ids') . ',';
         $store_class_names[]                         = "玩具乐器,DIY玩具,绘画工具,";//$request->input('store_class_names') . ',';
-
-        $param['store_class_commis_rates'] = BModel::getTableValue('goods_class', ['gc_id' => $param['sc_id']], 'commis_rate');
+        $param['sg_id']                              = 1;
+        $param['sg_name']                            = "系统默认";
+        $paying_amount                               = BModel::getTableValue('store_grade', ['sg_id' => 1], 'sg_price');
+        $param['paying_amount']                      = !$paying_amount ? 1000 : $paying_amount;
+        $param['sg_info']                            = serialize(["sg_price" => 1000]);
+        $param['store_class_commis_rates']           = BModel::getTableValue('goods_class', ['gc_id' => $param['sc_id']], 'commis_rate');
         if (BModel::getCount('store_joinin', ['member_id' => $param['member_id']]) > 0) {
             return Base::jsonReturn(2000, '店铺已存在申请记录');
         }
@@ -912,11 +916,8 @@ class StoreController extends Base
     {
         $member_id                         = $request->input('member_id');
         $param['paying_money_certificate'] = $request->input('paying_money_certificate');
-        $param['sg_id']                    = 1;
-        $param['sg_name']                  = "系统默认";
-        $param['paying_amount']            = BModel::getTableValue('store_grade', ['sg_id' => 1], 'sg_price');
-        $param['sg_info']                  = serialize(["sg_price" => $param['paying_amount']]);
-        $param['joinin_state']             = 11;
+
+        $param['joinin_state'] = 11;
 
         $res = BModel::upTableData('store_joinin', ['member_id' => $member_id], $param);
         if ($res) {
@@ -1037,13 +1038,13 @@ class StoreController extends Base
         $member_info = BModel::getTableFirstData('store', ['store_id' => $store_id], ['member_id', 'member_name']);
         $res         = Store::upTableData('store', ['store_id' => $store_id], ['store_avatar' => $avator]);
         if ($res) {
-            $field                                    = ['a.store_id', 'a.store_name', 'a.store_phone', 'a.store_avatar',
+            $field       = ['a.store_id', 'a.store_name', 'a.store_phone', 'a.store_avatar',
                 'a.area_info', 'a.store_address', 'a.work_start_time', 'a.work_end_time',
                 'a.store_state', 'a.store_description', 'a.work_start_time', 'a.work_end_time',
                 'b.business_licence_number_electronic',
                 'c.member_id', 'c.member_name', 'c.member_mobile'];
-            $data                                     = Store::getStoreAndJoinInfo(['a.member_id' => $member_info->member_id], $field);
-            $data->token                              = Base::makeToken($data->store_id, $member_info->member_name);
+            $data        = Store::getStoreAndJoinInfo(['a.member_id' => $member_info->member_id], $field);
+            $data->token = Base::makeToken($data->store_id, $member_info->member_name);
             return Base::jsonReturn(200, '获取成功', $data);
         } else {
             return Base::jsonReturn(2001, '获取失败');
@@ -1094,8 +1095,8 @@ class StoreController extends Base
         if (!Base::checkStoreExist($store_id)) {
             return Base::jsonReturn(2000, '商家不存在');
         }
-        $member_id=BModel::getTableValue('store',['store_id'=>$store_id],'member_id');
-        $res =BModel::delData('umeng',['member_id'=>$member_id]);
+        $member_id = BModel::getTableValue('store', ['store_id' => $store_id], 'member_id');
+        $res       = BModel::delData('umeng', ['member_id' => $member_id]);
         if ($res) {
             return Base::jsonReturn(200, '退出成功');
         } else {
