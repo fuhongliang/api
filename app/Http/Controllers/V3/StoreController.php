@@ -428,7 +428,7 @@ class StoreController extends Base
         $result['30_orderamount']    = $money_30;
         $result['store_collect']     = $store_collect_data;
         $result['goods_num']         = $goods_num;
-        $result['jingying_url']      = 'http://47.111.27.189:2000/v3/store_jingying/' . $store_id;
+        $result['jingying_url']      =getenv('HOST_URL')."/#/manage/" . $store_id;
         return Base::jsonReturn(200, '获取成功', $result);
     }
 
