@@ -128,7 +128,7 @@ class MemberController extends Base
         $member_passwd = $request->input('member_passwd');
         $app_type      = $request->input('app_type');
         $device_tokens = $request->input('device_tokens');
-        if (empty($member_name) || empty($member_passwd)|| empty($app_type) || empty($device_tokens)) {
+        if (empty($member_name) || empty($member_passwd) || empty($app_type) || empty($device_tokens)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
         $memberInfo = BModel::getTableFirstData('member', ['member_mobile' => $member_name]);
@@ -136,7 +136,7 @@ class MemberController extends Base
             $member_id = $memberInfo->member_id;
             if (md5($member_passwd) == $memberInfo->member_passwd) {
                 $joinin_url = "";
-                $um_data = array(
+                $um_data    = array(
                     'app_type' => $app_type,
                     'device_tokens' => $device_tokens,
                     'member_id' => $member_id
@@ -169,8 +169,8 @@ class MemberController extends Base
                         $data  = Store::getStoreAndJoinInfo(['a.member_id' => $member_id], $field);
 
                         //$data                                     = BModel::getTableFieldFirstData('member', ['member_id' => $member_id],['member_id','member_name']);
-                        $data->token                              = Base::makeToken($member_name);
-                        $token_data                               = array(
+                        $data->token = Base::makeToken($member_name);
+                        $token_data  = array(
                             'member_id' => $member_id,
                             'token' => $data->token,
                             'add_time' => time(),
