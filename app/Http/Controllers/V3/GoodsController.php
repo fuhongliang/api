@@ -343,8 +343,6 @@ class GoodsController extends Base
             $file_name = $field->goods_image;
             $disk      = QiniuStorage::disk('qiniu');
             $disk->delete($file_name);
-//            $img_path  = '/shop/store/goods' . '/' . $store_id . '/' . $file_name;
-//            Storage::disk('public')->delete($img_path);
         }
         DB::transaction(function () use ($field, $goods_id, $goods_array, $goods_comm) {
             Goods::upGoodsField(['goods_id' => $goods_id], $goods_array);
