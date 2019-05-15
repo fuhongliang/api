@@ -136,6 +136,10 @@ class MemberController extends Base
             $member_id = $memberInfo->member_id;
             if (md5($member_passwd) == $memberInfo->member_passwd) {
                 $joinin_url = "";
+                if(BModel::getCount('umeng',['member_id'=>$member_id])>0)
+                {
+                    BModel::delData('umeng',['member_id'=>$member_id]);
+                }
                 $um_data    = array(
                     'app_type' => $app_type,
                     'device_tokens' => $device_tokens,
