@@ -891,7 +891,7 @@ class StoreController extends Base
         $param['sg_id']                              = 1;
         $param['sg_name']                            = "系统默认";
         $paying_amount                               = BModel::getTableValue('store_grade', ['sg_id' => 1], 'sg_price');
-        $param['paying_amount']                      = !$paying_amount ? 1000 : $paying_amount;
+        $param['paying_amount']                      = 1000;
         $param['sg_info']                            = serialize(["sg_price" => 1000]);
         $param['store_class_commis_rates']           = BModel::getTableValue('goods_class', ['gc_id' => $param['sc_id']], 'commis_rate');
         if (BModel::getCount('store_joinin', ['member_id' => $param['member_id']]) > 0) {
