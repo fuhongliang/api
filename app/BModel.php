@@ -116,4 +116,33 @@ class BModel extends Model
         return   DB::table($table)->where($condition)->sum($field);
     }
 
+    /**
+     * @param $table
+     * @param $sort
+     * @param array $field
+     * @return array
+     */
+    static function getOrderData($table,$sort,$field=['*'])
+    {
+        $data=DB::table($table)->orderBy($sort,'desc')->get($field);
+        return $data->isEmpty() ? array() : $data->toArray();
+    }
+
+    /**
+     * @param $table
+     * @param $lefttable
+     * @param $first
+     * @param $right
+     * @param $condition
+     * @param array $field
+     * @return array
+     */
+    static function getLeftData($table,$lefttable,$first,$right,$condition,$field=['*'])
+    {
+        $data=DB::table($table)
+            ->leftJoin($lefttable,$first,$right)
+            ->where($condition)
+            ->get($field);
+        return $data->isEmpty() ? array() : $data->toArray();
+    }
 }

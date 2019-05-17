@@ -12,8 +12,7 @@
 */
 
 Route::group(['namespace' => 'U1'], function () {
-    Route::any('/',function(){
-        return '6666';
-    });
+    Route::any('index','MemberController@homePage');//首页
+    Route::any('sms_login','MemberController@smsLogin');//验证码登录
 
 });
