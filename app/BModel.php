@@ -143,6 +143,7 @@ class BModel extends Model
             ->leftJoin($lefttable,$first,$right)
             ->where($condition)
             ->get($field);
-        return $data->isEmpty() ? array() : $data->toArray();
+        return $data;
     }
+
 }

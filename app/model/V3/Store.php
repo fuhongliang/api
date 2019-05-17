@@ -66,7 +66,7 @@ class Store extends BModel
     {
         return DB::table('store_goods_class')
             ->where($condition)
-            ->orderBy('stc_sort', 'asc')
+            ->orderBy('stc_id', 'desc')
             ->get($field);
     }
 
