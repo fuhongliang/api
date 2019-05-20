@@ -116,6 +116,18 @@ class BModel extends Model
         return   DB::table($table)->where($condition)->sum($field);
     }
 
+    /**数量自减
+     * @param $table
+     * @param $column
+     * @param $amount
+     * @return int
+     */
+    static function numDecrement($table,$condition,$column,$amount)
+    {
+        return   DB::table($table)->where($condition)->decrement($column, $amount);
+    }
+
+
     /**
      * @param $table
      * @param $sort
