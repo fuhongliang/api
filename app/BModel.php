@@ -80,6 +80,7 @@ class BModel extends Model
      */
     static function getCount($table,$condition)
     {
+
         return DB::table($table)
             ->where($condition)
             ->count();

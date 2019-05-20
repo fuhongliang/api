@@ -156,7 +156,8 @@ class Member extends BModel
      * @param array $goodsid_array
      * @return array
      */
-    static function getGoodsOnlineListAndPromotionByIdArray($goodsid_array) {
+    static function getGoodsOnlineListAndPromotionByIdArray($goodsid_array)
+    {
         if (empty($goodsid_array) || !is_array($goodsid_array)) return array();
 
         $goods_list = array();
@@ -166,31 +167,109 @@ class Member extends BModel
         }
         return $goods_list;
     }
+
     /**
      * 查询出售中的商品详细信息及其促销信息
      * @param int $goods_id
      * @return array
      */
-    static function getGoodsOnlineInfoAndPromotionById($goods_id) {
+    static function getGoodsOnlineInfoAndPromotionById($goods_id)
+    {
         $goods_info = self::getGoodsInfoAndPromotionById($goods_id);
-        if (empty($goods_info) || $goods_info->goods_state != 1|| $goods_info->goods_verify != 1) {
+        if (empty($goods_info) || $goods_info->goods_state != 1 || $goods_info->goods_verify != 1) {
             return array();
         }
         return $goods_info;
     }
+
     /**
      * 查询商品详细信息及其促销信息
      * @param int $goods_id
      * @return array
      */
-    static function getGoodsInfoAndPromotionById($goods_id) {
-        $goods_info = BModel::getTableFirstData('goods',['goods_id'=>$goods_id]);
+    static function getGoodsInfoAndPromotionById($goods_id)
+    {
+        $goods_info = BModel::getTableFirstData('goods', ['goods_id' => $goods_id]);
         if (empty($goods_info)) {
             return array();
         }
         return $goods_info;
     }
 
+    static function getGoodsComData($condition, $field = ['*'])
+    {
+        $data = DB::table('evaluate_goods AS a')
+            ->leftJoin('member as b', 'a.geval_frommemberid', 'b.member_id')
+            ->where($condition)
+            ->orderBy('geval_addtime', 'desc')
+            ->get($field);
+        return $data;
+    }
 
+    static function getManyi($store_id)
+    {
+        return DB::table('store_com')->where('store_id', $store_id)->whereIn('haoping', [1, 2])->count();
+    }
+
+    static function getBuManyi($store_id)
+    {
+        return DB::table('store_com')->where('store_id', $store_id)->whereNotIn('haoping', [1, 2])->count();
+    }
+
+    static function getYoutu($store_id)
+    {
+        return DB::table('store_com')->where('store_id', $store_id)->whereNotNull('images')->count();
+    }
+
+    static function getStoreComList($store_id, $type)
+    {
+        $result = [];
+        $field  = ['a.content', 'a.haoping', 'a.images', 'a.is_replay', 'a.parent_id', 'b.member_name', 'b.member_avatar'];
+        if (!$type) {
+            $data = DB::table('store_com AS a')
+                ->leftJoin('member as b', 'a.member_id', 'b.member_id')
+                ->where('a.store_id', $store_id)
+                ->orderBy('a.add_time', 'desc')
+                ->get($field);
+        } elseif ($type == 1) {
+            $data = DB::table('store_com AS a')
+                ->leftJoin('member as b', 'a.member_id', 'b.member_id')
+                ->where('a.store_id', $store_id)
+                ->whereIn('haoping', [1, 2])
+                ->orderBy('a.add_time', 'desc')
+                ->get($field);
+        } elseif ($type == 2) {
+            $data = DB::table('store_com AS a')
+                ->leftJoin('member as b', 'a.member_id', 'b.member_id')
+                ->where('a.store_id', $store_id)
+                ->whereNotIn('haoping', [1, 2])
+                ->orderBy('a.add_time', 'desc')
+                ->get($field);
+        } elseif ($type == 3) {
+            $data = DB::table('store_com AS a')
+                ->leftJoin('member as b', 'a.member_id', 'b.member_id')
+                ->where('a.store_id', $store_id)
+                ->whereNotNull('images')
+                ->orderBy('a.add_time', 'desc')
+                ->get($field);
+        }
+        if ($data->isEmpty()) {
+            return array();
+        }
+        $datas = $data->toArray();
+        foreach ($datas as $k => $v) {
+            $result[$k]['content']       = $v->content;
+            $result[$k]['haoping']       = $v->haoping;
+            $result[$k]['images']        = explode(',', $v->images);
+            $result[$k]['member_name']   = $v->member_name;
+            $result[$k]['member_avator'] = $v->member_avatar;
+            if ($v->is_replay == 1) {
+                $result[$k]['replay'] = BModel::getTableValue('store_com', ['com_id' => $v->parent_id]);
+            } else {
+                $result[$k]['replay'] = '';
+            }
+        }
+        return $result;
+    }
 
 }

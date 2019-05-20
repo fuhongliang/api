@@ -22,6 +22,20 @@ Route::group(['namespace' => 'U1'], function () {
 
 
     Route::any('store_info','MemberController@storeInfo');//店铺详情
-    Route::any('add_cart','MemberController@addCart');//添加购物车
+    Route::any('add_cart','MemberController@addCart');//添加购物车   如果存在数量+1
+    Route::any('voucher_list','MemberController@voucherList');//店铺代金券列表
+    Route::any('get_voucher','MemberController@getVoucher');//领取代金券
+
+
+    Route::any('goods_detail','MemberController@goodsDetail');//商品详情
+
+    Route::any('store_com','MemberController@storeCom');//评论商家店铺
+
+    Route::any('store_com_list','MemberController@storeComList');//店铺评论列表
+
+    Route::any('store_detail','MemberController@storeDetail');//店铺信息详情
+
+    Route::any('my_cart','MemberController@myCart');//我的购物车
+
 
 });
