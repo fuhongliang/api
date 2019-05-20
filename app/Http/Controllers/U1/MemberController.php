@@ -573,7 +573,7 @@ class MemberController extends Base
             {
                 if($v->bl_id != 0)
                 {
-                    $result[$v->store_id][]=BModel::getTableAllData('p_bundling_goods',['bl_id'=>$v->bl_id],['goods_name','goods_image','bl_goods_price'])->toArray();
+                    $result[$v->store_id][]=BModel::getTableFieldFirstData('p_bundling_goods',['bl_id'=>$v->bl_id],['goods_name','goods_image','bl_goods_price']);
                 }else{
                     $result[$v->store_id][]=$v;
                 }
