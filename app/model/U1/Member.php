@@ -272,4 +272,75 @@ class Member extends BModel
         return $result;
     }
 
+    static function getManSongCount($store_id, $total_amount)
+    {
+        $discount=DB::table('p_mansong_rule as a')
+            ->leftJoin('p_mansong as b','a.mansong_id','b.mansong_id')
+            ->where('a.price','<=',$total_amount)
+            ->where('b.store_id',$store_id)
+            ->orderBy('a.price','desc')
+            ->limit(1)
+            ->value('a.discount');
+        return !$discount ? 0: $discount;
+    }
+    static function getVoucherCount($store_id,$member_id,$amount)
+    {
+        $voucher_price=DB::table('voucher')
+            ->where('voucher_store_id',$store_id)
+            ->where('voucher_owner_id',$member_id)
+            ->where('voucher_limit','<',$amount)
+            ->where('voucher_end_date','<',time())
+            ->orderBy('voucher_price','desc')
+            ->limit(1)
+            ->value('voucher_price');
+        return !$voucher_price ? 0: $voucher_price;
+    }
+    static function getUserVoucherList($store_id,$member_id,$amount)
+    {
+        $voucher=DB::table('voucher')
+            ->where('voucher_store_id',$store_id)
+            ->where('voucher_owner_id',$member_id)
+            ->where('voucher_limit','<',$amount)
+            ->where('voucher_end_date','<',time())
+            ->orderBy('voucher_price','desc')
+            ->get(['voucher_price','voucher_id']);
+        return $voucher->isEmpty()?[]:$voucher->toArray();
+    }
+    static function getAllOrder($member_id)
+    {
+        $data=DB::table('order as a')
+            ->leftJoin('order_common as b','a.order_id','b.order_id')
+            ->leftJoin('store as c','a.store_id','c.store_id')
+            ->where('a.buyer_id',$member_id)
+            ->get(['a.order_id','c.store_name','c.store_avatar','a.order_state']);
+        return $data->isEmpty()?[]:$data->toArray();
+    }
+    static function getEvaluationOrder($member_id)
+    {
+        $data=DB::table('order as a')
+            ->leftJoin('order_common as b','a.order_id','b.order_id')
+            ->leftJoin('store as c','a.store_id','c.store_id')
+            ->where('a.buyer_id',$member_id)
+            ->where('evaluation_state',0)
+            ->get(['a.order_id','c.store_name','c.store_avatar','a.order_state']);
+        return $data->isEmpty()?[]:$data->toArray();
+    }
+    static function getRefundStateOrder($member_id)
+    {
+        $data=DB::table('order as a')
+            ->leftJoin('order_common as b','a.order_id','b.order_id')
+            ->leftJoin('store as c','a.store_id','c.store_id')
+            ->where('a.buyer_id',$member_id)
+            ->where('refund_state',2)
+            ->get(['a.order_id','c.store_name','c.store_avatar','a.order_state']);
+        return $data->isEmpty()?[]:$data->toArray();
+    }
+    static function getBLGoodsMarketprice($bl_id)
+    {
+        return DB::table('goods AS a')
+            ->leftJoin('p_bundling_goods AS b','a.goods_id','b.goods_id')
+            ->where('b.bl_id',$bl_id)
+            ->sum('a.goods_marketprice');
+    }
+
 }

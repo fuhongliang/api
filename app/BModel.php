@@ -128,6 +128,17 @@ class BModel extends Model
         return   DB::table($table)->where($condition)->decrement($column, $amount);
     }
 
+    /**自增
+     * @param $table
+     * @param $condition
+     * @param $column
+     * @param $amount
+     * @return int
+     */
+    static function numIncrement($table,$condition,$column,$amount)
+    {
+        return   DB::table($table)->where($condition)->increment($column, $amount);
+    }
 
     /**
      * @param $table

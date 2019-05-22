@@ -22,7 +22,7 @@ Route::group(['namespace' => 'U1'], function () {
 
 
     Route::any('store_info','MemberController@storeInfo');//店铺详情
-    Route::any('add_cart','MemberController@addCart');//添加购物车   如果存在数量+1
+    Route::any('add_cart','MemberController@addCart');//添加购物车
     Route::any('voucher_list','MemberController@voucherList');//店铺代金券列表
     Route::any('get_voucher','MemberController@getVoucher');//领取代金券
 
@@ -36,6 +36,15 @@ Route::group(['namespace' => 'U1'], function () {
     Route::any('store_detail','MemberController@storeDetail');//店铺信息详情
 
     Route::any('my_cart','MemberController@myCart');//我的购物车
+    Route::any('clear_cart','MemberController@clearCart');//清购物车
+
+    Route::any('go_settlement','MemberController@Settlement');//去结算
+
+    Route::any('buy_step','MemberController@buyStep');//下单
+
+    Route::any('order_list','MemberController@orderList');//订单列表
+
+    Route::any('order_info','MemberController@orderInfo');//订单详情
 
 
 });

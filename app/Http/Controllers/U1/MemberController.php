@@ -288,28 +288,40 @@ class MemberController extends Base
                     return Base::jsonReturn(1004, '库存不足');
                 }
             }
-
-            //优惠套装作为一条记录插入购物车，图片取套装内的第一个商品图
-            $goods_info                = array();
-            $goods_info['store_id']    = $bl_info->store_id;
-            $goods_info['goods_id']    = $goods_list[0]->goods_id;
-            $goods_info['goods_name']  = $bl_info->bl_name;
-            $goods_info['goods_price'] = $bl_amount;
-            $goods_info['goods_num']   = $quantity;
-            $goods_info['goods_image'] = $goods_list[0]->goods_image;
-            $goods_info['store_name']  = $bl_info->store_name;
-            $goods_info['bl_id']       = $goods_id;
-            $goods_info['buyer_id']    = $member_id;
-
-            DB::transaction(function () use ($goods_info, $goods_id_array, $quantity) {
-                BModel::insertData('cart', $goods_info);
-                foreach ($goods_id_array as $goodsid) {
-                    $is_much = BModel::getTableValue('goods', ['goods_id' => $goodsid], 'is_much');
-                    if ($is_much == 1) {
-                        BModel::numDecrement('goods', ['goods_id' => $goodsid], 'goods_storage', $quantity);
+            if (BModel::getCount('cart', ['bl_id' => $goods_id, 'buyer_id' => $member_id]) > 0) {
+                DB::transaction(function () use ($goods_info, $goods_id_array, $quantity, $member_id, $goods_id) {
+                    BModel::numIncrement('cart', ['bl_id' => $goods_id, 'buyer_id' => $member_id], 'goods_num', $quantity);
+                    foreach ($goods_id_array as $goodsid) {
+                        $is_much = BModel::getTableValue('goods', ['goods_id' => $goodsid], 'is_much');
+                        if ($is_much == 1) {
+                            BModel::numDecrement('goods', ['goods_id' => $goodsid], 'goods_storage', $quantity);
+                        }
                     }
-                }
-            });
+                });
+            } else {
+                //优惠套装作为一条记录插入购物车，图片取套装内的第一个商品图
+                $goods_info                = array();
+                $goods_info['store_id']    = $bl_info->store_id;
+                $goods_info['goods_id']    = $goods_list[0]->goods_id;
+                $goods_info['goods_name']  = $bl_info->bl_name;
+                $goods_info['goods_price'] = $bl_amount;
+                $goods_info['goods_num']   = $quantity;
+                $goods_info['goods_image'] = $goods_list[0]->goods_image;
+                $goods_info['store_name']  = $bl_info->store_name;
+                $goods_info['bl_id']       = $goods_id;
+                $goods_info['buyer_id']    = $member_id;
+
+                DB::transaction(function () use ($goods_info, $goods_id_array, $quantity) {
+                    BModel::insertData('cart', $goods_info);
+                    foreach ($goods_id_array as $goodsid) {
+                        $is_much = BModel::getTableValue('goods', ['goods_id' => $goodsid], 'is_much');
+                        if ($is_much == 1) {
+                            BModel::numDecrement('goods', ['goods_id' => $goodsid], 'goods_storage', $quantity);
+                        }
+                    }
+                });
+            }
+
         } elseif ($stc_id == 'xianshi') {
             $xianshi_info = BModel::getTableFirstData('p_xianshi', array('xianshi_id' => $goods_id));
             if (empty($xianshi_info) || $xianshi_info->state == '0' || $xianshi_info->end_time <= time()) {
@@ -341,25 +353,38 @@ class MemberController extends Base
                     return Base::jsonReturn(1004, '库存不足');
                 }
             }
-            $goods_info                = array();
-            $goods_info['store_id']    = $xianshi_info->store_id;
-            $goods_info['goods_id']    = $goods_list[0]->goods_id;
-            $goods_info['goods_name']  = $xianshi_info->xianshi_name;
-            $goods_info['goods_price'] = $xianshi_amount;
-            $goods_info['goods_num']   = $quantity;
-            $goods_info['goods_image'] = $goods_list[0]->goods_image;
-            $goods_info['store_name']  = $xianshi_info->store_name;
-            $goods_info['buyer_id']    = $member_id;
-
-            DB::transaction(function () use ($goods_info, $goods_id_array, $quantity) {
-                BModel::insertData('cart', $goods_info);
-                foreach ($goods_id_array as $goodsid) {
-                    $is_much = BModel::getTableValue('goods', ['goods_id' => $goodsid], 'is_much');
-                    if ($is_much == 1) {
-                        BModel::numDecrement('goods', ['goods_id' => $goodsid], 'goods_storage', $quantity);
+            if (BModel::getCount('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id]) > 0) {
+                DB::transaction(function () use ($goods_info, $goods_id_array, $quantity, $member_id, $goods_id) {
+                    BModel::numIncrement('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id], 'goods_num', $quantity);
+                    foreach ($goods_id_array as $goodsid) {
+                        $is_much = BModel::getTableValue('goods', ['goods_id' => $goodsid], 'is_much');
+                        if ($is_much == 1) {
+                            BModel::numDecrement('goods', ['goods_id' => $goodsid], 'goods_storage', $quantity);
+                        }
                     }
-                }
-            });
+                });
+            } else {
+                $goods_info                = array();
+                $goods_info['store_id']    = $xianshi_info->store_id;
+                $goods_info['goods_id']    = $goods_list[0]->goods_id;
+                $goods_info['goods_name']  = $xianshi_info->xianshi_name;
+                $goods_info['goods_price'] = $xianshi_amount;
+                $goods_info['goods_num']   = $quantity;
+                $goods_info['goods_image'] = $goods_list[0]->goods_image;
+                $goods_info['store_name']  = $xianshi_info->store_name;
+                $goods_info['buyer_id']    = $member_id;
+
+                DB::transaction(function () use ($goods_info, $goods_id_array, $quantity) {
+                    BModel::insertData('cart', $goods_info);
+                    foreach ($goods_id_array as $goodsid) {
+                        $is_much = BModel::getTableValue('goods', ['goods_id' => $goodsid], 'is_much');
+                        if ($is_much == 1) {
+                            BModel::numDecrement('goods', ['goods_id' => $goodsid], 'goods_storage', $quantity);
+                        }
+                    }
+                });
+            }
+
         } else {
             $goods_info = BModel::getTableFirstData('goods', array('goods_id' => $goods_id));
             if (empty($goods_info) || $goods_info->goods_state != 1) {
@@ -372,25 +397,38 @@ class MemberController extends Base
             if ($goods_info->store_id == $storeid) {
                 return Base::jsonReturn(1003, '不能购买自己的商品');
             }
-            $goodsinfo                = array();
-            $goodsinfo['store_id']    = $goods_info->store_id;
-            $goodsinfo['goods_id']    = $goods_id;
-            $goodsinfo['goods_name']  = $goods_info->goods_name;
-            $goodsinfo['goods_price'] = $goods_info->goods_price;
-            $goodsinfo['goods_num']   = $quantity;
-            $goodsinfo['goods_image'] = $goods_info->goods_image;
-            $goodsinfo['store_name']  = $goods_info->store_name;
-            $goodsinfo['buyer_id']    = $member_id;
 
-            DB::transaction(function () use ($goodsinfo, $goods_id, $quantity) {
-                BModel::insertData('cart', $goodsinfo);
+            if (BModel::getCount('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id]) > 0) {
+                DB::transaction(function () use ($quantity, $member_id, $goods_id) {
+                    BModel::numIncrement('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id], 'goods_num', $quantity);
+                    $is_much = BModel::getTableValue('goods', ['goods_id' => $goods_id], 'is_much');
+                    if ($is_much == 1) {
+                        BModel::numDecrement('goods', ['goods_id' => $goods_id], 'goods_storage', $quantity);
+                    }
+                });
+            } else {
+                $goodsinfo                = array();
+                $goodsinfo['store_id']    = $goods_info->store_id;
+                $goodsinfo['goods_id']    = $goods_id;
+                $goodsinfo['goods_name']  = $goods_info->goods_name;
+                $goodsinfo['goods_price'] = $goods_info->goods_price;
+                $goodsinfo['goods_num']   = $quantity;
+                $goodsinfo['goods_image'] = $goods_info->goods_image;
+                $goodsinfo['store_name']  = $goods_info->store_name;
+                $goodsinfo['buyer_id']    = $member_id;
 
-                $is_much = BModel::getTableValue('goods', ['goods_id' => $goods_id], 'is_much');
-                if ($is_much == 1) {
-                    BModel::numDecrement('goods', ['goods_id' => $goods_id], 'goods_storage', $quantity);
-                }
+                DB::transaction(function () use ($goodsinfo, $goods_id, $quantity) {
+                    BModel::insertData('cart', $goodsinfo);
 
-            });
+                    $is_much = BModel::getTableValue('goods', ['goods_id' => $goods_id], 'is_much');
+                    if ($is_much == 1) {
+                        BModel::numDecrement('goods', ['goods_id' => $goods_id], 'goods_storage', $quantity);
+                    }
+
+                });
+            }
+
+
         }
         $data           = [];
         $data['nums']   = BModel::getCount('cart', ['store_id' => $store_id]);
@@ -555,67 +593,278 @@ class MemberController extends Base
         $store_info->sc_name = BModel::getTableValue('store_class', ['sc_id' => $store_info->sc_id], 'sc_name');
         return Base::jsonReturn(200, '获取成功', $store_info);
     }
+
+    /**获取uest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     function myCart(Request $request)
     {
-        $store_id            = $request->input('store_id');
-        $member_id            = $request->input('member_id');
-        $field=['a.*','b.goods_state','b.is_much','b.goods_storage'];
-        $cart=BModel::getLeftData('cart as a','goods as b','a.goods_id','b.goods_id',['a.buyer_id'=>$member_id],$field);
-        if($cart->isEmpty())
-        {
-            return [];
+        $store_id  = $request->input('store_id');
+        $member_id = $request->input('member_id');
+        $cart_data = DB::table('cart')->where('buyer_id', $member_id)->distinct()->get(['store_id'])->toArray();
+        $result    = [];
+        foreach ($cart_data as $cart_datum) {
+            $amount                                = 0;
+            $result[$cart_datum->store_id]['list'] = BModel::getTableAllData('cart', ['store_id' => $cart_datum->store_id])->toArray();
+            foreach ($result[$cart_datum->store_id]['list'] as $v) {
+                $amount += Base::ncPriceFormat($v->goods_price * $v->goods_num);
+            }
+            $result[$cart_datum->store_id]['amount']     = $amount;
+            $result[$cart_datum->store_id]['store_name'] = BModel::getTableValue('store', ['store_id' => $cart_datum->store_id], 'store_name');
         }
+        return Base::jsonReturn(200, '获取成功', $result);
+    }
 
-        if($cart->toArray())
-        {
+    /**清空购物车
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function clearCart(Request $request)
+    {
+        $store_id  = $request->input('store_id');
+        $member_id = $request->input('member_id');
+        $res       = BModel::delData('cart', ['buyer_id' => $member_id]);
+        if ($res) {
+            return Base::jsonReturn(200, '清空成功');
+        } else {
+            return Base::jsonReturn(2000, '清空失败');
+        }
+    }
 
-            foreach($cart->toArray() as $k=>$v)
-            {
-                if($v->bl_id != 0)
-                {
-                    $result[$v->store_id][]=BModel::getTableFieldFirstData('p_bundling_goods',['bl_id'=>$v->bl_id],['goods_name','goods_image','bl_goods_price']);
-                }else{
-                    $result[$v->store_id][]=$v;
+    /**确认订单
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function Settlement(Request $request)
+    {
+        $store_id          = $request->input('store_id');
+        $member_id         = $request->input('member_id');
+        $result            = [];
+        $address           = BModel::getTableFieldFirstData('address', ['member_id' => $member_id, 'is_default' => 1], ['true_name', 'mob_phone', 'area_info', 'address']);
+        $result['address'] = !$address ? [] : $address;
+        $cart              = BModel::getTableAllData('cart', ['buyer_id' => $member_id, 'store_id' => $store_id]);
+        $amount            = 0;
+        if (!$cart->isEmpty()) {
+            foreach ($cart->toArray() as $v) {
+                if ($v->bl_id == 1) {
+                    $bl_data        = BModel::getTableAllData('p_bundling_goods', ['bl_id' => $v->bl_id], ['goods_id'])->toArray();
+                    $v->marketprice = DB::table('goods')->whereIn('goods_id', array_column($bl_data, 'goods_id'))->sum('goods_marketprice');
+                } else {
+                    $v->marketprice = BModel::getTableValue('goods', ['goods_id' => $v->goods_id], 'goods_marketprice');
                 }
-
+                $amount += $v->goods_price * $v->goods_num;
             }
-
         }
-dd($result);
-die;
+        $result['cart']            = $cart->isEmpty() ? [] : $cart->toArray();
+        $result['peisong']         = 5;
+        $result['manjian']         = Member::getManSongCount($store_id, $amount);
+        $result['daijinquan']      = Member::getVoucherCount($store_id, $member_id, $amount);
+        $daijinquan_list           = Member::getUserVoucherList($store_id, $member_id, $amount);
+        $result['daijinquan_list'] = $daijinquan_list;
+        $result['total']           = $amount + $result['peisong'] - $result['manjian'] - $result['daijinquan'];
+        return Base::jsonReturn(200, '获取成功', $result);
+    }
 
-        $storeid = BModel::getTableValue('store', ['member_id' => $member_id], 'store_id');
-        $result=[];
-        $store_id_array=[];
-        foreach ($cart as $v)
-        {
-            if (empty($v) || $v->goods_state != 1) {
-                return Base::jsonReturn(1001, '商品不存在或已下架');
+    /**生成订单
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function buyStep(Request $request)
+    {
+        $store_id       = $request->input('store_id');
+        $member_id      = $request->input('member_id');
+        $address_id     = $request->input('address_id');
+        $cart_id        = $request->input('cart_id');
+        $voucher_id     = $request->input('voucher_id');
+        $payment_code   = $request->input('payment_code');//支付宝，微信
+        $manjian_amount = $request->input('manjian_amount');
+        $peisong_amount = $request->input('peisong_amount');
+        $total_amount   = $request->input('total_amount');
+        $shipping_time  = $request->input('shipping_time');
+        $order_message  = $request->input('order_message');
+
+        $cart_id = [8, 32];
+        //验证收货地址
+        if ($address_id <= 0) {
+            return Base::jsonReturn(1001, '请选择收货地址');
+        } else {
+            $input_address_info = BModel::getTableFieldFirstData('address', ['address_id' => $address_id], ['member_id']);
+            if ($input_address_info['memberid'] != $member_id) {
+                return Base::jsonReturn(1002, '请选择收货地址');
             }
-            if ($v->is_much != 2 && $v->goods_storage < $v->goods_num) {
-                return Base::jsonReturn(1002, '商品库存不足');
-            }
-            //不能购买自己店铺
-            if ($v->store_id == $storeid) {
-                return Base::jsonReturn(1003, '不能购买自己的商品');
-            }
-            array_push($store_id_array,$v->store_id);
         }
-        $store_id_array=array_unique($store_id_array);
-        if(!empty($store_id_array))
-        {
-            $field=['store_name','goods_id','goods_name','goods_price','goods_num','goods_image','bl_id'];
-            foreach ($store_id_array as $k=>$id)
-            {
-                $cart_data[]=BModel::getTableAllOrderData('cart',['store_id'=>$id],'cart_id')->toArray();
+
+        //获得总价格
+        $cart   = DB::table('cart')->whereIn('cart_id', $cart_id)->get();
+        $amount = 0;
+        if (!$cart->isEmpty()) {
+            foreach ($cart->toArray() as $v) {
+                $amount += $v->goods_price * $v->goods_num;
             }
-            dd($cart_data);
+        }
+        $manjian = Member::getManSongCount($store_id, $amount);
+        if ($manjian_amount != $manjian) {
+            return Base::jsonReturn(1003, '满减金额有错误');
+        }
+        $voucher_price = 0;
+        if ($voucher_id) {
+            $voucher_price = BModel::getTableValue('voucher', ['voucher_id' => $voucher_id], 'voucher_price');
+            $voucher_price = !$voucher_price ? 0 : $voucher_price;
+        }
+        $total                   = $amount + $peisong_amount - $manjian - $voucher_price;//应支付价格
+        $pay_sn                  = Base::makePaySn($member_id);
+        $order_pay_data          = array(
+            'pay_sn' => $pay_sn,
+            'buyer_id' => $member_id,
+        );
+        $pay_id                  = BModel::insertData('order_pay', $order_pay_data);
+        $order_data              = array(
+            'order_sn' => Base::makeOrderSn($pay_id),
+            'pay_sn' => $pay_sn,
+            'store_id' => $store_id,
+            'store_name' => BModel::getTableValue('store', ['store_id' => $store_id], 'store_name'),
+            'buyer_id' => $member_id,
+            'buyer_name' => BModel::getTableValue('member', ['member_id' => $member_id], 'member_name'),
+            'add_time' => time(),
+            'payment_code' => 'wxpay',
+            'goods_amount' => $total,
+            'order_amount' => $total,
+            'shipping_fee' => $peisong_amount,
+            'order_state' => 10,
+        );
+        $order_id                = BModel::insertData('order', $order_data);
+        $reciver_info['address'] = $input_address_info['area_info'] . '&nbsp;' . $input_address_info['address'];
+        $reciver_info['phone']   = $input_address_info['mob_phone'] . ($input_address_info['tel_phone'] ? ',' . $input_address_info['tel_phone'] : null);
+        $reciver_info            = serialize($reciver_info);
+        $order_common_data       = array(
+            'store_id' => $store_id,
+            'shipping_time' => $shipping_time,
+            'order_message' => $order_message,
+            'voucher_price' => $voucher_price,
+            'voucher_code' => $voucher_id,
+            'reciver_name' => $input_address_info['true_name'],
+            'reciver_info' => $reciver_info,
+            'reciver_city_id' => $input_address_info['city_id'],
+        );
+        BModel::insertData('order', $order_common_data);
+
+        foreach ($cart_id as $v) {
+            $cart_data   = BModel::getTableFirstData('cart', ['cart_id' => $v]);
+            $gc_id       = BModel::getTableValue('goods', ['goods_id' => $cart_data->goods_id], 'gc_id');
+            $commis_rate = BModel::getTableValue('goods_class', ['gc_id' => $gc_id], 'commis_rate');
+            if ($cart_data['bl_id'] == 0) {
+                $order_goods = array(
+                    'order_id' => $order_id,
+                    'goods_id' => $cart_data->goods_id,
+                    'goods_name' => $cart_data->goods_name,
+                    'goods_price' => $cart_data->goods_price,
+                    'goods_num' => $cart_data->goods_num,
+                    'goods_image' => $cart_data->goods_image,
+                    'goods_pay_price' => $cart_data->goods_price,
+                    'store_id' => $store_id,
+                    'buyer_id' => $member_id,
+                    'commis_rate' => $commis_rate,
+                    'gc_id' => $gc_id
+                );
+            } else {
+                $order_goods = array(
+                    'order_id' => $order_id,
+                    'goods_id' => $cart_data->goods_id,
+                    'goods_name' => $cart_data->goods_name,
+                    'goods_price' => $cart_data->goods_price,
+                    'goods_num' => $cart_data->goods_num,
+                    'goods_image' => $cart_data->goods_image,
+                    'goods_pay_price' => $cart_data->goods_price,
+                    'store_id' => $store_id,
+                    'buyer_id' => $member_id,
+                    'goods_type' => 4,
+                    'promotions_id' => $cart_data['bl_id'],
+                    'commis_rate' => $commis_rate,
+                    'gc_id' => $gc_id
+                );
+            }
+            BModel::insertData('order_goods', $order_goods);
+        }
+    }
+
+    /**订单列表
+     * @param Request $request
+     */
+    function orderList(Request $request)
+    {
+        $store_id  = $request->input('store_id');
+        $member_id = $request->input('member_id');
+        $type      = $request->input('type');//全部 2 未评价 3 退款
+        $data      = [];
+        if (!$type) {
+            $data = Member::getAllOrder($member_id);
+        } elseif ($type == 2) {
+            $data = Member::getEvaluationOrder($member_id);
+        } elseif ($type == 3) {
+            $data = Member::getRefundStateOrder($member_id);
+        }
+        if ($data) {
+            foreach ($data as $k => &$v) {
+                $amount        = 0;
+                $order_data    = DB::table('order_goods')->where('order_id', $v->order_id)->get()->toArray();
+                $v->goods_list = $order_data;
+                foreach ($order_data as $order_datum) {
+                    $amount += $order_datum->goods_price * $order_datum->goods_num;
+                }
+                $v->amount = $amount;
+            }
+        }
+        return Base::jsonReturn('200', '获取成功', $data);
+    }
+
+    function orderInfo(Request $request)
+    {
+        $store_id  = $request->input('store_id');
+        $member_id = $request->input('member_id');
+        $order_id  = $request->input('order_id');
+
+        $result                = [];
+        $order_data            = BModel::getTableFieldFirstData('order', ['order_id' => $order_id],
+            ['store_id', 'order_state','shipping_fee','manjian_amount','order_sn','add_time','payment_code']);
+        $result['store_name']  = BModel::getTableValue('store', ['store_id' => $order_data->store_id], 'store_name');
+        $result['order_state'] = $order_data->order_state;
+
+        $result['order_detail'] = DB::table('order_goods AS a')
+            ->leftJoin('order AS b', 'a.order_id', 'b.order_id')
+            ->leftJoin('order_common AS c', 'a.order_id', 'c.order_id')
+            ->where('b.order_id', $order_id)
+            ->get(['a.goods_id', 'a.goods_name', 'a.goods_price', 'a.goods_num', 'a.goods_image', 'c.voucher_code']);
+        $amount=0;
+        foreach ($result['order_detail'] as &$item) {
+           if(!is_null($item->voucher_code))
+           {
+               $item->goods_marketprice=Member::getBLGoodsMarketprice($item->voucher_code);
+           }else{
+               $item->goods_marketprice=BModel::getTableValue('goods',['goods_id'=>$item->goods_id],'goods_marketprice');
+           }
+            $amount += $item->goods_price * $item->goods_num;
         }
 
-        return $result;
+        $result['peisong']=$order_data->shipping_fee;
+        $result['manjian']=$order_data->manjian_amount;
+        $voucher_price=BModel::getTableValue('order_common',['order_id'=>$order_id],'voucher_price');
+        $result['daijinquan']=is_null($voucher_price) ? 0 :$voucher_price;
+        $result['total']=$amount + $result['peisong'] - $result['manjian'] - $result['daijinquan'];//应支付价格
 
 
-
+        $receive_info=BModel::getTableFieldFirstData('order_common',['order_id'=>$order_id],['reciver_name','reciver_info']);
+        $rec_data=unserialize($receive_info->reciver_info);
+        $result['peisong_info']=[
+            'username'=>$receive_info->reciver_name,
+            'address'=>$rec_data['address'],
+            'mobile'=>$rec_data['mob_phone']
+        ];
+        $result['order_info']=[
+            'order_sn'=>$order_data->order_sn,
+            'add_time'=>date('Y-m-d H:i:s',$order_data->add_time),
+            'payment_code'=>$order_data->payment_code,
+        ];
+        return Base::jsonReturn('200', '获取成功', $result);
     }
 
 
