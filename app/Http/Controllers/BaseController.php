@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\BModel;
+use App\Http\Controllers\BaseController as Base;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
-use Overtrue\EasySms\EasySms;
+use Illuminate\Support\Facades\Redis;
+
 
 class BaseController extends Controller
 {
@@ -84,5 +87,33 @@ class BaseController extends Controller
             $num++;
         }
         return (date('y', time()) % 9 + 1) . sprintf('%013d', $pay_id) . sprintf('%02d', $num);
+    }
+
+    /**发送短信
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getSMS(Request $request)
+    {
+        $phone_number = $request->input('phone_number');
+        if (!$phone_number) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!preg_match("/^1[34578]{1}\d{9}$/", $phone_number)) {
+            return Base::jsonReturn(1000, '手机号格式不正确');
+        }
+        if (Redis::get($phone_number)) {
+            $code = Redis::get($phone_number);
+        } else {
+            $code = rand('1000', '9999');
+        }
+        $res = SMSController::sendSms($phone_number, $code);
+
+        if ($res->Code == 'OK') {
+            Redis::setex($phone_number, 300, $code);
+            return Base::jsonReturn(200, '发送成功');
+        } else {
+            return Base::jsonReturn(2000, '发送失败');
+        }
     }
 }

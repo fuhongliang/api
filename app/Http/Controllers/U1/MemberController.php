@@ -37,7 +37,7 @@ class MemberController extends Base
      */
     function smsLogin(Request $request)
     {
-        $phone_number  = $request->input('mobile');
+        $phone_number  = $request->input('phone_number');
         $verify_code   = $request->input('code');
         $device_tokens = $request->input('device_tokens');
         $app_type      = $request->input('app_type');
@@ -55,7 +55,6 @@ class MemberController extends Base
         if (BModel::getCount('member', ['member_mobile' => $phone_number]) == 1) {
             $member_data = BModel::getTableFirstData('member', ['member_mobile' => $phone_number], ['member_passwd', 'member_id']);
             $member_id   = $member_data->member_id;
-            BModel::delData('umeng', ['member_id' => $member_id]);
             if (!$member_data->member_passwd) {
                 $need_pwd = true;
             }
@@ -76,8 +75,11 @@ class MemberController extends Base
             $member_id = BModel::insertData('member', $ins_data);
             BModel::insertData('member_common', ['member_id' => $member_id]);
         }
-        BModel::insertData('umeng', ['app_type' => $app_type, 'device_tokens' => $device_tokens, 'member_id' => $member_id]);
-        $member_info           = BModel::getTableFirstData('member', ['member_id' => $member_id], ['member_mobile', 'member_name', 'member_avatar']);
+        DB::transaction(function () use ($member_id, $app_type, $device_tokens) {
+            BModel::delData('umeng', ['member_id' => $member_id]);
+            BModel::insertData('umeng', ['app_type' => $app_type, 'device_tokens' => $device_tokens, 'member_id' => $member_id]);
+        });
+        $member_info           = BModel::getTableFieldFirstData('member', ['member_id' => $member_id], ['member_id', 'member_mobile', 'member_name', 'member_avatar']);
         $member_info->need_pwd = $need_pwd;
         return Base::jsonReturn('200', '登录成功', $member_info);
     }
@@ -88,7 +90,7 @@ class MemberController extends Base
      */
     function userLogin(Request $request)
     {
-        $phone_number  = $request->input('mobile');
+        $phone_number  = $request->input('phone_number');
         $password      = $request->input('password');
         $device_tokens = $request->input('device_tokens');
         $app_type      = $request->input('app_type');
@@ -110,7 +112,7 @@ class MemberController extends Base
                 'member_login_ip' => $request->getClientIp()
             );
             BModel::upTableData('member', ['member_id' => $member_data->member_id], $up_data);
-            $member_info = BModel::getTableFirstData('member', ['member_id' => $member_data->member_id], ['member_mobile', 'member_name', 'member_avatar']);
+            $member_info = BModel::getTableFieldFirstData('member', ['member_id' => $member_data->member_id], ['member_id', 'member_mobile', 'member_name', 'member_avatar']);
             return Base::jsonReturn('200', '登录成功', $member_info);
         } else {
             return Base::jsonReturn('1002', '用户不存在');
@@ -128,14 +130,14 @@ class MemberController extends Base
         if (empty($member_id) || empty($password)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        if (BModel::getCount('member_id', ['member_id' => $member_id]) == 0) {
+        if (BModel::getCount('member', ['member_id' => $member_id]) == 0) {
             return Base::jsonReturn(1001, '用户不存在');
         }
         $res = BModel::upTableData('member', ['member_id' => $member_id], ['member_passwd' => md5($password)]);
         if ($res) {
-            return Base::jsonReturn('200', '添加成功');
+            return Base::jsonReturn(200, '添加成功');
         } else {
-            return Base::jsonReturn('1002', '添加失败');
+            return Base::jsonReturn(1002, '添加失败');
         }
     }
 
@@ -825,7 +827,7 @@ class MemberController extends Base
 
         $result                = [];
         $order_data            = BModel::getTableFieldFirstData('order', ['order_id' => $order_id],
-            ['store_id', 'order_state','shipping_fee','manjian_amount','order_sn','add_time','payment_code']);
+            ['store_id', 'order_state', 'shipping_fee', 'manjian_amount', 'order_sn', 'add_time', 'payment_code']);
         $result['store_name']  = BModel::getTableValue('store', ['store_id' => $order_data->store_id], 'store_name');
         $result['order_state'] = $order_data->order_state;
 
@@ -834,35 +836,34 @@ class MemberController extends Base
             ->leftJoin('order_common AS c', 'a.order_id', 'c.order_id')
             ->where('b.order_id', $order_id)
             ->get(['a.goods_id', 'a.goods_name', 'a.goods_price', 'a.goods_num', 'a.goods_image', 'c.voucher_code']);
-        $amount=0;
+        $amount                 = 0;
         foreach ($result['order_detail'] as &$item) {
-           if(!is_null($item->voucher_code))
-           {
-               $item->goods_marketprice=Member::getBLGoodsMarketprice($item->voucher_code);
-           }else{
-               $item->goods_marketprice=BModel::getTableValue('goods',['goods_id'=>$item->goods_id],'goods_marketprice');
-           }
+            if (!is_null($item->voucher_code)) {
+                $item->goods_marketprice = Member::getBLGoodsMarketprice($item->voucher_code);
+            } else {
+                $item->goods_marketprice = BModel::getTableValue('goods', ['goods_id' => $item->goods_id], 'goods_marketprice');
+            }
             $amount += $item->goods_price * $item->goods_num;
         }
 
-        $result['peisong']=$order_data->shipping_fee;
-        $result['manjian']=$order_data->manjian_amount;
-        $voucher_price=BModel::getTableValue('order_common',['order_id'=>$order_id],'voucher_price');
-        $result['daijinquan']=is_null($voucher_price) ? 0 :$voucher_price;
-        $result['total']=$amount + $result['peisong'] - $result['manjian'] - $result['daijinquan'];//应支付价格
+        $result['peisong']    = $order_data->shipping_fee;
+        $result['manjian']    = $order_data->manjian_amount;
+        $voucher_price        = BModel::getTableValue('order_common', ['order_id' => $order_id], 'voucher_price');
+        $result['daijinquan'] = is_null($voucher_price) ? 0 : $voucher_price;
+        $result['total']      = $amount + $result['peisong'] - $result['manjian'] - $result['daijinquan'];//应支付价格
 
 
-        $receive_info=BModel::getTableFieldFirstData('order_common',['order_id'=>$order_id],['reciver_name','reciver_info']);
-        $rec_data=unserialize($receive_info->reciver_info);
-        $result['peisong_info']=[
-            'username'=>$receive_info->reciver_name,
-            'address'=>$rec_data['address'],
-            'mobile'=>$rec_data['mob_phone']
+        $receive_info           = BModel::getTableFieldFirstData('order_common', ['order_id' => $order_id], ['reciver_name', 'reciver_info']);
+        $rec_data               = unserialize($receive_info->reciver_info);
+        $result['peisong_info'] = [
+            'username' => $receive_info->reciver_name,
+            'address' => $rec_data['address'],
+            'mobile' => $rec_data['mob_phone']
         ];
-        $result['order_info']=[
-            'order_sn'=>$order_data->order_sn,
-            'add_time'=>date('Y-m-d H:i:s',$order_data->add_time),
-            'payment_code'=>$order_data->payment_code,
+        $result['order_info']   = [
+            'order_sn' => $order_data->order_sn,
+            'add_time' => date('Y-m-d H:i:s', $order_data->add_time),
+            'payment_code' => $order_data->payment_code,
         ];
         return Base::jsonReturn('200', '获取成功', $result);
     }
