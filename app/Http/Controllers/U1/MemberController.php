@@ -7,6 +7,7 @@ use App\BModel;
 use App\Http\Controllers\BaseController as Base;
 use App\model\U1\Member;
 use App\model\V3\Store;
+use App\model\V3\Token;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
@@ -80,7 +81,16 @@ class MemberController extends Base
             BModel::insertData('umeng', ['app_type' => $app_type, 'device_tokens' => $device_tokens, 'member_id' => $member_id]);
         });
         $member_info           = BModel::getTableFieldFirstData('member', ['member_id' => $member_id], ['member_id', 'member_mobile', 'member_name', 'member_avatar']);
+        $member_info->member_avatar =is_null($member_info->member_avatar) ? '':$member_info->member_avatar;
         $member_info->need_pwd = $need_pwd;
+        $member_info->token    = Base::makeToken(microtime());
+        $token_data            = array(
+            'member_id' => $member_id,
+            'token' => $member_info->token,
+            'add_time' => time(),
+            'expire_time' => time() + 24 * 5 * 3600
+        );
+        Token::addToken($token_data);
         return Base::jsonReturn('200', '登录成功', $member_info);
     }
 
@@ -112,7 +122,16 @@ class MemberController extends Base
                 'member_login_ip' => $request->getClientIp()
             );
             BModel::upTableData('member', ['member_id' => $member_data->member_id], $up_data);
-            $member_info = BModel::getTableFieldFirstData('member', ['member_id' => $member_data->member_id], ['member_id', 'member_mobile', 'member_name', 'member_avatar']);
+            $member_info        = BModel::getTableFieldFirstData('member', ['member_id' => $member_data->member_id], ['member_id', 'member_mobile', 'member_name', 'member_avatar']);
+            $member_info->member_avatar =is_null($member_info->member_avatar) ? '':$member_info->member_avatar;
+            $member_info->token = Base::makeToken(microtime());
+            $token_data         = array(
+                'member_id' => $member_data->member_id,
+                'token' => $member_info->token,
+                'add_time' => time(),
+                'expire_time' => time() + 24 * 5 * 3600
+            );
+            Token::addToken($token_data);
             return Base::jsonReturn('200', '登录成功', $member_info);
         } else {
             return Base::jsonReturn('1002', '用户不存在');

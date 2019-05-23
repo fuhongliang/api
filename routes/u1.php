@@ -13,14 +13,19 @@
 Route::any('get_sms', 'BaseController@getSMS');//获取验证码
 Route::group(['namespace' => 'U1'], function () {
 
-    Route::any('index','MemberController@homePage');//首页
     Route::any('sms_login','MemberController@smsLogin');//验证码登录
     Route::any('user_login','MemberController@userLogin');//账号密码登录
     Route::any('user_add_pwd','MemberController@userAddPwd');//用户添加密码
 
+
+
+
+
+
+
     Route::any('user_address_list','MemberController@userAddrList');//用户收货地址列表
     Route::any('user_address_add','MemberController@userAddrAdd');//用户收货地址添加
-
+    Route::any('index','MemberController@homePage');//首页
 
     Route::any('store_info','MemberController@storeInfo');//店铺详情
     Route::any('add_cart','MemberController@addCart');//添加购物车
