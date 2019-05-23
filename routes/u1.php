@@ -10,9 +10,12 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::post('get_sms', 'BaseController@getSMS');//获取验证码
-Route::post('sms_login','MemberController@smsLogin');//验证码登录
-Route::post('user_login','MemberController@userLogin');//账号密码登录
+
+Route::group(['namespace' => 'U1'], function () {
+    Route::post('get_sms', 'BaseController@getSMS');//获取验证码
+    Route::post('sms_login', 'MemberController@smsLogin');//验证码登录
+    Route::post('user_login', 'MemberController@userLogin');//账号密码登录
+});
 
 Route::group(['namespace' => 'U1','middleware' => ['checktoken']], function () {
     Route::post('user_add_pwd','MemberController@userAddPwd');//用户添加密码
