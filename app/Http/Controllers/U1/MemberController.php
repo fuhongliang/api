@@ -172,20 +172,41 @@ class MemberController extends Base
         if (empty($member_id)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        if (BModel::getCount('member_id', ['member_id' => $member_id]) == 0) {
+        if (BModel::getCount('member', ['member_id' => $member_id]) == 0) {
             return Base::jsonReturn(1001, '用户不存在');
         }
-        $res = BModel::getTableAllData('address', ['member_id' => $member_id], ['area_info', 'address', 'mob_phone', 'sex', 'true_name', 'is_default']);
-
-        return Base::jsonReturn('200', '获取成功', $res->isEmpty() ? array() : $res->toArray());
+        $field=['address_id','area_info', 'address', 'mob_phone', 'sex', 'true_name', 'is_default'];
+        $res = BModel::getTableAllData('address', ['member_id' => $member_id], $field);
+        $result=$res->isEmpty()?[]:$res->toArray();
+        return Base::jsonReturn('200', '获取成功', $result);
     }
 
-    /**添加收货地址
+    /**地址详情
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    function userAddrAdd(Request $request)
+    function userAddrInfo(Request $request)
     {
+        $address_id = $request->input('address_id');
+        if (empty($address_id)) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (BModel::getCount('address', ['address_id' => $address_id]) == 0) {
+            return Base::jsonReturn(1001, '地址不存在');
+        }
+        $field=['address_id','area_info', 'address', 'mob_phone', 'sex', 'true_name', 'is_default'];
+        $res = BModel::getTableFieldFirstData('address', ['address_id' => $address_id], $field);
+        return Base::jsonReturn('200', '获取成功', $res);
+    }
+
+
+    /**保存收货地址
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function userAddrSave(Request $request)
+    {
+        $address_id   = $request->input('address_id');
         $member_id   = $request->input('member_id');
         $true_name   = $request->input('true_name');
         $sex         = $request->input('sex');
@@ -197,8 +218,11 @@ class MemberController extends Base
         if (!$member_id || !$true_name || !$sex || !$mob_phone || !$province_id || !$city_id || !$area_id || !$address) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        if (BModel::getCount('member_id', ['member_id' => $member_id]) == 0) {
+        if (BModel::getCount('member', ['member_id' => $member_id]) == 0) {
             return Base::jsonReturn(1001, '用户不存在');
+        }
+        if ($address_id && BModel::getCount('address', ['address_id' => $address_id]) == 0) {
+            return Base::jsonReturn(1001, '地址不存在');
         }
         $province = BModel::getTableValue('area', ['area_id' => $province_id], 'area_name');
         $city     = BModel::getTableValue('area', ['area_id' => $city_id], 'area_name');

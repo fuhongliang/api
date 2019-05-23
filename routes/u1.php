@@ -18,16 +18,14 @@ Route::group(['namespace' => 'U1'], function () {
 });
 
 Route::group(['namespace' => 'U1','middleware' => ['checktoken']], function () {
-    Route::post('user_add_pwd','MemberController@userAddPwd');//用户添加密码
+    Route::post('user_add_pwd','MemberController@userAddPwd');//添加密码
+    Route::post('user_address_list','MemberController@userAddrList');//用户收货地址列表
+    Route::post('user_address_info','MemberController@userAddrInfo');//用户收货地址详情
+    Route::post('user_address_save','MemberController@userAddrSave');//用户收货地址保存
 
 
 
 
-
-
-
-    Route::any('user_address_list','MemberController@userAddrList');//用户收货地址列表
-    Route::any('user_address_add','MemberController@userAddrAdd');//用户收货地址添加
     Route::any('index','MemberController@homePage');//首页
 
     Route::any('store_info','MemberController@storeInfo');//店铺详情
