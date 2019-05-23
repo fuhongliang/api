@@ -13,7 +13,6 @@
 Route::post('get_sms', 'BaseController@getSMS');//获取验证码
 
 Route::group(['namespace' => 'U1'], function () {
-
     Route::post('sms_login', 'MemberController@smsLogin');//验证码登录
     Route::post('user_login', 'MemberController@userLogin');//账号密码登录
 });
