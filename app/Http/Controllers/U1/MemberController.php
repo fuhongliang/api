@@ -5,6 +5,7 @@ namespace App\Http\Controllers\U1;
 
 use App\BModel;
 use App\Http\Controllers\BaseController as Base;
+use App\Http\Controllers\SMSController;
 use App\model\U1\Member;
 use App\model\V3\Store;
 use App\model\V3\Token;
@@ -14,6 +15,34 @@ use Illuminate\Support\Facades\Redis;
 
 class MemberController extends Base
 {
+
+    /**发送短信
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getSMS(Request $request)
+    {
+        $phone_number = $request->input('phone_number');
+        if (!$phone_number) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (!preg_match("/^1[34578]{1}\d{9}$/", $phone_number)) {
+            return Base::jsonReturn(1000, '手机号格式不正确');
+        }
+        if (Redis::get($phone_number)) {
+            $code = Redis::get($phone_number);
+        } else {
+            $code = rand('1000', '9999');
+        }
+        $res = SMSController::sendSms($phone_number, $code);
+
+        if ($res->Code == 'OK') {
+            Redis::setex($phone_number, 300, $code);
+            return Base::jsonReturn(200, '发送成功');
+        } else {
+            return Base::jsonReturn(2000, '发送失败');
+        }
+    }
     /**首页
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
