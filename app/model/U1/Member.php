@@ -13,7 +13,7 @@ class Member extends BModel
      */
     static function getParentGoodsClass()
     {
-        $data = BModel::getTableAllOrderData('goods_class', ['gc_parent_id' => 0, 'gc_show' => 1], 'gc_sort', ['gc_title', 'gc_id', 'icon_image']);
+        $data = BModel::getTableAllOrderData('goods_class', ['gc_parent_id' => 0, 'gc_show' => 1], 'gc_sort', ['gc_name', 'gc_id', 'icon_image']);
         return $data->isEmpty() ? array() : $data->toArray();
     }
 
@@ -26,19 +26,43 @@ class Member extends BModel
         return $data->isEmpty() ? array() : $data->toArray();
     }
 
-    static function getStoreList($keyword, $page)
+    static function getStoreList($keyword, $page, $type)
     {
-        $result    = [];
-        $skip      = ($page - 1) * 10;
-        $store_ids = DB::table('goods as a')
-            ->leftJoin('store as b', 'a.store_id', 'b.store_id')
-            ->where('a.goods_name', 'like', '%' . $keyword . '%')
-            ->orWhere('b.store_name', 'like', '%' . $keyword . '%')
-            ->orderBy('b.store_id', 'desc')
-            ->skip($skip)
-            ->take(10)
-            ->distinct()
-            ->get(['b.store_id']);
+        $result = [];
+        $skip   = ($page - 1) * 10;
+        if (!$type || $type == 1)//默认
+        {
+            $store_ids = DB::table('goods as a')
+                ->leftJoin('store as b', 'a.store_id', 'b.store_id')
+                ->where('a.goods_name', 'like', '%' . $keyword . '%')
+                ->orWhere('b.store_name', 'like', '%' . $keyword . '%')
+                ->orderBy('b.store_id', 'desc')
+                ->skip($skip)
+                ->take(10)
+                ->distinct()
+                ->get(['b.store_id']);
+        } elseif ($type == 2)//销量
+        {
+            $store_ids = DB::table('goods as a')
+                ->leftJoin('store as b', 'a.store_id', 'b.store_id')
+                ->where('a.goods_name', 'like', '%' . $keyword . '%')
+                ->orWhere('b.store_name', 'like', '%' . $keyword . '%')
+                ->orderBy('b.store_sales', 'desc')
+                ->skip($skip)
+                ->take(10)
+                ->distinct()
+                ->get(['b.store_id']);
+        } elseif ($type == 4) {
+            $store_ids = DB::table('goods as a')
+                ->leftJoin('store as b', 'a.store_id', 'b.store_id')
+                ->where('a.goods_name', 'like', '%' . $keyword . '%')
+                ->orWhere('b.store_name', 'like', '%' . $keyword . '%')
+                ->orderBy('b.store_credit', 'desc')
+                ->skip($skip)
+                ->take(10)
+                ->distinct()
+                ->get(['b.store_id']);
+        }
         if (!$store_ids->isEmpty()) {
             $storeIds = $store_ids->toArray();
             foreach ($storeIds as $k => $val) {
@@ -46,7 +70,7 @@ class Member extends BModel
                 $result[$k]          = $store_data;
                 $xianshi_data        = BModel::getTableAllData('p_xianshi', ['store_id' => $val->store_id, 'state' => 1], ['xianshi_name', 'xianshi_id']);
                 $result[$k]->xianshi = $xianshi_data->isEmpty() ? array() : $xianshi_data->toArray();
-                $manjian             = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $val->store_id], ['a.price', 'a.discount']);
+                $manjian             = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $val->store_id], ['a.rule_id', 'a.price', 'a.discount']);
                 $result[$k]->manjian = $manjian->isEmpty() ? [] : $manjian->toArray();
             }
         }
@@ -75,6 +99,11 @@ class Member extends BModel
                 ->where('a.goods_state', 1)
                 ->orderBy('a.goods_salenum', 'desc')
                 ->get($fields);
+            if (!$data->isEmpty()) {
+                foreach ($data as &$datum) {
+                    $datum->zan = BModel::getCount('goods_zan', ['goods_id' => $datum->goods_id]);
+                }
+            }
             return $data->isEmpty() ? $goods_info : $data->toArray();
         } elseif ($class_id == 'zhekou') {
             $data = DB::table('p_xianshi')
@@ -91,6 +120,7 @@ class Member extends BModel
                     $goods_info[$k]['goods_price']       = BModel::getSum('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'goods_price');
                     $goods_info[$k]['img_name']          = BModel::getTableValue('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'goods_image');
                     $goods_info[$k]['goods_salenum']     = 999;
+                    $goods_info[$k]['zan']               = BModel::getCount('goods_zan', ['goods_id' => $datum->goods_id]);
                     $goods_info[$k]['goods_marketprice'] = BModel::getSum('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'xianshi_price');
                 }
             }
@@ -110,6 +140,7 @@ class Member extends BModel
                     $goods_info[$k]['goods_price']   = BModel::getSum('p_bundling_goods', ['bl_id' => $val->bl_id], 'bl_goods_price');
                     $goods_info[$k]['img_name']      = BModel::getTableValue('p_bundling_goods', ['bl_id' => $val->bl_id], 'goods_image');
                     $goods_info[$k]['goods_salenum'] = 999;
+                    $goods_info[$k]['zan']           = BModel::getCount('goods_zan', ['goods_id' => $datum->goods_id]);
                     $goods_ids                       = BModel::getTableAllData('p_bundling_goods', ['bl_id' => $val->bl_id], ['goods_id']);
                     $gids                            = [];
                     foreach ($goods_ids as $goods_id) {
@@ -120,28 +151,29 @@ class Member extends BModel
                 }
             }
             return $goods_info;
-        }
-        $data = DB::table('goods')
-            ->where('store_id', $store_id)
-            ->whereNotNull('goods_stcids')
-            ->get(['goods_id', 'goods_stcid']);
-        if (empty($data)) {
-            return $goods_info;
         } else {
-            foreach ($data as $val) {
-                if (!empty($val->goods_stcid)) {
-                    if ($class_id == $val->goods_stcid) {
-                        array_push($ids, $val->goods_id);
+            $data = DB::table('goods')
+                ->where('store_id', $store_id)
+                ->whereNotNull('goods_stcids')
+                ->get(['goods_id', 'goods_stcid']);
+            if (empty($data)) {
+                return $goods_info;
+            } else {
+                foreach ($data as $val) {
+                    if (!empty($val->goods_stcid)) {
+                        if (intval($class_id) == $val->goods_stcid) {
+                            array_push($ids, $val->goods_id);
+                        }
                     }
                 }
-            }
-            if (!empty($ids)) {
-                foreach ($ids as $k => $goods_id) {
-
-                    $goods_info[$k] = Goods::getGoodsInfo(['goods_id' => $goods_id], $fields);
+                if (!empty($ids)) {
+                    foreach ($ids as $k => $goods_id) {
+                        $goods_info[$k]      = Goods::getGoodsInfo(['goods_id' => $goods_id], $fields);
+                        $goods_info[$k]->zan = BModel::getCount('goods_zan', ['goods_id' => $goods_id]);
+                    }
                 }
+                return $goods_info;
             }
-            return $goods_info;
         }
     }
 
@@ -224,28 +256,28 @@ class Member extends BModel
     static function getStoreComList($store_id, $type)
     {
         $result = [];
-        $field  = ['a.content', 'a.haoping', 'a.images', 'a.is_replay', 'a.parent_id', 'b.member_name', 'b.member_avatar'];
-        if (!$type) {
+        $field  = ['a.content', 'a.haoping', 'a.images', 'a.add_time', 'a.is_replay', 'a.parent_id', 'b.member_name', 'b.member_avatar'];
+        if (!$type || $type == 1) {
             $data = DB::table('store_com AS a')
                 ->leftJoin('member as b', 'a.member_id', 'b.member_id')
                 ->where('a.store_id', $store_id)
-                ->orderBy('a.add_time', 'desc')
-                ->get($field);
-        } elseif ($type == 1) {
-            $data = DB::table('store_com AS a')
-                ->leftJoin('member as b', 'a.member_id', 'b.member_id')
-                ->where('a.store_id', $store_id)
-                ->whereIn('haoping', [1, 2])
                 ->orderBy('a.add_time', 'desc')
                 ->get($field);
         } elseif ($type == 2) {
             $data = DB::table('store_com AS a')
                 ->leftJoin('member as b', 'a.member_id', 'b.member_id')
                 ->where('a.store_id', $store_id)
-                ->whereNotIn('haoping', [1, 2])
+                ->whereIn('haoping', [1, 2])
                 ->orderBy('a.add_time', 'desc')
                 ->get($field);
         } elseif ($type == 3) {
+            $data = DB::table('store_com AS a')
+                ->leftJoin('member as b', 'a.member_id', 'b.member_id')
+                ->where('a.store_id', $store_id)
+                ->whereNotIn('haoping', [1, 2])
+                ->orderBy('a.add_time', 'desc')
+                ->get($field);
+        } elseif ($type == 4) {
             $data = DB::table('store_com AS a')
                 ->leftJoin('member as b', 'a.member_id', 'b.member_id')
                 ->where('a.store_id', $store_id)
@@ -258,11 +290,13 @@ class Member extends BModel
         }
         $datas = $data->toArray();
         foreach ($datas as $k => $v) {
-            $result[$k]['content']       = $v->content;
+            $result[$k]['content']       = is_null($v->content) ? "" : $v->content;
             $result[$k]['haoping']       = $v->haoping;
             $result[$k]['images']        = explode(',', $v->images);
+            $result[$k]['credit']        = 4;
+            $result[$k]['add_time']      = date('Y-m-d', $v->add_time);
             $result[$k]['member_name']   = $v->member_name;
-            $result[$k]['member_avator'] = $v->member_avatar;
+            $result[$k]['member_avator'] = is_null($v->member_avatar) ? "" : $v->member_avatar;
             if ($v->is_replay == 1) {
                 $result[$k]['replay'] = BModel::getTableValue('store_com', ['com_id' => $v->parent_id]);
             } else {
@@ -274,72 +308,78 @@ class Member extends BModel
 
     static function getManSongCount($store_id, $total_amount)
     {
-        $discount=DB::table('p_mansong_rule as a')
-            ->leftJoin('p_mansong as b','a.mansong_id','b.mansong_id')
-            ->where('a.price','<=',$total_amount)
-            ->where('b.store_id',$store_id)
-            ->orderBy('a.price','desc')
+        $discount = DB::table('p_mansong_rule as a')
+            ->leftJoin('p_mansong as b', 'a.mansong_id', 'b.mansong_id')
+            ->where('a.price', '<=', $total_amount)
+            ->where('b.store_id', $store_id)
+            ->orderBy('a.price', 'desc')
             ->limit(1)
             ->value('a.discount');
-        return !$discount ? 0: $discount;
+        return !$discount ? 0 : $discount;
     }
-    static function getVoucherCount($store_id,$member_id,$amount)
+
+    static function getVoucherCount($store_id, $member_id, $amount)
     {
-        $voucher_price=DB::table('voucher')
-            ->where('voucher_store_id',$store_id)
-            ->where('voucher_owner_id',$member_id)
-            ->where('voucher_limit','<',$amount)
-            ->where('voucher_end_date','<',time())
-            ->orderBy('voucher_price','desc')
+        $voucher_price = DB::table('voucher')
+            ->where('voucher_store_id', $store_id)
+            ->where('voucher_owner_id', $member_id)
+            ->where('voucher_limit', '<', $amount)
+            ->where('voucher_end_date', '<', time())
+            ->orderBy('voucher_price', 'desc')
             ->limit(1)
             ->value('voucher_price');
-        return !$voucher_price ? 0: $voucher_price;
+        return !$voucher_price ? 0 : $voucher_price;
     }
-    static function getUserVoucherList($store_id,$member_id,$amount)
+
+    static function getUserVoucherList($store_id, $member_id, $amount)
     {
-        $voucher=DB::table('voucher')
-            ->where('voucher_store_id',$store_id)
-            ->where('voucher_owner_id',$member_id)
-            ->where('voucher_limit','<',$amount)
-            ->where('voucher_end_date','<',time())
-            ->orderBy('voucher_price','desc')
-            ->get(['voucher_price','voucher_id']);
-        return $voucher->isEmpty()?[]:$voucher->toArray();
+        $voucher = DB::table('voucher')
+            ->where('voucher_store_id', $store_id)
+            ->where('voucher_owner_id', $member_id)
+            ->where('voucher_limit', '<', $amount)
+            ->where('voucher_end_date', '<', time())
+            ->orderBy('voucher_price', 'desc')
+            ->get(['voucher_price', 'voucher_id']);
+        return $voucher->isEmpty() ? [] : $voucher->toArray();
     }
+
     static function getAllOrder($member_id)
     {
-        $data=DB::table('order as a')
-            ->leftJoin('order_common as b','a.order_id','b.order_id')
-            ->leftJoin('store as c','a.store_id','c.store_id')
-            ->where('a.buyer_id',$member_id)
-            ->get(['a.order_id','c.store_name','c.store_avatar','a.order_state']);
-        return $data->isEmpty()?[]:$data->toArray();
+        $data = DB::table('order as a')
+            ->leftJoin('order_common as b', 'a.order_id', 'b.order_id')
+            ->leftJoin('store as c', 'a.store_id', 'c.store_id')
+            ->where('a.buyer_id', $member_id)
+            ->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state']);
+        return $data->isEmpty() ? [] : $data->toArray();
     }
+
     static function getEvaluationOrder($member_id)
     {
-        $data=DB::table('order as a')
-            ->leftJoin('order_common as b','a.order_id','b.order_id')
-            ->leftJoin('store as c','a.store_id','c.store_id')
-            ->where('a.buyer_id',$member_id)
-            ->where('evaluation_state',0)
-            ->get(['a.order_id','c.store_name','c.store_avatar','a.order_state']);
-        return $data->isEmpty()?[]:$data->toArray();
+        $data = DB::table('order as a')
+            ->leftJoin('order_common as b', 'a.order_id', 'b.order_id')
+            ->leftJoin('store as c', 'a.store_id', 'c.store_id')
+            ->where('a.buyer_id', $member_id)
+            ->where('evaluation_state', 0)
+            ->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state']);
+        return $data->isEmpty() ? [] : $data->toArray();
     }
+
     static function getRefundStateOrder($member_id)
     {
-        $data=DB::table('order as a')
-            ->leftJoin('order_common as b','a.order_id','b.order_id')
-            ->leftJoin('store as c','a.store_id','c.store_id')
-            ->where('a.buyer_id',$member_id)
-            ->where('refund_state',2)
-            ->get(['a.order_id','c.store_name','c.store_avatar','a.order_state']);
-        return $data->isEmpty()?[]:$data->toArray();
+        $data = DB::table('order as a')
+            ->leftJoin('order_common as b', 'a.order_id', 'b.order_id')
+            ->leftJoin('store as c', 'a.store_id', 'c.store_id')
+            ->where('a.buyer_id', $member_id)
+            ->where('refund_state', 2)
+            ->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state']);
+        return $data->isEmpty() ? [] : $data->toArray();
     }
+
     static function getBLGoodsMarketprice($bl_id)
     {
         return DB::table('goods AS a')
-            ->leftJoin('p_bundling_goods AS b','a.goods_id','b.goods_id')
-            ->where('b.bl_id',$bl_id)
+            ->leftJoin('p_bundling_goods AS b', 'a.goods_id', 'b.goods_id')
+            ->where('b.bl_id', $bl_id)
             ->sum('a.goods_marketprice');
     }
 

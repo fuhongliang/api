@@ -43,20 +43,26 @@ class MemberController extends Base
             return Base::jsonReturn(2000, '发送失败');
         }
     }
+
     /**首页
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     function homePage(Request $request)
     {
-        $keyword                  = $request->input('keyword');
-        $page                     = $request->input('page');
+        $keyword   = $request->input('keyword');
+        $page      = $request->input('page');
+        $longitude = $request->input('longitude');//经度
+        $dimension = $request->input('dimension');//维度
+        $type      = $request->input('type');
+
+
         $result                   = [];
         $result['banner_data']    = BModel::getOrderData('app_banner', 'sort', ['title', 'image_name', 'link_url']);
         $result['gcsort_data']    = Member::getParentGoodsClass();
         $result['discount_data']  = Member::getAppDiscount();
         $page                     = !$page ? 1 : $page;
-        $result['storelist_data'] = Member::getStoreList($keyword, $page);
+        $result['storelist_data'] = Member::getStoreList($keyword, $page, $type);
 
         return Base::jsonReturn('200', '获取成功', $result);
     }
@@ -109,12 +115,12 @@ class MemberController extends Base
             BModel::delData('umeng', ['member_id' => $member_id]);
             BModel::insertData('umeng', ['app_type' => $app_type, 'device_tokens' => $device_tokens, 'member_id' => $member_id]);
         });
-        BModel::delData('token',['member_id' => $member_id]);
-        $member_info           = BModel::getTableFieldFirstData('member', ['member_id' => $member_id], ['member_id', 'member_mobile', 'member_name', 'member_avatar']);
-        $member_info->member_avatar =is_null($member_info->member_avatar) ? '':$member_info->member_avatar;
-        $member_info->need_pwd = $need_pwd;
-        $member_info->token    = Base::makeToken(microtime());
-        $token_data            = array(
+        BModel::delData('token', ['member_id' => $member_id]);
+        $member_info                = BModel::getTableFieldFirstData('member', ['member_id' => $member_id], ['member_id', 'member_mobile', 'member_name', 'member_avatar']);
+        $member_info->member_avatar = is_null($member_info->member_avatar) ? '' : $member_info->member_avatar;
+        $member_info->need_pwd      = $need_pwd;
+        $member_info->token         = Base::makeToken(microtime());
+        $token_data                 = array(
             'member_id' => $member_id,
             'token' => $member_info->token,
             'add_time' => time(),
@@ -152,11 +158,11 @@ class MemberController extends Base
                 'member_login_ip' => $request->getClientIp()
             );
             BModel::upTableData('member', ['member_id' => $member_data->member_id], $up_data);
-            BModel::delData('token',['member_id' => $member_data->member_id]);
-            $member_info        = BModel::getTableFieldFirstData('member', ['member_id' => $member_data->member_id], ['member_id', 'member_mobile', 'member_name', 'member_avatar']);
-            $member_info->member_avatar =is_null($member_info->member_avatar) ? '':$member_info->member_avatar;
-            $member_info->token = Base::makeToken(microtime());
-            $token_data         = array(
+            BModel::delData('token', ['member_id' => $member_data->member_id]);
+            $member_info                = BModel::getTableFieldFirstData('member', ['member_id' => $member_data->member_id], ['member_id', 'member_mobile', 'member_name', 'member_avatar']);
+            $member_info->member_avatar = is_null($member_info->member_avatar) ? '' : $member_info->member_avatar;
+            $member_info->token         = Base::makeToken(microtime());
+            $token_data                 = array(
                 'member_id' => $member_data->member_id,
                 'token' => $member_info->token,
                 'add_time' => time(),
@@ -204,9 +210,9 @@ class MemberController extends Base
         if (BModel::getCount('member', ['member_id' => $member_id]) == 0) {
             return Base::jsonReturn(1001, '用户不存在');
         }
-        $field=['address_id','area_info', 'address', 'mob_phone', 'sex', 'true_name', 'is_default'];
-        $res = BModel::getTableAllData('address', ['member_id' => $member_id], $field);
-        $result=$res->isEmpty()?[]:$res->toArray();
+        $field  = ['address_id', 'area_info', 'address', 'mob_phone', 'sex', 'true_name', 'is_default'];
+        $res    = BModel::getTableAllData('address', ['member_id' => $member_id], $field);
+        $result = $res->isEmpty() ? [] : $res->toArray();
         return Base::jsonReturn('200', '获取成功', $result);
     }
 
@@ -223,8 +229,9 @@ class MemberController extends Base
         if (BModel::getCount('address', ['address_id' => $address_id]) == 0) {
             return Base::jsonReturn(1001, '地址不存在');
         }
-        $field=['address_id','area_info', 'address', 'mob_phone', 'sex', 'true_name', 'is_default'];
-        $res = BModel::getTableFieldFirstData('address', ['address_id' => $address_id], $field);
+        $field           = ['address_id', 'area_info', 'address', 'mob_phone', 'sex', 'true_name', 'is_default'];
+        $res             = BModel::getTableFieldFirstData('address', ['address_id' => $address_id], $field);
+        $res->is_default = intval($res->is_default);
         return Base::jsonReturn('200', '获取成功', $res);
     }
 
@@ -235,42 +242,45 @@ class MemberController extends Base
      */
     function userAddrSave(Request $request)
     {
-        $address_id   = $request->input('address_id');
-        $member_id   = $request->input('member_id');
-        $true_name   = $request->input('true_name');
-        $sex         = $request->input('sex');
-        $mob_phone   = $request->input('mobile_phone');
-        $province_id = $request->input('province_id');
-        $city_id     = $request->input('city_id');
-        $area_id     = $request->input('area_id');
-        $address     = $request->input('address');
-        if (!$member_id || !$true_name || !$sex || !$mob_phone || !$province_id || !$city_id || !$area_id || !$address) {
+        $address_id = $request->input('address_id');
+        $member_id  = $request->input('member_id');
+        $true_name  = $request->input('true_name');
+        $sex        = $request->input('sex');
+        $mob_phone  = $request->input('mobile_phone');
+        $area_info  = $request->input('area_info');
+        $address    = $request->input('address');
+        $is_default = $request->input('is_default');
+        if (!$member_id || !$true_name || !$sex || !$mob_phone || !$area_info || !$address) {
             return Base::jsonReturn(1000, '参数缺失');
         }
         if (BModel::getCount('member', ['member_id' => $member_id]) == 0) {
             return Base::jsonReturn(1001, '用户不存在');
         }
         if ($address_id && BModel::getCount('address', ['address_id' => $address_id]) == 0) {
-            return Base::jsonReturn(1001, '地址不存在');
+            return Base::jsonReturn(1002, '地址不存在');
         }
-        $province = BModel::getTableValue('area', ['area_id' => $province_id], 'area_name');
-        $city     = BModel::getTableValue('area', ['area_id' => $city_id], 'area_name');
-        $area     = BModel::getTableValue('area', ['area_id' => $area_id], 'area_name');
+        if ($is_default && $is_default == 1) {
+            $addressid = BModel::getTableValue('address', ['member_id' => $member_id, 'is_default' => '1'], 'address_id');
+            BModel::upTableData('address', ['address_id' => $addressid], ['is_default' => '0']);
+        }
         $ins_data = array(
             'member_id' => $member_id,
             'true_name' => $true_name,
-            'area_id' => $area_id,
-            'city_id' => $city_id,
-            'area_info' => $province . $city . $area,
+            'area_info' => $area_info,
             'address' => $address,
             'mob_phone' => $mob_phone,
-            'sex' => $sex
+            'sex' => $sex,
+            'is_default' => $is_default == 1 ? '1' : '0'
         );
-        $result   = BModel::insertData('address', $ins_data);
-        if ($result) {
-            return Base::jsonReturn('200', '添加成功');
+        if ($address_id) {
+            $result = BModel::upTableData('address', ['address_id' => $address_id], $ins_data);
         } else {
-            return Base::jsonReturn('1002', '添加失败');
+            $result = BModel::insertData('address', $ins_data);
+        }
+        if ($result) {
+            return Base::jsonReturn('200', '操作成功');
+        } else {
+            return Base::jsonReturn('1003', '操作失败');
         }
     }
 
@@ -283,34 +293,65 @@ class MemberController extends Base
         $store_id  = $request->input('store_id');
         $member_id = $request->input('member_id');
         $class_id  = $request->input('class_id');
+        $tab_id    = $request->input('tab_id');//1,2,3
+        $type      = $request->input('type');//1,2,3,4
         $result    = [];
-        //店铺详情
-        $store_info           = BModel::getTableFieldFirstData('store', ['store_id' => $store_id], ['store_id', 'store_name', 'store_avatar', 'store_sales', 'store_credit', 'store_description']);
-        $result['store_info'] = !$store_info ? [] : $store_info;
-        //是否收藏
-        $count                = BModel::getCount('favorites', ['member_id' => $member_id, 'fav_type' => 'store', 'store_id' => $store_id]);
-        $result['is_collect'] = $count == 1 ? true : false;
-        $manjian              = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $store_id], ['a.price', 'a.discount']);
-        $result['manjian']    = $manjian->isEmpty() ? [] : $manjian->toArray();
-        $result['daijinquan'] = Member::getStoreVoucher($store_id);
-        //
-        $class_list = Store::getAllStoreClass(['store_id' => $store_id], ['stc_id', 'stc_name']);
-        $calssLists = [];
-        if (!$class_list->isEmpty()) {
-            $calssList = $class_list->toArray();
-            foreach ($calssList as $k => $val) {
-                $calssLists[$k]['stc_id']   = (string)$val->stc_id;
-                $calssLists[$k]['stc_name'] = (string)$val->stc_name;
-            }
+
+        if (!$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
         }
-        $goods_list           = Member::getStoreGoodsListByStcId($store_id, $class_id);
-        $result['class_list'] = $calssLists;
-        $result['goods_list'] = empty($goods_list) ? array() : $goods_list;
-        array_unshift($result['class_list'], ['stc_id' => "taozhuang", 'stc_name' => '优惠']);
-        array_unshift($result['class_list'], ['stc_id' => "xianshi", 'stc_name' => '折扣']);
-        array_unshift($result['class_list'], ['stc_id' => "hot", 'stc_name' => '热销']);
-        $result['cart']['nums']   = BModel::getCount('cart', ['store_id' => $store_id]);
-        $result['cart']['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
+        if (BModel::getCount('store', ['store_id' => $store_id]) == 0) {
+            return Base::jsonReturn(1001, '店铺不存在');
+        }
+        //店铺详情
+        $store_info             = BModel::getTableFieldFirstData('store', ['store_id' => $store_id], ['store_id', 'store_name', 'store_avatar', 'store_sales', 'store_credit', 'store_description']);
+        $store_info->daijinquan = Member::getStoreVoucher($store_id);
+        $result['store_info']   = $store_info;
+        //是否收藏
+        if (!$member_id) {
+            $count                = BModel::getCount('favorites', ['member_id' => $member_id, 'fav_type' => 'store', 'store_id' => $store_id]);
+            $result['is_collect'] = $count == 1 ? true : false;
+        } else {
+            $result['is_collect'] = false;
+        }
+        $manjian           = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $store_id], ['a.price', 'a.discount']);
+        $result['manjian'] = $manjian->isEmpty() ? [] : $manjian->toArray();
+
+        if (!$tab_id || $tab_id == 1) {
+            //
+            $class_list = Store::getAllStoreClass(['store_id' => $store_id], ['stc_id', 'stc_name']);
+            $calssLists = [];
+            if (!$class_list->isEmpty()) {
+                $calssList = $class_list->toArray();
+                foreach ($calssList as $k => $val) {
+                    $calssLists[$k]['stc_id']   = (string)$val->stc_id;
+                    $calssLists[$k]['stc_name'] = (string)$val->stc_name;
+                }
+            }
+            $goods_list           = Member::getStoreGoodsListByStcId($store_id, $class_id);
+            $result['class_list'] = $calssLists;
+            $result['goods_list'] = empty($goods_list) ? array() : $goods_list;
+            array_unshift($result['class_list'], ['stc_id' => "taozhuang", 'stc_name' => '优惠']);
+            array_unshift($result['class_list'], ['stc_id' => "xianshi", 'stc_name' => '折扣']);
+            array_unshift($result['class_list'], ['stc_id' => "hot", 'stc_name' => '热销']);
+            $result['cart']['nums']   = BModel::getCount('cart', ['store_id' => $store_id]);
+            $result['cart']['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
+//
+        } elseif ($tab_id == 2) {
+            $result['pingfen']['peisong']   = 0;
+            $result['pingfen']['baozhuang'] = 0;
+            $result['pingfen']['kouwei']    = 0;
+            $result['comment']['all']     = BModel::getCount('store_com', ['store_id' => $store_id]);
+            $result['comment']['manyi']   = Member::getManyi($store_id);
+            $result['comment']['bumanyi'] = Member::getBuManyi($store_id);
+            $result['comment']['youtu']   = Member::getYoutu($store_id);
+            $result['comment']['list']    = Member::getStoreComList($store_id, $type);
+        } elseif ($tab_id == 3) {
+            $field                           = ['a.area_info', 'a.store_address', 'b.face_img', 'b.logo_img', 'a.store_name', 'a.work_start_time', 'a.work_end_time', 'a.store_phone', 'a.sc_id'];
+            $store_info                      = BModel::getLeftData('store as a', 'store_joinin as b', 'a.member_id', 'b.member_id', ['a.store_id' => $store_id], $field)->first();
+            $result['store_detail']          = $store_info;
+            $result['store_detail']->sc_name = BModel::getTableValue('store_class', ['sc_id' => $store_info->sc_id], 'sc_name');
+        }
         return Base::jsonReturn(200, '获取成功', $result);
     }
 
