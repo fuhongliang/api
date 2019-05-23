@@ -80,6 +80,7 @@ class MemberController extends Base
             BModel::delData('umeng', ['member_id' => $member_id]);
             BModel::insertData('umeng', ['app_type' => $app_type, 'device_tokens' => $device_tokens, 'member_id' => $member_id]);
         });
+        BModel::delData('token',['member_id' => $member_id]);
         $member_info           = BModel::getTableFieldFirstData('member', ['member_id' => $member_id], ['member_id', 'member_mobile', 'member_name', 'member_avatar']);
         $member_info->member_avatar =is_null($member_info->member_avatar) ? '':$member_info->member_avatar;
         $member_info->need_pwd = $need_pwd;
@@ -122,6 +123,7 @@ class MemberController extends Base
                 'member_login_ip' => $request->getClientIp()
             );
             BModel::upTableData('member', ['member_id' => $member_data->member_id], $up_data);
+            BModel::delData('token',['member_id' => $member_data->member_id]);
             $member_info        = BModel::getTableFieldFirstData('member', ['member_id' => $member_data->member_id], ['member_id', 'member_mobile', 'member_name', 'member_avatar']);
             $member_info->member_avatar =is_null($member_info->member_avatar) ? '':$member_info->member_avatar;
             $member_info->token = Base::makeToken(microtime());
