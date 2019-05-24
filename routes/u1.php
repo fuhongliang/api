@@ -34,6 +34,7 @@ Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () 
     Route::post('store_com', 'MemberController@storeCom');//去评价---
     Route::post('cart_detail', 'MemberController@cartDetail');//购物车详情-----
     Route::post('go_settlement', 'MemberController@Settlement');//去结算
+    Route::post('buy_step', 'MemberController@buyStep');//下单
 
 
 
@@ -46,8 +47,6 @@ Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () 
 
 
 
-
-    Route::any('buy_step', 'MemberController@buyStep');//下单
 
     Route::any('order_list', 'MemberController@orderList');//订单列表
 

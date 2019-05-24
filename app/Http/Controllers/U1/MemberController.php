@@ -647,8 +647,8 @@ class MemberController extends Base
         $goods_field             = ['a.goods_id', 'a.goods_image', 'a.goods_name', 'a.goods_salenum', 'a.goods_price', 'a.goods_marketprice', 'b.goods_body as describe'];
         $data['goods_info']      = BModel::getLeftData('goods as a', 'goods_common as b', 'a.goods_commonid', 'b.goods_commonid', ['a.goods_id' => $goods_id], $goods_field)->first();
         $data['goods_info']->zan = BModel::getCount('goods_zan', ['goods_id' => $goods_id]);
-        $com_field                  = ['b.member_name', 'b.member_avatar', 'a.geval_content', 'a.geval_addtime'];
-        $data['com_info']        = Member::getGoodsComData(['geval_goodsid' => $goods_id],$member_id,$goods_id ,$com_field);
+        $com_field               = ['b.member_name', 'b.member_avatar', 'a.geval_content', 'a.geval_addtime'];
+        $data['com_info']        = Member::getGoodsComData(['geval_goodsid' => $goods_id], $member_id, $goods_id, $com_field);
         if ($member_id) {
             $count              = BModel::getCount('favorites', ['member_id' => $member_id, 'fav_type' => 'store', 'store_id' => $store_id]);
             $data['is_collect'] = $count == 1 ? true : false;
@@ -657,8 +657,8 @@ class MemberController extends Base
         }
 
         $data['cart']['nums'] = BModel::getCount('cart', ['store_id' => $store_id, 'buyer_id' => $member_id]);
-        $carts        = BModel::getTableAllData('cart', ['store_id' => $store_id, 'buyer_id' => $member_id], ['goods_price', 'goods_num']);
-        $money        = 0;
+        $carts                = BModel::getTableAllData('cart', ['store_id' => $store_id, 'buyer_id' => $member_id], ['goods_price', 'goods_num']);
+        $money                = 0;
         foreach ($carts as $cart) {
             $money += $cart->goods_price * $cart->goods_num;
         }
@@ -672,6 +672,7 @@ class MemberController extends Base
         $member_id = $request->input('member_id');
         $content   = $request->input('content');
     }
+
     /**评论店铺
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -760,9 +761,9 @@ class MemberController extends Base
                     $amount += $v->goods_price * $v->goods_num;
                 }
             }
-            $result['amount']     = Base::ncPriceFormat($amount);
-            $result['store'] = BModel::getTableFieldFirstData('store', ['store_id' => $cart_datum->store_id], ['store_name','store_id']);
-            $data[]               = $result;
+            $result['amount'] = Base::ncPriceFormat($amount);
+            $result['store']  = BModel::getTableFieldFirstData('store', ['store_id' => $cart_datum->store_id], ['store_name', 'store_id']);
+            $data[]           = $result;
         }
         return Base::jsonReturn(200, '获取成功', $data);
     }
@@ -794,8 +795,8 @@ class MemberController extends Base
      */
     function Settlement(Request $request)
     {
-        $store_id          = $request->input('store_id');
-        $member_id         = $request->input('member_id');
+        $store_id  = $request->input('store_id');
+        $member_id = $request->input('member_id');
         if (!$member_id || !$store_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
@@ -803,28 +804,20 @@ class MemberController extends Base
             return Base::jsonReturn(1001, '用户不存在');
         }
         $result            = [];
-        $address           = BModel::getTableFieldFirstData('address', ['member_id' => $member_id,'is_default'=>'1'], ['true_name', 'mob_phone', 'area_info', 'address']);
+        $address           = BModel::getTableFieldFirstData('address', ['member_id' => $member_id, 'is_default' => '1'], ['true_name', 'mob_phone', 'area_info', 'address']);
         $result['address'] = !$address ? [] : $address;
-        $cart              = BModel::getTableAllData('cart', ['buyer_id' => $member_id, 'store_id' => $store_id]);
-        $amount            = 0;
-        if (!$cart->isEmpty()) {
-            foreach ($cart->toArray() as $v) {
-                if ($v->bl_id == 1) {
-                    $bl_data        = BModel::getTableAllData('p_bundling_goods', ['bl_id' => $v->bl_id], ['goods_id'])->toArray();
-                    $v->marketprice = DB::table('goods')->whereIn('goods_id', array_column($bl_data, 'goods_id'))->sum('goods_marketprice');
-                } else {
-                    $v->marketprice = BModel::getTableValue('goods', ['goods_id' => $v->goods_id], 'goods_marketprice');
-                }
-                $amount += $v->goods_price * $v->goods_num;
-            }
-        }
-        $result['cart']            = $cart->isEmpty() ? [] : $cart->toArray();
-        $result['peisong_amount']         = 5;
-        $result['manjian_amount']         = Member::getManSongCount($store_id, $amount);
-        $result['daijinquan_amount']      = Member::getVoucherCount($store_id, $member_id, $amount);
-        $daijinquan_list           = Member::getUserVoucherList($store_id, $member_id, $amount);
-        $result['daijinquan_list'] = $daijinquan_list;
-        $result['total_amount']           = $amount + $result['peisong_amount'] - $result['manjian_amount'] - $result['daijinquan_amount'];
+
+        $result['store_detail'] = BModel::getTableFieldFirstData('store', ['store_id' => $store_id], ['store_id', 'store_name']);
+
+        $data                        = Member::getCartInfoByStoreId($store_id, $member_id);
+        $result['goods_detail']      = $data['data'];
+        $amount                      = $data['amount'];
+        $result['peisong_amount']    = 5;
+        $result['manjian_amount']    = Member::getManSongCount($store_id, $amount);
+        $result['daijinquan_amount'] = Member::getVoucherCount($store_id, $member_id, $amount);
+        $result['daijinquan_list']   = Member::getUserVoucherList($store_id, $member_id, $amount);
+        $total                       = $amount + $result['peisong_amount'] - $result['manjian_amount'] - $result['daijinquan_amount'];
+        $result['total_amount']      = $total <= 0 ? 0 : $total;
         return Base::jsonReturn(200, '获取成功', $result);
     }
 

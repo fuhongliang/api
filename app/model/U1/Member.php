@@ -3,6 +3,7 @@
 namespace App\model\U1;
 
 use App\BModel;
+use App\Http\Controllers\BaseController;
 use App\model\V3\Goods;
 use Illuminate\Support\Facades\DB;
 
@@ -392,6 +393,51 @@ class Member extends BModel
             ->leftJoin('p_bundling_goods AS b', 'a.goods_id', 'b.goods_id')
             ->where('b.bl_id', $bl_id)
             ->sum('a.goods_marketprice');
+    }
+
+    static function getCartInfoByStoreId($store_id, $member_id)
+    {
+        $field  = ['goods_id', 'goods_name', 'goods_price', 'goods_image', 'bl_id', 'xs_id', 'goods_num'];
+        $data   = BModel::getTableAllData('cart', ['store_id' => $store_id, 'buyer_id' => $member_id], $field);
+        $amount = 0;
+        if (!$data->isEmpty()) {
+            foreach ($data as $k => &$v) {
+                $amount += $v->goods_num * $v->goods_price;
+                if ($v->bl_id != 0) {
+                    $goods_data = BModel::getTableAllData('p_bundling_goods', ['bl_id' => $v->bl_id], ['goods_id']);
+                    if ($goods_data->isEmpty()) {
+                        return [];
+                    }
+                    $goods_id_array = [];
+                    foreach ($goods_data as $i) {
+                        array_push($goods_id_array, $i->goods_id);
+                    }
+                    $v->goods_marketprice = DB::table('goods')->whereIn('goods_id', array_unique($goods_id_array))->sum('goods_marketprice');
+                    unset($v->bl_id);
+                    unset($v->xs_id);
+                } elseif ($v->xs_id != 0) {
+                    $goods_data = BModel::getTableAllData('p_xianshi_goods', ['xianshi_id' => $v->xs_id], ['goods_id']);
+                    if ($goods_data->isEmpty()) {
+                        return [];
+                    }
+                    $goods_id_array = [];
+                    foreach ($goods_data as $i) {
+                        array_push($goods_id_array, $i->goods_id);
+                    }
+                    $v->goods_marketprice = DB::table('goods')->whereIn('goods_id', array_unique($goods_id_array))->sum('goods_marketprice');
+                    unset($v->xs_id);
+                    unset($v->bl_id);
+                } else {
+                    unset($v->bl_id);
+                    unset($v->xs_id);
+                    $v->goods_marketprice = BModel::getTableValue('goods', ['goods_id' => $v->goods_id], 'goods_marketprice');
+                }
+            }
+
+        }
+        $result['amount'] = BaseController::ncPriceFormat($amount);
+        $result['data']   = $data;
+        return $result;
     }
 
 }
