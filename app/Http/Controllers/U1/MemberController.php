@@ -736,10 +736,17 @@ class MemberController extends Base
         }
         $cart_data = DB::table('cart')->where('buyer_id', $member_id)->distinct()->get(['store_id'])->toArray();
         $result =$data   = [];
+        $amount=0;
         foreach ($cart_data as $cart_datum) {
             $result['list'] = BModel::getTableAllData('cart', ['store_id' => $cart_datum->store_id],['goods_id','goods_name','goods_price','goods_num','goods_image'])->toArray();
-            $amount=BModel::getSum('cart',['store_id'=>$cart_datum->store_id,'buyer_id'=>$member_id],'goods_price');
-            $result['amount']     = Base::ncPriceFormat($amount);
+            if(!empty($result['list']))
+            {
+                foreach ($result['list'] as $v)
+                {
+                    $amount+=$v->goods_price*$v->goods_num;
+                }
+            }
+            $result['amount']=Base::ncPriceFormat($amount);
             $result['store_name'] = BModel::getTableValue('store', ['store_id' => $cart_datum->store_id], 'store_name');
             $data[]=$result;
         }
