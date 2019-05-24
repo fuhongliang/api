@@ -411,7 +411,6 @@ class MemberController extends Base
             if (BModel::getCount('cart', ['bl_id' => $goods_id, 'buyer_id' => $member_id]) > 0) {
                 DB::transaction(function () use ($goods_info, $goods_id_array, $quantity, $member_id, $goods_id, $bl_amount) {
                     BModel::numIncrement('cart', ['bl_id' => $goods_id, 'buyer_id' => $member_id], 'goods_num', $quantity);
-                    BModel::numIncrement('cart', ['bl_id' => $goods_id, 'buyer_id' => $member_id], 'goods_price', Base::ncPriceFormat($bl_amount * $quantity));
                     foreach ($goods_id_array as $goodsid) {
                         $is_much = BModel::getTableValue('goods', ['goods_id' => $goodsid], 'is_much');
                         if ($is_much == 1) {
@@ -425,7 +424,7 @@ class MemberController extends Base
                 $goods_info['store_id']    = $store_id;
                 $goods_info['goods_id']    = $goods_list[0]->goods_id;
                 $goods_info['goods_name']  = $bl_info->bl_name;
-                $goods_info['goods_price'] = Base::ncPriceFormat($bl_amount * $quantity);
+                $goods_info['goods_price'] = Base::ncPriceFormat($bl_info->bl_discount_price);
                 $goods_info['goods_num']   = $quantity;
                 $goods_info['goods_image'] = $goods_list[0]->goods_image;
                 $goods_info['store_name']  = $bl_info->store_name;
@@ -477,7 +476,6 @@ class MemberController extends Base
             if (BModel::getCount('cart', ['xs_id' => $goods_id, 'buyer_id' => $member_id]) > 0) {
                 DB::transaction(function () use ($goods_info, $goods_id_array, $quantity, $member_id, $goods_id, $xianshi_amount) {
                     BModel::numIncrement('cart', ['xs_id' => $goods_id, 'buyer_id' => $member_id], 'goods_num', $quantity);
-                    BModel::numIncrement('cart', ['xs_id' => $goods_id, 'buyer_id' => $member_id], 'goods_price', Base::ncPriceFormat($xianshi_amount * $quantity));
                     foreach ($goods_id_array as $goodsid) {
                         $is_much = BModel::getTableValue('goods', ['goods_id' => $goodsid], 'is_much');
                         if ($is_much == 1) {
@@ -490,7 +488,7 @@ class MemberController extends Base
                 $goods_info['store_id']    = $store_id;
                 $goods_info['goods_id']    = $goods_list[0]->goods_id;
                 $goods_info['goods_name']  = $xianshi_info->xianshi_name;
-                $goods_info['goods_price'] = Base::ncPriceFormat($xianshi_amount * $quantity);
+                $goods_info['goods_price'] = Base::ncPriceFormat($xianshi_amount);
                 $goods_info['goods_num']   = $quantity;
                 $goods_info['goods_image'] = $goods_list[0]->goods_image;
                 $goods_info['store_name']  = $xianshi_info->store_name;
@@ -524,7 +522,6 @@ class MemberController extends Base
             if (BModel::getCount('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id,'bl_id'=>0,'xs_id'=>0]) > 0) {
                 DB::transaction(function () use ($quantity, $member_id, $goods_id, $goods_info) {
                     BModel::numIncrement('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id], 'goods_num', $quantity);
-                    BModel::numIncrement('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id], 'goods_price', Base::ncPriceFormat($goods_info->goods_price * $quantity));
                     $is_much = BModel::getTableValue('goods', ['goods_id' => $goods_id], 'is_much');
                     if ($is_much == 1) {
                         BModel::numDecrement('goods', ['goods_id' => $goods_id], 'goods_storage', $quantity);
@@ -535,7 +532,7 @@ class MemberController extends Base
                 $goodsinfo['store_id']    = $store_id;
                 $goodsinfo['goods_id']    = $goods_id;
                 $goodsinfo['goods_name']  = $goods_info->goods_name;
-                $goodsinfo['goods_price'] = Base::ncPriceFormat($goods_info->goods_price * $quantity);
+                $goodsinfo['goods_price'] = Base::ncPriceFormat($goods_info->goods_price);
                 $goodsinfo['goods_num']   = $quantity;
                 $goodsinfo['goods_image'] = $goods_info->goods_image;
                 $goodsinfo['store_name']  = $goods_info->store_name;
@@ -551,7 +548,12 @@ class MemberController extends Base
         }
         $data           = [];
         $data['nums']   = BModel::getCount('cart', ['store_id' => $store_id, 'buyer_id' => $member_id]);
-        $data['amount'] = BModel::getSum('cart', ['store_id' => $store_id, 'buyer_id' => $member_id], 'goods_price');
+        $carts=BModel::getTableAllData('cart',['store_id' => $store_id, 'buyer_id' => $member_id],['goods_price','goods_num']);
+        $money=0;
+        foreach ($carts as $cart) {
+            $money += $cart->goods_price * $cart->goods_num;
+        }
+        $data['amount'] = Base::ncPriceFormat($money);
         return Base::jsonReturn(200, '获取成功', $data);
     }
 
@@ -725,20 +727,23 @@ class MemberController extends Base
      */
     function myCart(Request $request)
     {
-        $store_id  = $request->input('store_id');
         $member_id = $request->input('member_id');
-        $cart_data = DB::table('cart')->where('buyer_id', $member_id)->distinct()->get(['store_id'])->toArray();
-        $result    = [];
-        foreach ($cart_data as $cart_datum) {
-            $amount                                = 0;
-            $result[$cart_datum->store_id]['list'] = BModel::getTableAllData('cart', ['store_id' => $cart_datum->store_id])->toArray();
-            foreach ($result[$cart_datum->store_id]['list'] as $v) {
-                $amount += Base::ncPriceFormat($v->goods_price * $v->goods_num);
-            }
-            $result[$cart_datum->store_id]['amount']     = $amount;
-            $result[$cart_datum->store_id]['store_name'] = BModel::getTableValue('store', ['store_id' => $cart_datum->store_id], 'store_name');
+        if (!$member_id) {
+            return Base::jsonReturn(1000, '参数缺失');
         }
-        return Base::jsonReturn(200, '获取成功', $result);
+        if (BModel::getCount('member', ['member_id' => $member_id]) == 0) {
+            return Base::jsonReturn(1001, '用户不存在');
+        }
+        $cart_data = DB::table('cart')->where('buyer_id', $member_id)->distinct()->get(['store_id'])->toArray();
+        $result =$data   = [];
+        foreach ($cart_data as $cart_datum) {
+            $result['list'] = BModel::getTableAllData('cart', ['store_id' => $cart_datum->store_id],['goods_id','goods_name','goods_price','goods_num','goods_image'])->toArray();
+            $amount=BModel::getSum('cart',['store_id'=>$cart_datum->store_id,'buyer_id'=>$member_id],'goods_price');
+            $result['amount']     = Base::ncPriceFormat($amount);
+            $result['store_name'] = BModel::getTableValue('store', ['store_id' => $cart_datum->store_id], 'store_name');
+            $data[]=$result;
+        }
+        return Base::jsonReturn(200, '获取成功', $data);
     }
 
     /**清空购物车

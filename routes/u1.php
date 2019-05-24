@@ -28,7 +28,7 @@ Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () 
     Route::post('voucher_list', 'MemberController@voucherList');//店铺代金券列表
     Route::post('get_voucher', 'MemberController@getVoucher');//领取代金券
     Route::post('add_cart', 'MemberController@addCart');//添加购物车
-
+    Route::post('my_cart', 'MemberController@myCart');//我的购物车
 
 
 
@@ -40,7 +40,7 @@ Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () 
 
 
 
-    Route::any('my_cart', 'MemberController@myCart');//我的购物车
+
     Route::any('clear_cart', 'MemberController@clearCart');//清购物车
 
     Route::any('go_settlement', 'MemberController@Settlement');//去结算
