@@ -370,15 +370,17 @@ class MemberController extends Base
         if (!$member_id || !$store_id || !$stc_id || !$goods_id || !$quantity) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        //判断是否为特殊商品
+        if (BModel::getCount('member', ['member_id' => $member_id]) == 0) {
+            return Base::jsonReturn(1001, '用户不存在');
+        }
         $storeid = BModel::getTableValue('store', ['member_id' => $member_id], 'store_id');
         if (!$storeid) {
             $storeid = 0;
         }
         if ($stc_id == 'taozhuang') {
             $bl_info = BModel::getTableFirstData('p_bundling', array('bl_id' => $goods_id));
-            if (empty($bl_info) || $bl_info->bl_state == '0') {
-                return Base::jsonReturn(1001, '该优惠套装已不存在，建议您单独购买');
+            if (empty($bl_info) || $bl_info->bl_state == 0) {
+                return Base::jsonReturn(1001, '该优惠套装已不存在');
             }
 
             //检查每个商品是否符合条件,并重新计算套装总价
@@ -398,16 +400,18 @@ class MemberController extends Base
                 if ($goods_info->store_id == $storeid) {
                     return Base::jsonReturn(1002, '不能购买自己的商品');
                 }
-                if (intval($goods_info->goods_storage) < 1) {
+                if ($goods_info->is_much == 1 && intval($goods_info->goods_storage) < 1) {
                     return Base::jsonReturn(1003, '没有库存');
                 }
-                if (intval($goods_info->goods_storage) < $quantity) {
+                if ($goods_info->is_much == 1 && intval($goods_info->goods_storage) < $quantity) {
                     return Base::jsonReturn(1004, '库存不足');
                 }
             }
+
             if (BModel::getCount('cart', ['bl_id' => $goods_id, 'buyer_id' => $member_id]) > 0) {
-                DB::transaction(function () use ($goods_info, $goods_id_array, $quantity, $member_id, $goods_id) {
+                DB::transaction(function () use ($goods_info, $goods_id_array, $quantity, $member_id, $goods_id, $bl_amount) {
                     BModel::numIncrement('cart', ['bl_id' => $goods_id, 'buyer_id' => $member_id], 'goods_num', $quantity);
+                    BModel::numIncrement('cart', ['bl_id' => $goods_id, 'buyer_id' => $member_id], 'goods_price', Base::ncPriceFormat($bl_amount * $quantity));
                     foreach ($goods_id_array as $goodsid) {
                         $is_much = BModel::getTableValue('goods', ['goods_id' => $goodsid], 'is_much');
                         if ($is_much == 1) {
@@ -418,10 +422,10 @@ class MemberController extends Base
             } else {
                 //优惠套装作为一条记录插入购物车，图片取套装内的第一个商品图
                 $goods_info                = array();
-                $goods_info['store_id']    = $bl_info->store_id;
+                $goods_info['store_id']    = $store_id;
                 $goods_info['goods_id']    = $goods_list[0]->goods_id;
                 $goods_info['goods_name']  = $bl_info->bl_name;
-                $goods_info['goods_price'] = $bl_amount;
+                $goods_info['goods_price'] = Base::ncPriceFormat($bl_amount * $quantity);
                 $goods_info['goods_num']   = $quantity;
                 $goods_info['goods_image'] = $goods_list[0]->goods_image;
                 $goods_info['store_name']  = $bl_info->store_name;
@@ -441,7 +445,7 @@ class MemberController extends Base
 
         } elseif ($stc_id == 'xianshi') {
             $xianshi_info = BModel::getTableFirstData('p_xianshi', array('xianshi_id' => $goods_id));
-            if (empty($xianshi_info) || $xianshi_info->state == '0' || $xianshi_info->end_time <= time()) {
+            if (empty($xianshi_info) || $xianshi_info->state == 0 || $xianshi_info->end_time <= time()) {
                 return Base::jsonReturn(1001, '该限时优惠已不存在');
             }
             if ($quantity < $xianshi_info->lower_limit) {
@@ -463,16 +467,17 @@ class MemberController extends Base
                 if ($goods_info->store_id == $storeid) {
                     return Base::jsonReturn(1002, '不能购买自己的商品');
                 }
-                if (intval($goods_info->goods_storage) < 1) {
+                if ($goods_info->is_much == 1 && intval($goods_info->goods_storage) < 1) {
                     return Base::jsonReturn(1003, '没有库存');
                 }
-                if (intval($goods_info->goods_storage) < $quantity) {
+                if ($goods_info->is_much == 1 && intval($goods_info->goods_storage) < $quantity) {
                     return Base::jsonReturn(1004, '库存不足');
                 }
             }
-            if (BModel::getCount('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id]) > 0) {
-                DB::transaction(function () use ($goods_info, $goods_id_array, $quantity, $member_id, $goods_id) {
-                    BModel::numIncrement('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id], 'goods_num', $quantity);
+            if (BModel::getCount('cart', ['xs_id' => $goods_id, 'buyer_id' => $member_id]) > 0) {
+                DB::transaction(function () use ($goods_info, $goods_id_array, $quantity, $member_id, $goods_id, $xianshi_amount) {
+                    BModel::numIncrement('cart', ['xs_id' => $goods_id, 'buyer_id' => $member_id], 'goods_num', $quantity);
+                    BModel::numIncrement('cart', ['xs_id' => $goods_id, 'buyer_id' => $member_id], 'goods_price', Base::ncPriceFormat($xianshi_amount * $quantity));
                     foreach ($goods_id_array as $goodsid) {
                         $is_much = BModel::getTableValue('goods', ['goods_id' => $goodsid], 'is_much');
                         if ($is_much == 1) {
@@ -482,14 +487,15 @@ class MemberController extends Base
                 });
             } else {
                 $goods_info                = array();
-                $goods_info['store_id']    = $xianshi_info->store_id;
+                $goods_info['store_id']    = $store_id;
                 $goods_info['goods_id']    = $goods_list[0]->goods_id;
                 $goods_info['goods_name']  = $xianshi_info->xianshi_name;
-                $goods_info['goods_price'] = $xianshi_amount;
+                $goods_info['goods_price'] = Base::ncPriceFormat($xianshi_amount * $quantity);
                 $goods_info['goods_num']   = $quantity;
                 $goods_info['goods_image'] = $goods_list[0]->goods_image;
                 $goods_info['store_name']  = $xianshi_info->store_name;
                 $goods_info['buyer_id']    = $member_id;
+                $goods_info['xs_id']       = $goods_id;
 
                 DB::transaction(function () use ($goods_info, $goods_id_array, $quantity) {
                     BModel::insertData('cart', $goods_info);
@@ -507,7 +513,7 @@ class MemberController extends Base
             if (empty($goods_info) || $goods_info->goods_state != 1) {
                 return Base::jsonReturn(1001, '商品不存在或已下架');
             }
-            if ($goods_info->is_much != 2 && $goods_info->goods_storage < $quantity) {
+            if ($goods_info->is_much == 1 && intval($goods_info->goods_storage) < $quantity) {
                 return Base::jsonReturn(1002, '商品库存不足');
             }
             //不能购买自己店铺
@@ -515,9 +521,10 @@ class MemberController extends Base
                 return Base::jsonReturn(1003, '不能购买自己的商品');
             }
 
-            if (BModel::getCount('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id]) > 0) {
-                DB::transaction(function () use ($quantity, $member_id, $goods_id) {
+            if (BModel::getCount('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id,'bl_id'=>0,'xs_id'=>0]) > 0) {
+                DB::transaction(function () use ($quantity, $member_id, $goods_id, $goods_info) {
                     BModel::numIncrement('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id], 'goods_num', $quantity);
+                    BModel::numIncrement('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id], 'goods_price', Base::ncPriceFormat($goods_info->goods_price * $quantity));
                     $is_much = BModel::getTableValue('goods', ['goods_id' => $goods_id], 'is_much');
                     if ($is_much == 1) {
                         BModel::numDecrement('goods', ['goods_id' => $goods_id], 'goods_storage', $quantity);
@@ -525,32 +532,27 @@ class MemberController extends Base
                 });
             } else {
                 $goodsinfo                = array();
-                $goodsinfo['store_id']    = $goods_info->store_id;
+                $goodsinfo['store_id']    = $store_id;
                 $goodsinfo['goods_id']    = $goods_id;
                 $goodsinfo['goods_name']  = $goods_info->goods_name;
-                $goodsinfo['goods_price'] = $goods_info->goods_price;
+                $goodsinfo['goods_price'] = Base::ncPriceFormat($goods_info->goods_price * $quantity);
                 $goodsinfo['goods_num']   = $quantity;
                 $goodsinfo['goods_image'] = $goods_info->goods_image;
                 $goodsinfo['store_name']  = $goods_info->store_name;
                 $goodsinfo['buyer_id']    = $member_id;
-
                 DB::transaction(function () use ($goodsinfo, $goods_id, $quantity) {
                     BModel::insertData('cart', $goodsinfo);
-
                     $is_much = BModel::getTableValue('goods', ['goods_id' => $goods_id], 'is_much');
                     if ($is_much == 1) {
                         BModel::numDecrement('goods', ['goods_id' => $goods_id], 'goods_storage', $quantity);
                     }
-
                 });
             }
-
-
         }
         $data           = [];
-        $data['nums']   = BModel::getCount('cart', ['store_id' => $store_id]);
-        $data['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
-        return Base::jsonReturn(200, '添加成功', $data);
+        $data['nums']   = BModel::getCount('cart', ['store_id' => $store_id, 'buyer_id' => $member_id]);
+        $data['amount'] = BModel::getSum('cart', ['store_id' => $store_id, 'buyer_id' => $member_id], 'goods_price');
+        return Base::jsonReturn(200, '获取成功', $data);
     }
 
     /**店铺代金券
