@@ -666,6 +666,12 @@ class MemberController extends Base
         return Base::jsonReturn(200, '请求成功', $data);
     }
 
+    function cartDetail(Request $request)
+    {
+        $store_id  = $request->input('store_id');
+        $member_id = $request->input('member_id');
+        $content   = $request->input('content');
+    }
     /**评论店铺
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -755,7 +761,7 @@ class MemberController extends Base
                 }
             }
             $result['amount']     = Base::ncPriceFormat($amount);
-            $result['store_name'] = BModel::getTableValue('store', ['store_id' => $cart_datum->store_id], 'store_name');
+            $result['store'] = BModel::getTableFieldFirstData('store', ['store_id' => $cart_datum->store_id], ['store_name','store_id']);
             $data[]               = $result;
         }
         return Base::jsonReturn(200, '获取成功', $data);
@@ -790,8 +796,14 @@ class MemberController extends Base
     {
         $store_id          = $request->input('store_id');
         $member_id         = $request->input('member_id');
+        if (!$member_id || !$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (BModel::getCount('member', ['member_id' => $member_id]) == 0) {
+            return Base::jsonReturn(1001, '用户不存在');
+        }
         $result            = [];
-        $address           = BModel::getTableFieldFirstData('address', ['member_id' => $member_id, 'is_default' => 1], ['true_name', 'mob_phone', 'area_info', 'address']);
+        $address           = BModel::getTableFieldFirstData('address', ['member_id' => $member_id,'is_default'=>'1'], ['true_name', 'mob_phone', 'area_info', 'address']);
         $result['address'] = !$address ? [] : $address;
         $cart              = BModel::getTableAllData('cart', ['buyer_id' => $member_id, 'store_id' => $store_id]);
         $amount            = 0;
@@ -807,12 +819,12 @@ class MemberController extends Base
             }
         }
         $result['cart']            = $cart->isEmpty() ? [] : $cart->toArray();
-        $result['peisong']         = 5;
-        $result['manjian']         = Member::getManSongCount($store_id, $amount);
-        $result['daijinquan']      = Member::getVoucherCount($store_id, $member_id, $amount);
+        $result['peisong_amount']         = 5;
+        $result['manjian_amount']         = Member::getManSongCount($store_id, $amount);
+        $result['daijinquan_amount']      = Member::getVoucherCount($store_id, $member_id, $amount);
         $daijinquan_list           = Member::getUserVoucherList($store_id, $member_id, $amount);
         $result['daijinquan_list'] = $daijinquan_list;
-        $result['total']           = $amount + $result['peisong'] - $result['manjian'] - $result['daijinquan'];
+        $result['total_amount']           = $amount + $result['peisong_amount'] - $result['manjian_amount'] - $result['daijinquan_amount'];
         return Base::jsonReturn(200, '获取成功', $result);
     }
 
