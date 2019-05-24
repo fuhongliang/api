@@ -25,22 +25,20 @@ Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () 
     Route::post('user_address_save', 'MemberController@userAddrSave');//用户收货地址保存
     Route::post('home_page', 'MemberController@homePage');//首页
     Route::post('store_info', 'MemberController@storeInfo');//店铺详情
+    Route::post('voucher_list', 'MemberController@voucherList');//店铺代金券列表
+    Route::post('get_voucher', 'MemberController@getVoucher');//领取代金券
+    Route::post('add_cart', 'MemberController@addCart');//添加购物车
 
 
 
 
-    Route::any('add_cart', 'MemberController@addCart');//添加购物车
-    Route::any('voucher_list', 'MemberController@voucherList');//店铺代金券列表
-    Route::any('get_voucher', 'MemberController@getVoucher');//领取代金券
 
 
     Route::any('goods_detail', 'MemberController@goodsDetail');//商品详情
 
     Route::any('store_com', 'MemberController@storeCom');//评论商家店铺
 
-    //Route::any('store_com_list', 'MemberController@storeComList');//店铺评论列表
 
-    //Route::any('store_detail', 'MemberController@storeDetail');//店铺信息详情
 
     Route::any('my_cart', 'MemberController@myCart');//我的购物车
     Route::any('clear_cart', 'MemberController@clearCart');//清购物车

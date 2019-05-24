@@ -341,11 +341,11 @@ class MemberController extends Base
             $result['pingfen']['peisong']   = 0;
             $result['pingfen']['baozhuang'] = 0;
             $result['pingfen']['kouwei']    = 0;
-            $result['comment']['all']     = BModel::getCount('store_com', ['store_id' => $store_id]);
-            $result['comment']['manyi']   = Member::getManyi($store_id);
-            $result['comment']['bumanyi'] = Member::getBuManyi($store_id);
-            $result['comment']['youtu']   = Member::getYoutu($store_id);
-            $result['comment']['list']    = Member::getStoreComList($store_id, $type);
+            $result['comment']['all']       = BModel::getCount('store_com', ['store_id' => $store_id]);
+            $result['comment']['manyi']     = Member::getManyi($store_id);
+            $result['comment']['bumanyi']   = Member::getBuManyi($store_id);
+            $result['comment']['youtu']     = Member::getYoutu($store_id);
+            $result['comment']['list']      = Member::getStoreComList($store_id, $type);
         } elseif ($tab_id == 3) {
             $field                           = ['a.area_info', 'a.store_address', 'b.face_img', 'b.logo_img', 'a.store_name', 'a.work_start_time', 'a.work_end_time', 'a.store_phone', 'a.sc_id'];
             $store_info                      = BModel::getLeftData('store as a', 'store_joinin as b', 'a.member_id', 'b.member_id', ['a.store_id' => $store_id], $field)->first();
@@ -561,7 +561,7 @@ class MemberController extends Base
     {
         $store_id  = $request->input('store_id');
         $member_id = $request->input('member_id');
-        if (!$store_id || !$member_id) {
+        if (!$store_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
         $result           = [];
@@ -591,9 +591,16 @@ class MemberController extends Base
         if (!$voucher_t_id || !$member_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
+        if (BModel::getCount('member', ['member_id' => $member_id]) == 0) {
+            return Base::jsonReturn(1001, '用户不存在');
+        }
         $voucher_info = BModel::getTableFirstData('voucher_template', ['voucher_t_id' => $voucher_t_id]);
         if (!$voucher_info) {
             return Base::jsonReturn(1001, '代金券不存在');
+        }
+        $store_id = BModel::getTableValue('store', ['member_id' => $member_id], 'store_id');
+        if ($store_id && $store_id == $voucher_info->voucher_t_store_id) {
+            return Base::jsonReturn(1002, '不能领取自己店铺代金券');
         }
         $member_name = BModel::getTableValue('member', ['member_id' => $member_id], 'member_name');
         $ins_data    = array(
