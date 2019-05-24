@@ -397,7 +397,7 @@ class Member extends BModel
 
     static function getCartInfoByStoreId($store_id, $member_id)
     {
-        $field  = ['goods_id', 'goods_name', 'goods_price', 'goods_image', 'bl_id', 'xs_id', 'goods_num'];
+        $field  = ['cart_id','goods_id', 'goods_name', 'goods_price', 'goods_image', 'bl_id', 'xs_id', 'goods_num'];
         $data   = BModel::getTableAllData('cart', ['store_id' => $store_id, 'buyer_id' => $member_id], $field);
         $amount = 0;
         if (!$data->isEmpty()) {
