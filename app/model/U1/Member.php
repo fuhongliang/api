@@ -228,14 +228,25 @@ class Member extends BModel
         return $goods_info;
     }
 
-    static function getGoodsComData($condition, $field = ['*'])
+    static function getGoodsComData($condition, $member_id, $goods_id, $field = ['*'])
     {
-        $data = DB::table('evaluate_goods AS a')
+        $result = [];
+        $data   = DB::table('evaluate_goods AS a')
             ->leftJoin('member as b', 'a.geval_frommemberid', 'b.member_id')
             ->where($condition)
             ->orderBy('geval_addtime', 'desc')
             ->get($field);
-        return $data;
+
+        if (!$data->isEmpty()) {
+            foreach ($data as $k => $v) {
+                $result[$k]['member_name']   = is_null($v->member_name) ? "" : $v->member_name;
+                $result[$k]['member_avatar'] = is_null($v->member_avatar) ? "" : $v->member_avatar;
+                $result[$k]['geval_content'] = is_null($v->geval_content) ? "" : $v->geval_content;
+                $result[$k]['geval_addtime'] = date('Y.m.d', $v->geval_addtime);
+                $result[$k]['is_zan']        = BModel::getCount('goods_zan', ['member_id' => $member_id, 'goods_id' => $goods_id]);
+            }
+        }
+        return $result;
     }
 
     static function getManyi($store_id)

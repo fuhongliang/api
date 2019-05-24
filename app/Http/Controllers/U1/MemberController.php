@@ -519,7 +519,7 @@ class MemberController extends Base
                 return Base::jsonReturn(1003, '不能购买自己的商品');
             }
 
-            if (BModel::getCount('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id,'bl_id'=>0,'xs_id'=>0]) > 0) {
+            if (BModel::getCount('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id, 'bl_id' => 0, 'xs_id' => 0]) > 0) {
                 DB::transaction(function () use ($quantity, $member_id, $goods_id, $goods_info) {
                     BModel::numIncrement('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id], 'goods_num', $quantity);
                     $is_much = BModel::getTableValue('goods', ['goods_id' => $goods_id], 'is_much');
@@ -546,10 +546,10 @@ class MemberController extends Base
                 });
             }
         }
-        $data           = [];
-        $data['nums']   = BModel::getCount('cart', ['store_id' => $store_id, 'buyer_id' => $member_id]);
-        $carts=BModel::getTableAllData('cart',['store_id' => $store_id, 'buyer_id' => $member_id],['goods_price','goods_num']);
-        $money=0;
+        $data         = [];
+        $data['nums'] = BModel::getCount('cart', ['store_id' => $store_id, 'buyer_id' => $member_id]);
+        $carts        = BModel::getTableAllData('cart', ['store_id' => $store_id, 'buyer_id' => $member_id], ['goods_price', 'goods_num']);
+        $money        = 0;
         foreach ($carts as $cart) {
             $money += $cart->goods_price * $cart->goods_num;
         }
@@ -638,22 +638,32 @@ class MemberController extends Base
     function goodsDetail(Request $request)
     {
         $store_id  = $request->input('store_id');
-        $member_id = $request->input('member_id');
+        $member_id = $request->input('member_id');///////////////////////////////
         $goods_id  = $request->input('goods_id');
-        if (!$store_id || !$member_id || !$goods_id) {
+        if (!$store_id || !$goods_id || !$member_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        $data                   = [];
-        $goods_field            = ['a.goods_id', 'a.goods_name', 'a.goods_salenum', 'a.goods_price', 'a.goods_marketprice', 'b.goods_body as describe'];
-        $data['goods_info']     = BModel::getLeftData('goods as a', 'goods_common as b', 'a.goods_commonid', 'b.goods_commonid', ['a.goods_id' => $goods_id], $goods_field)->first();
-        $com_field              = ['b.member_name', 'b.member_avatar', 'a.geval_content', 'a.geval_addtime'];
-        $com_info               = Member::getGoodsComData(['geval_goodsid' => $goods_id], $com_field);
-        $data['com_info']       = $com_info->isEmpty() ? [] : $com_info->toArray();
-        $data['cart']['nums']   = BModel::getCount('cart', ['store_id' => $store_id]);
-        $data['cart']['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
-        $count                  = BModel::getCount('favorites', ['member_id' => $member_id, 'fav_type' => 'store', 'store_id' => $store_id]);
-        $data['is_collect']     = $count == 1 ? true : false;
-        return Base::jsonReturn(2000, '请求失败', $data);
+        $data                    = [];
+        $goods_field             = ['a.goods_id', 'a.goods_image', 'a.goods_name', 'a.goods_salenum', 'a.goods_price', 'a.goods_marketprice', 'b.goods_body as describe'];
+        $data['goods_info']      = BModel::getLeftData('goods as a', 'goods_common as b', 'a.goods_commonid', 'b.goods_commonid', ['a.goods_id' => $goods_id], $goods_field)->first();
+        $data['goods_info']->zan = BModel::getCount('goods_zan', ['goods_id' => $goods_id]);
+        $com_field                  = ['b.member_name', 'b.member_avatar', 'a.geval_content', 'a.geval_addtime'];
+        $data['com_info']        = Member::getGoodsComData(['geval_goodsid' => $goods_id],$member_id,$goods_id ,$com_field);
+        if ($member_id) {
+            $count              = BModel::getCount('favorites', ['member_id' => $member_id, 'fav_type' => 'store', 'store_id' => $store_id]);
+            $data['is_collect'] = $count == 1 ? true : false;
+        } else {
+            $data['is_collect'] = false;
+        }
+
+        $data['cart']['nums'] = BModel::getCount('cart', ['store_id' => $store_id, 'buyer_id' => $member_id]);
+        $carts        = BModel::getTableAllData('cart', ['store_id' => $store_id, 'buyer_id' => $member_id], ['goods_price', 'goods_num']);
+        $money        = 0;
+        foreach ($carts as $cart) {
+            $money += $cart->goods_price * $cart->goods_num;
+        }
+        $data['cart']['amount'] = Base::ncPriceFormat($money);
+        return Base::jsonReturn(200, '请求成功', $data);
     }
 
     /**评论店铺
@@ -735,20 +745,18 @@ class MemberController extends Base
             return Base::jsonReturn(1001, '用户不存在');
         }
         $cart_data = DB::table('cart')->where('buyer_id', $member_id)->distinct()->get(['store_id'])->toArray();
-        $result =$data   = [];
-        $amount=0;
+        $result    = $data = [];
+        $amount    = 0;
         foreach ($cart_data as $cart_datum) {
-            $result['list'] = BModel::getTableAllData('cart', ['store_id' => $cart_datum->store_id],['goods_id','goods_name','goods_price','goods_num','goods_image'])->toArray();
-            if(!empty($result['list']))
-            {
-                foreach ($result['list'] as $v)
-                {
-                    $amount+=$v->goods_price*$v->goods_num;
+            $result['list'] = BModel::getTableAllData('cart', ['store_id' => $cart_datum->store_id], ['goods_id', 'goods_name', 'goods_price', 'goods_num', 'goods_image'])->toArray();
+            if (!empty($result['list'])) {
+                foreach ($result['list'] as $v) {
+                    $amount += $v->goods_price * $v->goods_num;
                 }
             }
-            $result['amount']=Base::ncPriceFormat($amount);
+            $result['amount']     = Base::ncPriceFormat($amount);
             $result['store_name'] = BModel::getTableValue('store', ['store_id' => $cart_datum->store_id], 'store_name');
-            $data[]=$result;
+            $data[]               = $result;
         }
         return Base::jsonReturn(200, '获取成功', $data);
     }
@@ -759,9 +767,14 @@ class MemberController extends Base
      */
     function clearCart(Request $request)
     {
-        $store_id  = $request->input('store_id');
         $member_id = $request->input('member_id');
-        $res       = BModel::delData('cart', ['buyer_id' => $member_id]);
+        if (!$member_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (BModel::getCount('member', ['member_id' => $member_id]) == 0) {
+            return Base::jsonReturn(1001, '用户不存在');
+        }
+        $res = BModel::delData('cart', ['buyer_id' => $member_id]);
         if ($res) {
             return Base::jsonReturn(200, '清空成功');
         } else {

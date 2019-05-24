@@ -29,19 +29,19 @@ Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () 
     Route::post('get_voucher', 'MemberController@getVoucher');//领取代金券
     Route::post('add_cart', 'MemberController@addCart');//添加购物车
     Route::post('my_cart', 'MemberController@myCart');//我的购物车
+    Route::post('clear_cart', 'MemberController@clearCart');//清购物车
+    Route::post('goods_detail', 'MemberController@goodsDetail');//商品详情
 
 
 
 
-
-    Route::any('goods_detail', 'MemberController@goodsDetail');//商品详情
 
     Route::any('store_com', 'MemberController@storeCom');//评论商家店铺
 
 
 
 
-    Route::any('clear_cart', 'MemberController@clearCart');//清购物车
+
 
     Route::any('go_settlement', 'MemberController@Settlement');//去结算
 
