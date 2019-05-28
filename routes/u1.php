@@ -16,6 +16,7 @@ Route::group(['namespace' => 'U1'], function () {
     Route::post('sms_login', 'MemberController@smsLogin');//验证码登录
     Route::post('user_login', 'MemberController@userLogin');//账号密码登录
     Route::post('get_sms', 'MemberController@getSMS');//获取验证码
+    Route::post('home_page', 'MemberController@homePage');//首页
 });
 
 Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () {
@@ -24,7 +25,6 @@ Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () 
     Route::post('user_address_info', 'MemberController@userAddrInfo');//用户收货地址详情
     Route::post('user_address_save', 'MemberController@userAddrSave');//用户收货地址保存
     Route::post('user_address_del', 'MemberController@userAddrDel');//用户收货地址删除
-    Route::post('home_page', 'MemberController@homePage');//首页
     Route::post('store_info', 'MemberController@storeInfo');//店铺详情
     Route::post('voucher_list', 'MemberController@voucherList');//店铺代金券列表
     Route::post('get_voucher', 'MemberController@getVoucher');//领取代金券
