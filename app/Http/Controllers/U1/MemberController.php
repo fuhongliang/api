@@ -55,8 +55,9 @@ class MemberController extends Base
         $longitude = $request->input('longitude');//经度
         $dimension = $request->input('dimension');//维度
         $type      = $request->input('type');
-
-
+        if (empty($longitude) || empty($dimension)) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
         $result                   = [];
         $result['banner_data']    = BModel::getOrderData('app_banner', 'sort', ['title', 'image_name', 'link_url']);
         $result['gcsort_data']    = Member::getParentGoodsClass();
