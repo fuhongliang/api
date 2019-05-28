@@ -216,6 +216,29 @@ class MemberController extends Base
         return Base::jsonReturn('200', '获取成功', $result);
     }
 
+    /**删除地址
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function userAddrDel(Request $request)
+    {
+        $address_id = $request->input('address_id');
+        $member_id = $request->input('member_id');
+        if (empty($address_id) || empty($member_id)) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (BModel::getCount('address', ['address_id' => $address_id]) == 0) {
+            return Base::jsonReturn(1001, '地址不存在');
+        }
+        $res=BModel::delData('address',['address_id' => $address_id,['member_id'=>$member_id]]);
+        if($res)
+        {
+            return Base::jsonReturn('200', '删除成功');
+        }else{
+            return Base::jsonReturn('2000', '删除成功');
+        }
+
+    }
     /**地址详情
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
