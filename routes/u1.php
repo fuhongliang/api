@@ -18,6 +18,7 @@ Route::group(['namespace' => 'U1'], function () {
     Route::post('get_sms', 'MemberController@getSMS');//获取验证码
     Route::post('home_page', 'MemberController@homePage');//首页
     Route::post('store_info', 'MemberController@storeInfo');//店铺详情
+    Route::post('area_list', 'MemberController@areaList');//地区列表
 });
 
 Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () {
@@ -38,7 +39,7 @@ Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () 
     Route::post('buy_step', 'MemberController@buyStep');//下单
     Route::post('order_list', 'MemberController@orderList');//订单列表
     Route::post('order_info', 'MemberController@orderInfo');//订单详情
-    Route::post('area_list', 'MemberController@areaList');//地区列表
+
 
 
 
