@@ -65,7 +65,7 @@ class MemberController extends Base
         $page                     = !$page ? 1 : $page;
         $result['storelist_data'] = Member::getStoreList($keyword, $page, $type);
 
-        return Base::jsonReturn('200', '获取成功', $result);
+        return Base::jsonReturn(200, '获取成功', $result);
     }
 
     /**验证码登录
@@ -128,7 +128,7 @@ class MemberController extends Base
             'expire_time' => time() + 24 * 5 * 3600
         );
         Token::addToken($token_data);
-        return Base::jsonReturn('200', '登录成功', $member_info);
+        return Base::jsonReturn(200, '登录成功', $member_info);
     }
 
     /**账号密码登录
@@ -150,7 +150,7 @@ class MemberController extends Base
         if (BModel::getCount('member', ['member_mobile' => $phone_number]) == 1) {
             $member_data = BModel::getTableFirstData('member', ['member_mobile' => $phone_number], ['member_passwd', 'member_id']);
             if (md5($password) != $member_data->member_passwd) {
-                return Base::jsonReturn('1001', '账号或密码错误');
+                return Base::jsonReturn(1001, '账号或密码错误');
             }
             BModel::delData('umeng', ['member_id' => $member_data->member_id]);
             BModel::insertData('umeng', ['app_type' => $app_type, 'device_tokens' => $device_tokens, 'member_id' => $member_data->member_id]);
@@ -170,9 +170,9 @@ class MemberController extends Base
                 'expire_time' => time() + 24 * 5 * 3600
             );
             Token::addToken($token_data);
-            return Base::jsonReturn('200', '登录成功', $member_info);
+            return Base::jsonReturn(200, '登录成功', $member_info);
         } else {
-            return Base::jsonReturn('1002', '用户不存在');
+            return Base::jsonReturn(1002, '用户不存在');
         }
     }
 
@@ -214,7 +214,7 @@ class MemberController extends Base
         $field  = ['address_id', 'area_info', 'address', 'mob_phone', 'sex', 'true_name', 'is_default'];
         $res    = BModel::getTableAllData('address', ['member_id' => $member_id], $field);
         $result = $res->isEmpty() ? [] : $res->toArray();
-        return Base::jsonReturn('200', '获取成功', $result);
+        return Base::jsonReturn(200, '获取成功', $result);
     }
 
     /**删除地址
@@ -234,9 +234,9 @@ class MemberController extends Base
         $res=BModel::delData('address',['address_id' => $address_id,['member_id'=>$member_id]]);
         if($res)
         {
-            return Base::jsonReturn('200', '删除成功');
+            return Base::jsonReturn(200, '删除成功');
         }else{
-            return Base::jsonReturn('2000', '删除成功');
+            return Base::jsonReturn(2000, '删除成功');
         }
 
     }
@@ -256,7 +256,7 @@ class MemberController extends Base
         $field           = ['address_id', 'area_info', 'address', 'mob_phone', 'sex', 'true_name', 'is_default'];
         $res             = BModel::getTableFieldFirstData('address', ['address_id' => $address_id], $field);
         $res->is_default = intval($res->is_default);
-        return Base::jsonReturn('200', '获取成功', $res);
+        return Base::jsonReturn(200, '获取成功', $res);
     }
 
 
@@ -302,9 +302,9 @@ class MemberController extends Base
             $result = BModel::insertData('address', $ins_data);
         }
         if ($result) {
-            return Base::jsonReturn('200', '操作成功');
+            return Base::jsonReturn(200, '操作成功');
         } else {
-            return Base::jsonReturn('1003', '操作失败');
+            return Base::jsonReturn(1003, '操作失败');
         }
     }
 
@@ -994,7 +994,7 @@ class MemberController extends Base
                 );
                 BModel::insertData('order_goods', $order_goods);
             }
-            return Base::jsonReturn('200', '下单成功');
+            return Base::jsonReturn(200, '下单成功');
         }
     }
 
@@ -1025,7 +1025,7 @@ class MemberController extends Base
                 $v->amount = $amount;
             }
         }
-        return Base::jsonReturn('200', '获取成功', $data);
+        return Base::jsonReturn(200, '获取成功', $data);
     }
 
     function orderInfo(Request $request)
@@ -1074,7 +1074,7 @@ class MemberController extends Base
             'add_time' => date('Y-m-d H:i:s', $order_data->add_time),
             'payment_code' => $order_data->payment_code,
         ];
-        return Base::jsonReturn('200', '获取成功', $result);
+        return Base::jsonReturn(200, '获取成功', $result);
     }
 
 

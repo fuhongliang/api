@@ -31,7 +31,7 @@ class BaseController extends Controller
     static function jsonReturn($code = 200, $msg = '', $data = null)
     {
         return response()->json([
-            'code' => $code,
+            'code' => intval($code),
             'data' => empty($data) || !isset($data) ? null : $data,
             'msg' => $msg
         ]);

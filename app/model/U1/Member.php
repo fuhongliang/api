@@ -30,7 +30,7 @@ class Member extends BModel
     static function getStoreList($keyword, $page, $type)
     {
         $result = [];
-        $skip   = ($page - 1) * 10;
+        $skip = ($page - 1) * 10;
         if (!$type || $type == 1)//默认
         {
             $store_ids = DB::table('goods as a')
@@ -53,6 +53,16 @@ class Member extends BModel
                 ->take(10)
                 ->distinct()
                 ->get(['b.store_id']);
+        } elseif ($type == 3) {
+            $store_ids = DB::table('goods as a')
+                ->leftJoin('store as b', 'a.store_id', 'b.store_id')
+                ->where('a.goods_name', 'like', '%' . $keyword . '%')
+                ->orWhere('b.store_name', 'like', '%' . $keyword . '%')
+                ->orderBy('b.store_credit', 'desc')
+                ->skip($skip)
+                ->take(10)
+                ->distinct()
+                ->get(['b.store_id']);
         } elseif ($type == 4) {
             $store_ids = DB::table('goods as a')
                 ->leftJoin('store as b', 'a.store_id', 'b.store_id')
@@ -67,11 +77,11 @@ class Member extends BModel
         if (!$store_ids->isEmpty()) {
             $storeIds = $store_ids->toArray();
             foreach ($storeIds as $k => $val) {
-                $store_data          = BModel::getTableFieldFirstData('store', ['store_id' => $val->store_id], ['store_id', 'store_name', 'store_avatar', 'store_sales', 'store_credit']);
-                $result[$k]          = $store_data;
-                $xianshi_data        = BModel::getTableAllData('p_xianshi', ['store_id' => $val->store_id, 'state' => 1], ['xianshi_name', 'xianshi_id']);
+                $store_data = BModel::getTableFieldFirstData('store', ['store_id' => $val->store_id], ['store_id', 'store_name', 'store_avatar', 'store_sales', 'store_credit']);
+                $result[$k] = $store_data;
+                $xianshi_data = BModel::getTableAllData('p_xianshi', ['store_id' => $val->store_id, 'state' => 1], ['xianshi_name', 'xianshi_id']);
                 $result[$k]->xianshi = $xianshi_data->isEmpty() ? array() : $xianshi_data->toArray();
-                $manjian             = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $val->store_id], ['a.rule_id', 'a.price', 'a.discount']);
+                $manjian = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $val->store_id], ['a.rule_id', 'a.price', 'a.discount']);
                 $result[$k]->manjian = $manjian->isEmpty() ? [] : $manjian->toArray();
             }
         }
@@ -92,7 +102,7 @@ class Member extends BModel
     static function getStoreGoodsListByStcId($store_id, $class_id)
     {
         $goods_info = $ids = array();
-        $fields     = ['a.goods_id', 'a.goods_name', 'a.goods_price', 'a.goods_marketprice', 'b.goods_body as goods_desc', 'a.goods_image as img_name', 'a.goods_salenum'];
+        $fields = ['a.goods_id', 'a.goods_name', 'a.goods_price', 'a.goods_marketprice', 'b.goods_body as goods_desc', 'a.goods_image as img_name', 'a.goods_salenum'];
         if (!$class_id || $class_id == 'hot') {
             $data = DB::table('goods as a')
                 ->leftJoin('goods_common as b', 'a.goods_commonid', 'b.goods_commonid')
@@ -115,13 +125,13 @@ class Member extends BModel
             if (!$data->isEmpty()) {
                 $xianshi_data = $data->toArray();
                 foreach ($xianshi_data as $k => $val) {
-                    $goods_info[$k]['goods_id']          = $val->xianshi_id;
-                    $goods_info[$k]['goods_name']        = $val->goods_name;
-                    $goods_info[$k]['goods_desc']        = $val->goods_desc;
-                    $goods_info[$k]['goods_price']       = BModel::getSum('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'goods_price');
-                    $goods_info[$k]['img_name']          = BModel::getTableValue('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'goods_image');
-                    $goods_info[$k]['goods_salenum']     = 999;
-                    $goods_info[$k]['zan']               = BModel::getCount('goods_zan', ['goods_id' => $datum->goods_id]);
+                    $goods_info[$k]['goods_id'] = $val->xianshi_id;
+                    $goods_info[$k]['goods_name'] = $val->goods_name;
+                    $goods_info[$k]['goods_desc'] = $val->goods_desc;
+                    $goods_info[$k]['goods_price'] = BModel::getSum('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'goods_price');
+                    $goods_info[$k]['img_name'] = BModel::getTableValue('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'goods_image');
+                    $goods_info[$k]['goods_salenum'] = 999;
+                    $goods_info[$k]['zan'] = BModel::getCount('goods_zan', ['goods_id' => $datum->goods_id]);
                     $goods_info[$k]['goods_marketprice'] = BModel::getSum('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'xianshi_price');
                 }
             }
@@ -135,19 +145,19 @@ class Member extends BModel
             if (!$data->isEmpty()) {
                 $youhui_data = $data->toArray();
                 foreach ($youhui_data as $k => $val) {
-                    $goods_info[$k]['goods_id']      = $val->bl_id;
-                    $goods_info[$k]['goods_name']    = $val->goods_name;
-                    $goods_info[$k]['goods_desc']    = $val->goods_desc;
-                    $goods_info[$k]['goods_price']   = BModel::getSum('p_bundling_goods', ['bl_id' => $val->bl_id], 'bl_goods_price');
-                    $goods_info[$k]['img_name']      = BModel::getTableValue('p_bundling_goods', ['bl_id' => $val->bl_id], 'goods_image');
+                    $goods_info[$k]['goods_id'] = $val->bl_id;
+                    $goods_info[$k]['goods_name'] = $val->goods_name;
+                    $goods_info[$k]['goods_desc'] = $val->goods_desc;
+                    $goods_info[$k]['goods_price'] = BModel::getSum('p_bundling_goods', ['bl_id' => $val->bl_id], 'bl_goods_price');
+                    $goods_info[$k]['img_name'] = BModel::getTableValue('p_bundling_goods', ['bl_id' => $val->bl_id], 'goods_image');
                     $goods_info[$k]['goods_salenum'] = 999;
-                    $goods_info[$k]['zan']           = BModel::getCount('goods_zan', ['goods_id' => $datum->goods_id]);
-                    $goods_ids                       = BModel::getTableAllData('p_bundling_goods', ['bl_id' => $val->bl_id], ['goods_id']);
-                    $gids                            = [];
+                    $goods_info[$k]['zan'] = BModel::getCount('goods_zan', ['goods_id' => $datum->goods_id]);
+                    $goods_ids = BModel::getTableAllData('p_bundling_goods', ['bl_id' => $val->bl_id], ['goods_id']);
+                    $gids = [];
                     foreach ($goods_ids as $goods_id) {
                         array_push($gids, $goods_id->goods_id);
                     }
-                    $goods_marketprice                   = DB::table('goods')->whereIn('goods_id', $gids)->sum('goods_marketprice');
+                    $goods_marketprice = DB::table('goods')->whereIn('goods_id', $gids)->sum('goods_marketprice');
                     $goods_info[$k]['goods_marketprice'] = $goods_marketprice;
                 }
             }
@@ -169,7 +179,7 @@ class Member extends BModel
                 }
                 if (!empty($ids)) {
                     foreach ($ids as $k => $goods_id) {
-                        $goods_info[$k]      = Goods::getGoodsInfo(['goods_id' => $goods_id], $fields);
+                        $goods_info[$k] = Goods::getGoodsInfo(['goods_id' => $goods_id], $fields);
                         $goods_info[$k]->zan = BModel::getCount('goods_zan', ['goods_id' => $goods_id]);
                     }
                 }
@@ -232,7 +242,7 @@ class Member extends BModel
     static function getGoodsComData($condition, $member_id, $goods_id, $field = ['*'])
     {
         $result = [];
-        $data   = DB::table('evaluate_goods AS a')
+        $data = DB::table('evaluate_goods AS a')
             ->leftJoin('member as b', 'a.geval_frommemberid', 'b.member_id')
             ->where($condition)
             ->orderBy('geval_addtime', 'desc')
@@ -240,11 +250,11 @@ class Member extends BModel
 
         if (!$data->isEmpty()) {
             foreach ($data as $k => $v) {
-                $result[$k]['member_name']   = is_null($v->member_name) ? "" : $v->member_name;
+                $result[$k]['member_name'] = is_null($v->member_name) ? "" : $v->member_name;
                 $result[$k]['member_avatar'] = is_null($v->member_avatar) ? "" : $v->member_avatar;
                 $result[$k]['geval_content'] = is_null($v->geval_content) ? "" : $v->geval_content;
                 $result[$k]['geval_addtime'] = date('Y.m.d', $v->geval_addtime);
-                $result[$k]['is_zan']        = BModel::getCount('goods_zan', ['member_id' => $member_id, 'goods_id' => $goods_id]);
+                $result[$k]['is_zan'] = BModel::getCount('goods_zan', ['member_id' => $member_id, 'goods_id' => $goods_id]);
             }
         }
         return $result;
@@ -268,7 +278,7 @@ class Member extends BModel
     static function getStoreComList($store_id, $type)
     {
         $result = [];
-        $field  = ['a.content', 'a.haoping', 'a.images', 'a.add_time', 'a.is_replay', 'a.parent_id', 'b.member_name', 'b.member_avatar'];
+        $field = ['a.content', 'a.haoping', 'a.images', 'a.add_time', 'a.is_replay', 'a.parent_id', 'b.member_name', 'b.member_avatar'];
         if (!$type || $type == 1) {
             $data = DB::table('store_com AS a')
                 ->leftJoin('member as b', 'a.member_id', 'b.member_id')
@@ -302,12 +312,12 @@ class Member extends BModel
         }
         $datas = $data->toArray();
         foreach ($datas as $k => $v) {
-            $result[$k]['content']       = is_null($v->content) ? "" : $v->content;
-            $result[$k]['haoping']       = $v->haoping;
-            $result[$k]['images']        = explode(',', $v->images);
-            $result[$k]['credit']        = 4;
-            $result[$k]['add_time']      = date('Y-m-d', $v->add_time);
-            $result[$k]['member_name']   = $v->member_name;
+            $result[$k]['content'] = is_null($v->content) ? "" : $v->content;
+            $result[$k]['haoping'] = $v->haoping;
+            $result[$k]['images'] = explode(',', $v->images);
+            $result[$k]['credit'] = 4;
+            $result[$k]['add_time'] = date('Y-m-d', $v->add_time);
+            $result[$k]['member_name'] = $v->member_name;
             $result[$k]['member_avator'] = is_null($v->member_avatar) ? "" : $v->member_avatar;
             if ($v->is_replay == 1) {
                 $result[$k]['replay'] = BModel::getTableValue('store_com', ['com_id' => $v->parent_id]);
@@ -397,8 +407,8 @@ class Member extends BModel
 
     static function getCartInfoByStoreId($store_id, $member_id)
     {
-        $field  = ['cart_id','goods_id', 'goods_name', 'goods_price', 'goods_image', 'bl_id', 'xs_id', 'goods_num'];
-        $data   = BModel::getTableAllData('cart', ['store_id' => $store_id, 'buyer_id' => $member_id], $field);
+        $field = ['cart_id', 'goods_id', 'goods_name', 'goods_price', 'goods_image', 'bl_id', 'xs_id', 'goods_num'];
+        $data = BModel::getTableAllData('cart', ['store_id' => $store_id, 'buyer_id' => $member_id], $field);
         $amount = 0;
         if (!$data->isEmpty()) {
             foreach ($data as $k => &$v) {
@@ -436,7 +446,7 @@ class Member extends BModel
 
         }
         $result['amount'] = BaseController::ncPriceFormat($amount);
-        $result['data']   = $data;
+        $result['data'] = $data;
         return $result;
     }
 
