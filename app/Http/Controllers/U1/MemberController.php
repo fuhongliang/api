@@ -1103,5 +1103,84 @@ class MemberController extends Base
         return Base::jsonReturn(200, '获取成功', $result);
     }
 
+    /**地区列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function areaList(Request $request)
+    {
+        $data=DB::table('area')->get()->toArray();
+
+        foreach ($data as $a) {
+            $data['name'][$a->area_id] = $a->area_name;
+            $data['parent'][$a->area_id] = $a->area_parent_id;
+            $data['children'][$a->area_parent_id][] = $a->area_id;
+
+            if ($a->area_deep == 1 && $a->area_region)
+                $data['region'][$a->area_region][] = $a->area_id;
+        }
+        $arr = array();
+        foreach ($data['children'][0] as $i) {
+            $arr[$i] = $data['name'][$i];
+        }
+        $array=array(
+            array(
+                'title'=>'A',
+                'content'=>array($arr[12],$arr[34])
+            ),
+            array(
+                'title'=>'C',
+                'content'=>array($arr[22])
+            ),
+            array(
+                'title'=>'F',
+                'content'=>array($arr[13])
+            ),
+            array(
+                'title'=>'G',
+                'content'=>array($arr[19],$arr[28],$arr[20],$arr[24])
+            ),
+            array(
+                'title'=>'H',
+                'content'=>array($arr[21],$arr[3],$arr[16],$arr[8])
+            ),
+            array(
+                'title'=>'J',
+                'content'=>array($arr[10],$arr[14],$arr[7])
+            ),
+            array(
+                'title'=>'N',
+                'content'=>array($arr[6],$arr[5],$arr[30])
+            ),
+            array(
+                'title'=>'Q',
+                'content'=>array($arr[29])
+            ),
+            array(
+                'title'=>'S',
+                'content'=>array($arr[15],$arr[4],$arr[27],$arr[23])
+            ),
+            array(
+                'title'=>'T',
+                'content'=>array($arr[32])
+            ),
+            array(
+                'title'=>'X',
+                'content'=>array($arr[26],$arr[31],$arr[33])
+            ),
+            array(
+                'title'=>'Y',
+                'content'=>array($arr[25])
+            ),
+            array(
+                'title'=>'Z',
+                'content'=>array($arr[11])
+            ),
+        );
+        return Base::jsonReturn(200, '获取成功', $array);
+
+    }
+
+
 
 }

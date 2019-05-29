@@ -38,7 +38,7 @@ Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () 
     Route::post('buy_step', 'MemberController@buyStep');//下单
     Route::post('order_list', 'MemberController@orderList');//订单列表
     Route::post('order_info', 'MemberController@orderInfo');//订单详情
-
+    Route::post('area_list', 'MemberController@areaList');//地区列表
 
 
 
