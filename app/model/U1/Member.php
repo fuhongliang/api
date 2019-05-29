@@ -381,6 +381,7 @@ class Member extends BModel
             ->leftJoin('order_common as b', 'a.order_id', 'b.order_id')
             ->leftJoin('store as c', 'a.store_id', 'c.store_id')
             ->where('a.buyer_id', $member_id)
+            ->where('a.order_state',40)
             ->where('evaluation_state', 0)
             ->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state']);
         return $data->isEmpty() ? [] : $data->toArray();
