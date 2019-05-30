@@ -317,8 +317,8 @@ class MemberController extends Base
         $store_id = $request->input('store_id');
         $member_id = $request->input('member_id');
         $class_id = $request->input('class_id');
-        $tab_id = $request->input('tab_id');//1,2,3
-        $type = $request->input('type');//1,2,3,4
+//        $tab_id = $request->input('tab_id');//1,2,3
+//        $type = $request->input('type');//1,2,3,4
         $result = [];
 
         if (!$store_id) {
@@ -340,42 +340,81 @@ class MemberController extends Base
         }
         $manjian = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $store_id], ['a.price', 'a.discount']);
         $result['manjian'] = $manjian->isEmpty() ? [] : $manjian->toArray();
-
-        if (!$tab_id || $tab_id == 1) {
-            //
-            $class_list = Store::getAllStoreClass(['store_id' => $store_id], ['stc_id', 'stc_name']);
-            $calssLists = [];
-            if (!$class_list->isEmpty()) {
-                $calssList = $class_list->toArray();
-                foreach ($calssList as $k => $val) {
-                    $calssLists[$k]['stc_id'] = (string)$val->stc_id;
-                    $calssLists[$k]['stc_name'] = (string)$val->stc_name;
-                }
+        $class_list = Store::getAllStoreClass(['store_id' => $store_id], ['stc_id', 'stc_name']);
+        $calssLists = [];
+        if (!$class_list->isEmpty()) {
+            $calssList = $class_list->toArray();
+            foreach ($calssList as $k => $val) {
+                $calssLists[$k]['stc_id'] = (string)$val->stc_id;
+                $calssLists[$k]['stc_name'] = (string)$val->stc_name;
             }
-            $goods_list = Member::getStoreGoodsListByStcId($store_id, $class_id);
-            $result['class_list'] = $calssLists;
-            $result['goods_list'] = empty($goods_list) ? array() : $goods_list;
-            array_unshift($result['class_list'], ['stc_id' => "taozhuang", 'stc_name' => '优惠']);
-            array_unshift($result['class_list'], ['stc_id' => "xianshi", 'stc_name' => '折扣']);
-            array_unshift($result['class_list'], ['stc_id' => "hot", 'stc_name' => '热销']);
-            $result['cart']['nums'] = BModel::getCount('cart', ['store_id' => $store_id]);
-            $result['cart']['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
-//
-        } elseif ($tab_id == 2) {
-            $result['pingfen']['peisong'] = 0;
-            $result['pingfen']['baozhuang'] = 0;
-            $result['pingfen']['kouwei'] = 0;
-            $result['comment']['all'] = BModel::getCount('store_com', ['store_id' => $store_id]);
-            $result['comment']['manyi'] = Member::getManyi($store_id);
-            $result['comment']['bumanyi'] = Member::getBuManyi($store_id);
-            $result['comment']['youtu'] = Member::getYoutu($store_id);
-            $result['comment']['list'] = Member::getStoreComList($store_id, $type);
-        } elseif ($tab_id == 3) {
-            $field = ['a.area_info', 'a.store_address', 'b.face_img', 'b.logo_img', 'a.store_name', 'a.work_start_time', 'a.work_end_time', 'a.store_phone', 'a.sc_id'];
-            $store_info = BModel::getLeftData('store as a', 'store_joinin as b', 'a.member_id', 'b.member_id', ['a.store_id' => $store_id], $field)->first();
-            $result['store_detail'] = $store_info;
-            $result['store_detail']->sc_name = BModel::getTableValue('store_class', ['sc_id' => $store_info->sc_id], 'sc_name');
         }
+        //$goods_list = Member::getStoreGoodsListByStcId($store_id, $class_id);
+        $result['goods_list'] = $calssLists;
+
+        foreach ($result['goods_list'] as $k => &$m) {
+            $m['goods'] = Member::getStoreGoodsListByStcId($store_id, $m['stc_id']);
+        }
+        array_unshift($result['goods_list'],
+            array(
+                'stc_id' => "taozhuang",
+                'stc_name' => "优惠",
+                'child' => Member::getStoreGoodsListByStcId($store_id, 'taozhuang')
+            ));
+        array_unshift($result['goods_list'],
+            array(
+                'stc_id' => "xianshi",
+                'stc_name' => "折扣",
+                'child' => Member::getStoreGoodsListByStcId($store_id, 'xianshi')
+            ));
+        array_unshift($result['goods_list'],
+            array(
+                'stc_id' => "hot",
+                'stc_name' => "热销",
+                'child' => Member::getStoreGoodsListByStcId($store_id, 'hot')
+            ));
+        //$result['goods_list'] = empty($goods_list) ? array() : $goods_list;
+//        array_unshift($result['class_list'], ['stc_id' => "taozhuang", 'stc_name' => '优惠']);
+//        array_unshift($result['class_list'], ['stc_id' => "xianshi", 'stc_name' => '折扣']);
+//        array_unshift($result['class_list'], ['stc_id' => "hot", 'stc_name' => '热销']);
+
+        $result['cart']['nums'] = BModel::getCount('cart', ['store_id' => $store_id]);
+        $result['cart']['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
+//        if (!$tab_id || $tab_id == 1) {
+//            //
+//            $class_list = Store::getAllStoreClass(['store_id' => $store_id], ['stc_id', 'stc_name']);
+//            $calssLists = [];
+//            if (!$class_list->isEmpty()) {
+//                $calssList = $class_list->toArray();
+//                foreach ($calssList as $k => $val) {
+//                    $calssLists[$k]['stc_id'] = (string)$val->stc_id;
+//                    $calssLists[$k]['stc_name'] = (string)$val->stc_name;
+//                }
+//            }
+//            $goods_list = Member::getStoreGoodsListByStcId($store_id, $class_id);
+//            $result['class_list'] = $calssLists;
+//            $result['goods_list'] = empty($goods_list) ? array() : $goods_list;
+//            array_unshift($result['class_list'], ['stc_id' => "taozhuang", 'stc_name' => '优惠']);
+//            array_unshift($result['class_list'], ['stc_id' => "xianshi", 'stc_name' => '折扣']);
+//            array_unshift($result['class_list'], ['stc_id' => "hot", 'stc_name' => '热销']);
+//            $result['cart']['nums'] = BModel::getCount('cart', ['store_id' => $store_id]);
+//            $result['cart']['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
+////
+//        } elseif ($tab_id == 2) {
+//            $result['pingfen']['peisong'] = 0;
+//            $result['pingfen']['baozhuang'] = 0;
+//            $result['pingfen']['kouwei'] = 0;
+//            $result['comment']['all'] = BModel::getCount('store_com', ['store_id' => $store_id]);
+//            $result['comment']['manyi'] = Member::getManyi($store_id);
+//            $result['comment']['bumanyi'] = Member::getBuManyi($store_id);
+//            $result['comment']['youtu'] = Member::getYoutu($store_id);
+//            $result['comment']['list'] = Member::getStoreComList($store_id, $type);
+//        } elseif ($tab_id == 3) {
+//            $field = ['a.area_info', 'a.store_address', 'b.face_img', 'b.logo_img', 'a.store_name', 'a.work_start_time', 'a.work_end_time', 'a.store_phone', 'a.sc_id'];
+//            $store_info = BModel::getLeftData('store as a', 'store_joinin as b', 'a.member_id', 'b.member_id', ['a.store_id' => $store_id], $field)->first();
+//            $result['store_detail'] = $store_info;
+//            $result['store_detail']->sc_name = BModel::getTableValue('store_class', ['sc_id' => $store_info->sc_id], 'sc_name');
+//        }
         return Base::jsonReturn(200, '获取成功', $result);
     }
 
@@ -1109,7 +1148,7 @@ class MemberController extends Base
      */
     function areaList(Request $request)
     {
-        $data=DB::table('area')->get()->toArray();
+        $data = DB::table('area')->get()->toArray();
 
         foreach ($data as $a) {
             $data['name'][$a->area_id] = $a->area_name;
@@ -1123,64 +1162,63 @@ class MemberController extends Base
         foreach ($data['children'][0] as $i) {
             $arr[$i] = $data['name'][$i];
         }
-        $array=array(
+        $array = array(
             array(
-                'title'=>'A',
-                'content'=>array($arr[12],$arr[34])
+                'title' => 'A',
+                'content' => array($arr[12], $arr[34])
             ),
             array(
-                'title'=>'C',
-                'content'=>array($arr[22])
+                'title' => 'C',
+                'content' => array($arr[22])
             ),
             array(
-                'title'=>'F',
-                'content'=>array($arr[13])
+                'title' => 'F',
+                'content' => array($arr[13])
             ),
             array(
-                'title'=>'G',
-                'content'=>array($arr[19],$arr[28],$arr[20],$arr[24])
+                'title' => 'G',
+                'content' => array($arr[19], $arr[28], $arr[20], $arr[24])
             ),
             array(
-                'title'=>'H',
-                'content'=>array($arr[21],$arr[3],$arr[16],$arr[8])
+                'title' => 'H',
+                'content' => array($arr[21], $arr[3], $arr[16], $arr[8])
             ),
             array(
-                'title'=>'J',
-                'content'=>array($arr[10],$arr[14],$arr[7])
+                'title' => 'J',
+                'content' => array($arr[10], $arr[14], $arr[7])
             ),
             array(
-                'title'=>'N',
-                'content'=>array($arr[6],$arr[5],$arr[30])
+                'title' => 'N',
+                'content' => array($arr[6], $arr[5], $arr[30])
             ),
             array(
-                'title'=>'Q',
-                'content'=>array($arr[29])
+                'title' => 'Q',
+                'content' => array($arr[29])
             ),
             array(
-                'title'=>'S',
-                'content'=>array($arr[15],$arr[4],$arr[27],$arr[23])
+                'title' => 'S',
+                'content' => array($arr[15], $arr[4], $arr[27], $arr[23])
             ),
             array(
-                'title'=>'T',
-                'content'=>array($arr[32])
+                'title' => 'T',
+                'content' => array($arr[32])
             ),
             array(
-                'title'=>'X',
-                'content'=>array($arr[26],$arr[31],$arr[33])
+                'title' => 'X',
+                'content' => array($arr[26], $arr[31], $arr[33])
             ),
             array(
-                'title'=>'Y',
-                'content'=>array($arr[25])
+                'title' => 'Y',
+                'content' => array($arr[25])
             ),
             array(
-                'title'=>'Z',
-                'content'=>array($arr[11])
+                'title' => 'Z',
+                'content' => array($arr[11])
             ),
         );
         return Base::jsonReturn(200, '获取成功', $array);
 
     }
-
 
 
 }
