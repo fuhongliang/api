@@ -316,7 +316,7 @@ class MemberController extends Base
     {
         $store_id = $request->input('store_id');
         $member_id = $request->input('member_id');
-        $class_id = $request->input('class_id');
+ //       $class_id = $request->input('class_id');
 //        $tab_id = $request->input('tab_id');//1,2,3
 //        $type = $request->input('type');//1,2,3,4
         $result = [];
@@ -359,19 +359,19 @@ class MemberController extends Base
             array(
                 'stc_id' => "taozhuang",
                 'stc_name' => "优惠",
-                'child' => Member::getStoreGoodsListByStcId($store_id, 'taozhuang')
+                'goods' => Member::getStoreGoodsListByStcId($store_id, 'taozhuang')
             ));
         array_unshift($result['goods_list'],
             array(
                 'stc_id' => "xianshi",
                 'stc_name' => "折扣",
-                'child' => Member::getStoreGoodsListByStcId($store_id, 'xianshi')
+                'goods' => Member::getStoreGoodsListByStcId($store_id, 'xianshi')
             ));
         array_unshift($result['goods_list'],
             array(
                 'stc_id' => "hot",
                 'stc_name' => "热销",
-                'child' => Member::getStoreGoodsListByStcId($store_id, 'hot')
+                'goods' => Member::getStoreGoodsListByStcId($store_id, 'hot')
             ));
         //$result['goods_list'] = empty($goods_list) ? array() : $goods_list;
 //        array_unshift($result['class_list'], ['stc_id' => "taozhuang", 'stc_name' => '优惠']);
@@ -380,6 +380,8 @@ class MemberController extends Base
 
         $result['cart']['nums'] = BModel::getCount('cart', ['store_id' => $store_id]);
         $result['cart']['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
+        $result['pignjia_url'] = "8888888.com";
+        $result['shangjia_url'] = "99999999.com";
 //        if (!$tab_id || $tab_id == 1) {
 //            //
 //            $class_list = Store::getAllStoreClass(['store_id' => $store_id], ['stc_id', 'stc_name']);
