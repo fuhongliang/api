@@ -231,7 +231,7 @@ class MemberController extends Base
         if (BModel::getCount('address', ['address_id' => $address_id]) == 0) {
             return Base::jsonReturn(1001, '地址不存在');
         }
-        $res = BModel::delData('address', ['address_id' => $address_id, ['member_id' => $member_id]]);
+        $res = BModel::delData('address', ['address_id' => $address_id, 'member_id' => $member_id]);
         if ($res) {
             return Base::jsonReturn(200, '删除成功');
         } else {
