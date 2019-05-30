@@ -316,7 +316,7 @@ class MemberController extends Base
     {
         $store_id = $request->input('store_id');
         $member_id = $request->input('member_id');
- //       $class_id = $request->input('class_id');
+        //       $class_id = $request->input('class_id');
 //        $tab_id = $request->input('tab_id');//1,2,3
 //        $type = $request->input('type');//1,2,3,4
         $result = [];
@@ -418,6 +418,58 @@ class MemberController extends Base
 //            $result['store_detail']->sc_name = BModel::getTableValue('store_class', ['sc_id' => $store_info->sc_id], 'sc_name');
 //        }
         return Base::jsonReturn(200, '获取成功', $result);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function allComment(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        $member_id = $request->input('member_id');
+        $type = $request->input('type');//1,2,3,4
+        $result = [];
+
+        if (!$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (BModel::getCount('store', ['store_id' => $store_id]) == 0) {
+            return Base::jsonReturn(1001, '店铺不存在');
+        }
+        $result['pingfen']['peisong'] = 0;
+        $result['pingfen']['baozhuang'] = 0;
+        $result['pingfen']['kouwei'] = 0;
+        $result['comment']['all'] = BModel::getCount('store_com', ['store_id' => $store_id]);
+        $result['comment']['manyi'] = Member::getManyi($store_id);
+        $result['comment']['bumanyi'] = Member::getBuManyi($store_id);
+        $result['comment']['youtu'] = Member::getYoutu($store_id);
+        $result['comment']['list'] = Member::getStoreComList($store_id, $type);
+        return Base::jsonReturn(200, '获取成功', $result);
+
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function storDetail(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        $result = [];
+
+        if (!$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (BModel::getCount('store', ['store_id' => $store_id]) == 0) {
+            return Base::jsonReturn(1001, '店铺不存在');
+        }
+        $field = ['a.area_info', 'a.store_address', 'b.face_img', 'b.logo_img', 'a.store_name', 'a.work_start_time', 'a.work_end_time', 'a.store_phone', 'a.sc_id'];
+        $store_info = BModel::getLeftData('store as a', 'store_joinin as b', 'a.member_id', 'b.member_id', ['a.store_id' => $store_id], $field)->first();
+        $result = $store_info;
+        $result->sc_name = BModel::getTableValue('store_class', ['sc_id' => $store_info->sc_id], 'sc_name');
+        return Base::jsonReturn(200, '获取成功', $result);
+
     }
 
     /**添加购物车

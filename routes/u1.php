@@ -19,6 +19,8 @@ Route::group(['namespace' => 'U1'], function () {
     Route::post('home_page', 'MemberController@homePage');//首页
     Route::post('store_info', 'MemberController@storeInfo');//店铺详情
     Route::post('area_list', 'MemberController@areaList');//地区列表
+    Route::post('all_comment', 'MemberController@allComment');//店铺评价
+    Route::post('storeinfo', 'MemberController@storDetail');//店铺详情
 });
 
 Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () {
