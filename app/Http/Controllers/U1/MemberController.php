@@ -427,7 +427,6 @@ class MemberController extends Base
     function allComment(Request $request)
     {
         $store_id = $request->input('store_id');
-        $member_id = $request->input('member_id');
         $type = $request->input('type');//1,2,3,4
         $result = [];
 
@@ -441,6 +440,7 @@ class MemberController extends Base
         $result['pingfen']['baozhuang'] = 0;
         $result['pingfen']['kouwei'] = 0;
         $result['comment']['all'] = BModel::getCount('store_com', ['store_id' => $store_id]);
+
         $result['comment']['manyi'] = Member::getManyi($store_id);
         $result['comment']['bumanyi'] = Member::getBuManyi($store_id);
         $result['comment']['youtu'] = Member::getYoutu($store_id);

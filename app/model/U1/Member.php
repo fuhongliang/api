@@ -320,7 +320,7 @@ class Member extends BModel
             $result[$k]['member_name'] = $v->member_name;
             $result[$k]['member_avator'] = is_null($v->member_avatar) ? "" : $v->member_avatar;
             if ($v->is_replay == 1) {
-                $result[$k]['replay'] = BModel::getTableValue('store_com', ['com_id' => $v->parent_id]);
+                $result[$k]['replay'] = BModel::getTableValue('store_com', ['com_id' => $v->parent_id],'content');
             } else {
                 $result[$k]['replay'] = '';
             }
