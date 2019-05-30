@@ -235,7 +235,7 @@ class MemberController extends Base
         if ($res) {
             return Base::jsonReturn(200, '删除成功');
         } else {
-            return Base::jsonReturn(2000, '删除成功');
+            return Base::jsonReturn(2000, '删除失败');
         }
 
     }
