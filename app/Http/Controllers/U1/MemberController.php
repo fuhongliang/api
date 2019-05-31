@@ -104,7 +104,7 @@ class MemberController extends Base
             //未注册
             $ins_data = array(
                 'member_mobile' => $phone_number,
-                'member_name' => '未设置_' . time(),
+                'member_name' => $phone_number,
                 'member_mobile_bind' => 1,
                 'member_time' => time()
             );

@@ -739,7 +739,7 @@ class StoreController extends Base
         $data['account']   = empty($account) ? null : $account;
         $data['message']   = array(
             'addtime' => date('Y-m-d H:i:s'),
-            'msg' => '可为免费空位欺负你委屈而烦恼为妇女'
+            'msg' => 'xxxxxxxxxx'
         );
         return Base::jsonReturn(200, '获取成功', $data);
     }
