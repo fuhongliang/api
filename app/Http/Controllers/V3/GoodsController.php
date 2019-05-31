@@ -121,10 +121,10 @@ class GoodsController extends Base
         //商品common信息
         $common_array['goods_name'] = $goods_name;
         $common_array['goods_jingle'] = '';
-        $common_array['gc_id'] = intval($bind_class->class_3);
-        $common_array['gc_id_1'] = intval($bind_class->class_1);
-        $common_array['gc_id_2'] = intval($bind_class->class_2);
-        $common_array['gc_id_3'] = intval($bind_class->class_3);
+        $common_array['gc_id'] = 845;//intval($bind_class->class_3);
+        $common_array['gc_id_1'] =825;// intval($bind_class->class_1);
+        $common_array['gc_id_2'] = 827;//intval($bind_class->class_2);
+        $common_array['gc_id_3'] =845;// intval($bind_class->class_3);
         $common_array['gc_name'] = '';
         $common_array['brand_id'] = 1;
         $common_array['brand_name'] = '';
