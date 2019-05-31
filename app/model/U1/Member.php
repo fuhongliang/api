@@ -315,7 +315,6 @@ class Member extends BModel
             $result[$k]['content'] = is_null($v->content) ? "" : $v->content;
             $result[$k]['haoping'] = $v->haoping;
             $result[$k]['images'] = explode(',', $v->images);
-            $result[$k]['credit'] = 4;
             $result[$k]['add_time'] = date('Y-m-d', $v->add_time);
             $result[$k]['member_name'] = $v->member_name;
             $result[$k]['member_avator'] = is_null($v->member_avatar) ? "" : $v->member_avatar;
