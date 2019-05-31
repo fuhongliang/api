@@ -289,14 +289,14 @@ class Member extends BModel
             $data = DB::table('store_com AS a')
                 ->leftJoin('member as b', 'a.member_id', 'b.member_id')
                 ->where('a.store_id', $store_id)
-                ->whereIn('haoping', [1, 2])
+                ->whereIn('a.haoping', [1, 2])
                 ->orderBy('a.add_time', 'desc')
                 ->get($field);
         } elseif ($type == 3) {
             $data = DB::table('store_com AS a')
                 ->leftJoin('member as b', 'a.member_id', 'b.member_id')
                 ->where('a.store_id', $store_id)
-                ->whereNotIn('haoping', [1, 2])
+                ->whereNotIn('a.haoping', [1, 2])
                 ->orderBy('a.add_time', 'desc')
                 ->get($field);
         } elseif ($type == 4) {
