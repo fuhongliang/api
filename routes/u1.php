@@ -21,6 +21,7 @@ Route::group(['namespace' => 'U1'], function () {
     Route::post('area_list', 'MemberController@areaList');//地区列表
     Route::post('all_comment', 'MemberController@allComment');//店铺评价
     Route::post('storeinfo', 'MemberController@storDetail');//店铺详情
+    Route::post('goods_detail', 'MemberController@goodsDetail');//商品详情
 });
 
 Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () {
@@ -34,7 +35,7 @@ Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () 
     Route::post('add_cart', 'MemberController@addCart');//添加购物车
     Route::post('my_cart', 'MemberController@myCart');//我的购物车
     Route::post('clear_cart', 'MemberController@clearCart');//清购物车
-    Route::post('goods_detail', 'MemberController@goodsDetail');//商品详情
+
     Route::post('store_com', 'MemberController@storeCom');//去评价---
     Route::post('cart_detail', 'MemberController@cartDetail');//购物车详情-----
     Route::post('go_settlement', 'MemberController@Settlement');//去结算
