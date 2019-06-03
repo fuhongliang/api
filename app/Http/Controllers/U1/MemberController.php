@@ -1167,7 +1167,7 @@ class MemberController extends Base
                 foreach ($order_data as $order_datum) {
                     $amount += $order_datum->goods_price * $order_datum->goods_num;
                 }
-                $v->order_state = self::getOrderState($v->order_state, $v->refund_state, $v->evaluation_state);
+                $v->order_state = self::getOrderState($v->order_id, $v->order_state, $v->refund_state, $v->evaluation_state);
                 $v->total_amount = $amount;
                 unset($v->refund_state);
                 unset($v->evaluation_state);
@@ -1177,34 +1177,51 @@ class MemberController extends Base
     }
 //0(已取消)10(默认):未付款;20:已付款;25:商家已接单;30:已发货;35骑手已接单40:已收货;
 //待支付；等待商家接单；商家已接单；商家正准备商品；骑手正赶往商家；骑手正在送货；订单已完成；订单已取消；待评价；退款中；退款成功
-    static function getOrderState($order_state, $refund_state, $evaluation_state)
+    static function getOrderState($order_id, $order_state, $refund_state, $evaluation_state)
     {
         if ($order_state == 0) {
-            return "订单已取消";
+            return 1;
+            // return "订单已取消";
         }
         if ($order_state == 10) {
-            return "待支付";
+            return 2;
+            //return "待支付";
         }
         if ($order_state == 20) {
-            return "等待商家接单";
+            return 3;
+            //return "等待商家接单";
         }
         if ($order_state == 25) {
-            return "商家已接单，正准备商品";
+            return 4;
+            //return "商家已接单，正准备商品";
         }
         if ($order_state == 35) {
-            return "骑手正赶往商家";
+            return 5;
+            //return "骑手正赶往商家";
         }
         if ($order_state == 30) {
-            return "骑手正在送货";
+            return 6;
+            //return "骑手正在送货";
         }
         if ($order_state == 40) {
-            return "订单已完成";
+            return 7;
+            //return "订单已完成";
         }
-        if ($refund_state == 1 || $refund_state == 2) {
-            return "退款中";
+        if ($refund_state != 0) {
+            $refund_state = BModel::getTableValue('refund_return', ['order_id' => $order_id], 'refund_state');
+            if ($refund_state != 3) {
+                return 8;//退款中
+            } else {
+                return 9;//已完成
+            }
         }
         if ($order_state == 40 && $evaluation_state == 0) {
-            return "待评价";
+            return 10;
+            //return "待评价";
+        }
+        if ($order_state == 40 && $evaluation_state == 1) {
+            return 11;
+            //return "已评价";
         }
     }
 
