@@ -886,7 +886,7 @@ class StoreController extends Base
         $param['business_licence_number_electronic'] = $request->input('business_licence_number_electronic');
         $param['longitude']                          = $request->input('longitude',116.307629);
         $param['dimension']                          = $request->input('dimension',40.058359);
-        $param['sc_id']                              = 2;
+        $param['sc_id']                              = $request->input('sc_id');
         $param['joinin_state']                       = 10;
         $store_class_ids[]                           = "959,961,979,";//$request->input('store_class_ids') . ',';
         $store_class_names[]                         = "玩具乐器,DIY玩具,绘画工具,";//$request->input('store_class_names') . ',';
