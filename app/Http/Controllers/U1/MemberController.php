@@ -1260,12 +1260,11 @@ class MemberController extends Base
             return Base::jsonReturn(2000, '获取失败');
         }
         $rec_data = unserialize($receive_info->reciver_info);
-
         $result['peisong_info'] = [
             'username' => $receive_info->reciver_name,
             'address' => $rec_data['address'],
             'mobile' => $rec_data['phone'],
-            'sex' => $rec_data['sex'],
+            'sex' => !isset($rec_data['sex']) ? 1 : $rec_data['sex'],
         ];
         $result['order_info'] = [
             'order_sn' => $order_data->order_sn,
