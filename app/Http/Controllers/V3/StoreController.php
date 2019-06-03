@@ -884,6 +884,8 @@ class StoreController extends Base
         $param['business_licence_number']            = $request->input('business_licence_number');
         $param['ID_card']                            = $request->input('ID_card');
         $param['business_licence_number_electronic'] = $request->input('business_licence_number_electronic');
+        $param['longitude']                          = $request->input('longitude',116.307629);
+        $param['dimension']                          = $request->input('dimension',40.058359);
         $param['sc_id']                              = 2;
         $param['joinin_state']                       = 10;
         $store_class_ids[]                           = "959,961,979,";//$request->input('store_class_ids') . ',';
@@ -1013,10 +1015,10 @@ class StoreController extends Base
      */
     function gcList(Request $request)
     {
-        if (!$data = json_decode(Redis::get('gclists'))) {
+        //if (!$data = json_decode(Redis::get('gclists'))) {
             $data = Store::getGcList();
-            Redis::set('gclists', json_encode($data));
-        }
+//            Redis::set('gclists', json_encode($data));
+//        }
         return Base::jsonReturn(200, '获取成功', $data);
 
     }
