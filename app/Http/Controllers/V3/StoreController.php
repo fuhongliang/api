@@ -901,7 +901,7 @@ class StoreController extends Base
         if (BModel::getCount('store_joinin', ['member_id' => $param['member_id']]) > 0) {
             return Base::jsonReturn(2000, '店铺已存在申请记录');
         }
-        if(!$param['member_id'] || !$param['contacts_name'] || !$param['contacts_phone'] || !$param['store_name'])
+        if(!$param['member_id'] || !$param['contacts_name'] || !$param['contacts_phone'] || !$param['store_name'] || !$param['ID_card'])
         {
             return Base::jsonReturn(2001, '申请失败，请检查填写信息');
         }
