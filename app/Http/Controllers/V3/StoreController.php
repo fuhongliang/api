@@ -1013,10 +1013,10 @@ class StoreController extends Base
      */
     function gcList(Request $request)
     {
-        if (!$data = json_decode(Redis::get('gclists'))) {
+        //if (!$data = json_decode(Redis::get('gclists'))) {
             $data = Store::getGcList();
-            Redis::set('gclists', json_encode($data));
-        }
+//            Redis::set('gclists', json_encode($data));
+//        }
         return Base::jsonReturn(200, '获取成功', $data);
 
     }
