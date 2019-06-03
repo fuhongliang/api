@@ -1,6 +1,6 @@
 <?php
 
-namespace App\model\U1;
+namespace App\model\U2;
 
 use App\BModel;
 use App\Http\Controllers\BaseController;
@@ -27,7 +27,7 @@ class Member extends BModel
         return $data->isEmpty() ? array() : $data->toArray();
     }
 
-    static function getStoreList($longitude, $dimension, $keyword, $page, $type)
+    static function getStoreList($keyword, $page, $type)
     {
         $result = [];
         $skip = ($page - 1) * 10;
@@ -77,26 +77,12 @@ class Member extends BModel
         if (!$store_ids->isEmpty()) {
             $storeIds = $store_ids->toArray();
             foreach ($storeIds as $k => $val) {
-                $store_data = BModel::getTableFieldFirstData('store', ['store_id' => $val->store_id], ['store_id', 'store_name', 'store_avatar', 'store_sales', 'store_credit', 'longitude', 'dimension']);
+                $store_data = BModel::getTableFieldFirstData('store', ['store_id' => $val->store_id], ['store_id', 'store_name', 'store_avatar', 'store_sales', 'store_credit']);
                 $result[$k] = $store_data;
                 $xianshi_data = BModel::getTableAllData('p_xianshi', ['store_id' => $val->store_id, 'state' => 1], ['xianshi_name', 'xianshi_id']);
                 $result[$k]->xianshi = $xianshi_data->isEmpty() ? array() : $xianshi_data->toArray();
                 $manjian = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $val->store_id], ['a.rule_id', 'a.price', 'a.discount']);
                 $result[$k]->manjian = $manjian->isEmpty() ? [] : $manjian->toArray();
-                $lucheng = BaseController::getdistance($longitude, $dimension, $store_data->longitude, $store_data->dimension);
-                if ($lucheng < 1000) {
-                    $result[$k]->juli = ceil($lucheng) . "米";
-                } else {
-                    $result[$k]->juli = round($lucheng / 1000, 2) . "公里"; //10.46;
-                }
-                $shijian = ($lucheng / 3) / 60;
-                if ($shijian < 60) {
-                    $result[$k]->shijian = ceil($shijian) . "分";
-                } else {
-                    $result[$k]->shijian = floor($shijian / 60) . "小时" . ceil($shijian % 60) . "分";
-                }
-                unset($store_data->longitude);
-                unset($store_data->dimension);
             }
         }
         return $result;
@@ -333,7 +319,7 @@ class Member extends BModel
             $result[$k]['member_name'] = $v->member_name;
             $result[$k]['member_avator'] = is_null($v->member_avatar) ? "" : $v->member_avatar;
             if ($v->is_replay == 1) {
-                $result[$k]['replay'] = BModel::getTableValue('store_com', ['com_id' => $v->parent_id], 'content');
+                $result[$k]['replay'] = BModel::getTableValue('store_com', ['com_id' => $v->parent_id],'content');
             } else {
                 $result[$k]['replay'] = '';
             }
@@ -384,7 +370,7 @@ class Member extends BModel
             ->leftJoin('order_common as b', 'a.order_id', 'b.order_id')
             ->leftJoin('store as c', 'a.store_id', 'c.store_id')
             ->where('a.buyer_id', $member_id)
-            ->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state','a.refund_state','a.evaluation_state']);
+            ->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state']);
         return $data->isEmpty() ? [] : $data->toArray();
     }
 
@@ -394,9 +380,9 @@ class Member extends BModel
             ->leftJoin('order_common as b', 'a.order_id', 'b.order_id')
             ->leftJoin('store as c', 'a.store_id', 'c.store_id')
             ->where('a.buyer_id', $member_id)
-            ->where('a.order_state', 40)
+            ->where('a.order_state',40)
             ->where('evaluation_state', 0)
-            ->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state','a.refund_state','a.evaluation_state']);
+            ->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state']);
         return $data->isEmpty() ? [] : $data->toArray();
     }
 
@@ -407,7 +393,7 @@ class Member extends BModel
             ->leftJoin('store as c', 'a.store_id', 'c.store_id')
             ->where('a.buyer_id', $member_id)
             ->where('refund_state', 2)
-            ->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state','a.refund_state','a.evaluation_state']);
+            ->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state']);
         return $data->isEmpty() ? [] : $data->toArray();
     }
 

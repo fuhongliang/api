@@ -63,7 +63,7 @@ class MemberController extends Base
         $result['gcsort_data'] = Member::getParentGoodsClass();
         $result['discount_data'] = Member::getAppDiscount();
         $page = !$page ? 1 : $page;
-        $result['storelist_data'] = Member::getStoreList($keyword, $page, $type);
+        $result['storelist_data'] = Member::getStoreList($longitude, $dimension, $keyword, $page, $type);
 
         return Base::jsonReturn(200, '获取成功', $result);
     }
@@ -786,12 +786,42 @@ class MemberController extends Base
         return Base::jsonReturn(200, '请求成功', $data);
     }
 
-//    function cartDetail(Request $request)
-//    {
-//        $store_id  = $request->input('store_id');
-//        $member_id = $request->input('member_id');
-//        $content   = $request->input('content');
-//    }
+    /**评论页面
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function storeComInfo(Request $request)
+    {
+        $order_id = $request->input('order_id');
+        $member_id = $request->input('member_id');
+        if (BModel::getCount('order', ['order_id' => $order_id, 'buyer_id' => $member_id]) == 0) {
+            return Base::jsonReturn(1001, '订单不存在');
+        }
+        $result = [];
+        $result['qishou'] = [
+            'member_name' => '张琪',
+            'avator' => "xxxxx.jpg",
+            'time' => "2019-01-02 12:01"
+        ];
+        $store_info = DB::table('store as a')
+            ->leftJoin('order_goods as b', 'a.store_id', 'b.store_id')
+            ->where(['b.order_id' => $order_id])
+            ->get(['a.store_name', 'a.store_avatar', 'b.goods_id', 'b.goods_name'])
+            ->toArray();
+        $array = [];
+        foreach ($store_info as $k => $v) {
+            $array[$k]['goods_id'] = $v->goods_id;
+            $array[$k]['goods_name'] = $v->goods_name;
+            $store_name = $v->store_name;
+            $store_avatar = $v->store_avatar;
+        }
+        $result['info'] = [
+            'goods_info' => $array,
+            'store_name' => is_null($store_name) ? "" : $store_name,
+            'store_avatar' => is_null($store_avatar) ? "" : $store_avatar
+        ];
+        return Base::jsonReturn(200, '请求成功', $result);
+    }
 
     /**评论店铺
      * @param Request $request
@@ -802,11 +832,17 @@ class MemberController extends Base
         $store_id = $request->input('store_id');
         $member_id = $request->input('member_id');
         $content = $request->input('content');
-        $kouwei = $request->input('kouwei');
-        $baozhuang = $request->input('baozhuang');
+        $kouwei = $request->input('kouwei', 0);
+        $baozhuang = $request->input('baozhuang', 0);
         $images = $request->input('images');
-        $images = [1, 2, 3];
-        $images = implode(',', $images);
+        $zan_goods_id = $request->input('zan_goods_id');
+        $images = !$images ? "" : implode(',', $images);
+        if (!$store_id || !$content || !$member_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (BModel::getCount('store', ['store_id' => $store_id]) == 0) {
+            return Base::jsonReturn(1001, '店铺不存在');
+        }
         $ins_data = array(
             'content' => $content,
             'member_id' => $member_id,
@@ -817,10 +853,15 @@ class MemberController extends Base
             'images' => $images
         );
         $res = BModel::insertData('store_com', $ins_data);
+        if (!empty($zan_goods_id)) {
+            foreach ($zan_goods_id as $id) {
+                BModel::insertData('goods_zan', ['goods_id' => $id, 'member_id' => $member_id]);
+            }
+        }
         if ($res) {
-            return Base::jsonReturn(200, '领取成功');
+            return Base::jsonReturn(200, '评价成功');
         } else {
-            return Base::jsonReturn(2000, '领取失败');
+            return Base::jsonReturn(2000, '评价失败');
         }
     }
 
@@ -1126,10 +1167,45 @@ class MemberController extends Base
                 foreach ($order_data as $order_datum) {
                     $amount += $order_datum->goods_price * $order_datum->goods_num;
                 }
+                $v->order_state = self::getOrderState($v->order_state, $v->refund_state, $v->evaluation_state);
                 $v->total_amount = $amount;
+                unset($v->refund_state);
+                unset($v->evaluation_state);
             }
         }
         return Base::jsonReturn(200, '获取成功', $data);
+    }
+//0(已取消)10(默认):未付款;20:已付款;25:商家已接单;30:已发货;35骑手已接单40:已收货;
+//待支付；等待商家接单；商家已接单；商家正准备商品；骑手正赶往商家；骑手正在送货；订单已完成；订单已取消；待评价；退款中；退款成功
+    static function getOrderState($order_state, $refund_state, $evaluation_state)
+    {
+        if ($order_state == 0) {
+            return "订单已取消";
+        }
+        if ($order_state == 10) {
+            return "待支付";
+        }
+        if ($order_state == 20) {
+            return "等待商家接单";
+        }
+        if ($order_state == 25) {
+            return "商家已接单，正准备商品";
+        }
+        if ($order_state == 35) {
+            return "骑手正赶往商家";
+        }
+        if ($order_state == 30) {
+            return "骑手正在送货";
+        }
+        if ($order_state == 40) {
+            return "订单已完成";
+        }
+        if ($refund_state == 1 || $refund_state == 2) {
+            return "退款中";
+        }
+        if ($order_state == 40 && $evaluation_state == 0) {
+            return "待评价";
+        }
     }
 
     /**订单详情
@@ -1184,12 +1260,11 @@ class MemberController extends Base
             return Base::jsonReturn(2000, '获取失败');
         }
         $rec_data = unserialize($receive_info->reciver_info);
-
         $result['peisong_info'] = [
             'username' => $receive_info->reciver_name,
             'address' => $rec_data['address'],
             'mobile' => $rec_data['phone'],
-            'sex' => $rec_data['sex'],
+            'sex' => !isset($rec_data['sex']) ? 1 : $rec_data['sex'],
         ];
         $result['order_info'] = [
             'order_sn' => $order_data->order_sn,
@@ -1219,60 +1294,133 @@ class MemberController extends Base
         foreach ($data['children'][0] as $i) {
             $arr[$i] = $data['name'][$i];
         }
-        $array = array(
-            array(
-                'title' => 'A',
-                'content' => array($arr[12], $arr[34])
-            ),
-            array(
-                'title' => 'C',
-                'content' => array($arr[22])
-            ),
-            array(
-                'title' => 'F',
-                'content' => array($arr[13])
-            ),
-            array(
-                'title' => 'G',
-                'content' => array($arr[19], $arr[28], $arr[20], $arr[24])
-            ),
-            array(
-                'title' => 'H',
-                'content' => array($arr[21], $arr[3], $arr[16], $arr[8])
-            ),
-            array(
-                'title' => 'J',
-                'content' => array($arr[10], $arr[14], $arr[7])
-            ),
-            array(
-                'title' => 'N',
-                'content' => array($arr[6], $arr[5], $arr[30])
-            ),
-            array(
-                'title' => 'Q',
-                'content' => array($arr[29])
-            ),
-            array(
-                'title' => 'S',
-                'content' => array($arr[15], $arr[4], $arr[27], $arr[23])
-            ),
-            array(
-                'title' => 'T',
-                'content' => array($arr[32])
-            ),
-            array(
-                'title' => 'X',
-                'content' => array($arr[26], $arr[31], $arr[33])
-            ),
-            array(
-                'title' => 'Y',
-                'content' => array($arr[25])
-            ),
-            array(
-                'title' => 'Z',
-                'content' => array($arr[11])
-            ),
-        );
+        $array = [
+            "A" => [array(
+                "pinyin" => "anhui",
+                "abbr" => "AH",
+                "name" => $arr[12]
+            ), array(
+                "pinyin" => "aomen",
+                "abbr" => "AM",
+                "name" => $arr[34]
+            )],
+            "C" => [array(
+                "pinyin" => "chongqing",
+                "abbr" => "CQ",
+                "name" => $arr[22]
+            )],
+            "F" => [array(
+                "pinyin" => "fujian",
+                "abbr" => "FJ",
+                "name" => $arr[13]
+            )],
+            "G" => [array(
+                "pinyin" => "guangdong",
+                "abbr" => "GD",
+                "name" => $arr[19]
+            ), array(
+                "pinyin" => "gansu",
+                "abbr" => "GS",
+                "name" => $arr[28]
+            ), array(
+                "pinyin" => "guangxi",
+                "abbr" => "GX",
+                "name" => $arr[20]
+            ), array(
+                "pinyin" => "guizhou",
+                "abbr" => "GZ",
+                "name" => $arr[24]
+            )],
+            "H" => [array(
+                "pinyin" => "hainan",
+                "abbr" => "HN",
+                "name" => $arr[21]
+            ), array(
+                "pinyin" => "hebei",
+                "abbr" => "HB",
+                "name" => $arr[3]
+            ), array(
+                "pinyin" => "henan",
+                "abbr" => "HN",
+                "name" => $arr[16]
+            ), array(
+                "pinyin" => "heilongjiang",
+                "abbr" => "HLJ",
+                "name" => $arr[8]
+            )],
+            "J" => [array(
+                "pinyin" => "jiangsu",
+                "abbr" => "JS",
+                "name" => $arr[10]
+            ), array(
+                "pinyin" => "jiangxi",
+                "abbr" => "JX",
+                "name" => $arr[14]
+            ), array(
+                "pinyin" => "jilin",
+                "abbr" => "JL",
+                "name" => $arr[7]
+            )],
+            "N" => [array(
+                "pinyin" => "neimenggu",
+                "abbr" => "NMG",
+                "name" => $arr[5]
+            ), array(
+                "pinyin" => "ningxia",
+                "abbr" => "NX",
+                "name" => $arr[30]
+            )],
+            "Q" => [array(
+                "pinyin" => "qinghai",
+                "abbr" => "QH",
+                "name" => $arr[29]
+            )],
+            "S" => [array(
+                "pinyin" => "shandong",
+                "abbr" => "SD",
+                "name" => $arr[15]
+            ), array(
+                "pinyin" => "shanxi",
+                "abbr" => "SX",
+                "name" => $arr[4]
+            ), array(
+                "pinyin" => "shanxi",
+                "abbr" => "SX",
+                "name" => $arr[27]
+            ), array(
+                "pinyin" => "sichuan",
+                "abbr" => "SC",
+                "name" => $arr[23]
+            )],
+            "T" => [array(
+                "pinyin" => "taiwan",
+                "abbr" => "TW",
+                "name" => $arr[32]
+            )],
+            "X" => [array(
+                "pinyin" => "xizang",
+                "abbr" => "XZ",
+                "name" => $arr[26]
+            ), array(
+                "pinyin" => "xinjiang",
+                "abbr" => "XJ",
+                "name" => $arr[31]
+            ), array(
+                "pinyin" => "xianggang",
+                "abbr" => "XG",
+                "name" => $arr[33]
+            )],
+            "Y" => [array(
+                "pinyin" => "yunnan",
+                "abbr" => "YN",
+                "name" => $arr[25]
+            )],
+            "Z" => [array(
+                "pinyin" => "zhejiang",
+                "abbr" => "ZJ",
+                "name" => $arr[11]
+            )],
+        ];
         return Base::jsonReturn(200, '获取成功', $array);
 
     }

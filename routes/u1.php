@@ -36,16 +36,13 @@ Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () 
     Route::post('my_cart', 'MemberController@myCart');//我的购物车
     Route::post('clear_cart', 'MemberController@clearCart');//清购物车
 
-    Route::post('store_com', 'MemberController@storeCom');//去评价---
+    Route::post('store_com_info', 'MemberController@storeComInfo');//评价---
+    Route::post('add_store_com', 'MemberController@storeCom');//去评价---
     Route::post('cart_detail', 'MemberController@cartDetail');//购物车详情-----
     Route::post('go_settlement', 'MemberController@Settlement');//去结算
     Route::post('buy_step', 'MemberController@buyStep');//下单
     Route::post('order_list', 'MemberController@orderList');//订单列表
     Route::post('order_info', 'MemberController@orderInfo');//订单详情
-
-
-
-
 
 
 });
