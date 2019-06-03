@@ -132,6 +132,7 @@ class MemberController extends Base
         $memberInfo = BModel::getTableFirstData('member', ['member_mobile' => $member_name]);
         if ($memberInfo) {
             $member_id = $memberInfo->member_id;
+            dd($member_id);
             if (md5($member_passwd) == $memberInfo->member_passwd) {
                 $joinin_url = "";
                 if(BModel::getCount('umeng',['member_id'=>$member_id])>0)
