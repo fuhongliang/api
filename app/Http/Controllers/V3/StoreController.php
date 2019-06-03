@@ -897,12 +897,16 @@ class StoreController extends Base
         $param['sc_bail']                            = 100;
         $param['sg_info']                            = serialize(["sg_price" => 1000]);
         $param['store_class_commis_rates']           = BModel::getTableValue('goods_class', ['gc_id' => $param['sc_id']], 'commis_rate');
+
         if (BModel::getCount('store_joinin', ['member_id' => $param['member_id']]) > 0) {
             return Base::jsonReturn(2000, '店铺已存在申请记录');
         }
         if(!$param['member_id'] || !$param['contacts_name'] || !$param['contacts_phone'] || !$param['store_name'])
         {
             return Base::jsonReturn(2001, '申请失败，请检查填写信息');
+        }
+        if (BModel::getCount('member', ['member_id' => $param['member_id']]) == 0) {
+            return Base::jsonReturn(2002, '用户不存在');
         }
         $param['store_class_ids']   = serialize($store_class_ids);
         $param['store_class_names'] = serialize($store_class_names);
