@@ -760,6 +760,9 @@ class MemberController extends Base
         if (!$store_id || !$goods_id || !$member_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
+        if (BModel::getCount('goods', ['goods_id' => $goods_id]) == 0) {
+            return Base::jsonReturn(1001, '商品不存在');
+        }
         $data = [];
         $goods_field = ['a.goods_id', 'a.goods_image', 'a.goods_name', 'a.goods_salenum', 'a.goods_price', 'a.goods_marketprice', 'b.goods_body as describe'];
         $data['goods_info'] = BModel::getLeftData('goods as a', 'goods_common as b', 'a.goods_commonid', 'b.goods_commonid', ['a.goods_id' => $goods_id], $goods_field)->first();
