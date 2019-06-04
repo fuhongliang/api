@@ -26,7 +26,7 @@ class MemberController extends Base
         if (!$phone_number) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        if (!preg_match("/^1[34578]{1}\d{9}$/", $phone_number)) {
+        if (!preg_match("/^1[3456789]{1}\d{9}$/", $phone_number)) {
             return Base::jsonReturn(1000, '手机号格式不正确');
         }
         if (Redis::get($phone_number)) {
@@ -81,7 +81,7 @@ class MemberController extends Base
         if (empty($phone_number) || empty($verify_code) || empty($device_tokens) || empty($app_type)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        if (!preg_match("/^1[34578]{1}\d{9}$/", $phone_number)) {
+        if (!preg_match("/^1[3456789]{1}\d{9}$/", $phone_number)) {
             return Base::jsonReturn(1000, '手机号格式不正确');
         }
         $code = Redis::get($phone_number);
@@ -144,7 +144,7 @@ class MemberController extends Base
         if (empty($phone_number) || empty($password) || empty($device_tokens) || empty($app_type)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        if (!preg_match("/^1[34578]{1}\d{9}$/", $phone_number)) {
+        if (!preg_match("/^1[3456789]{1}\d{9}$/", $phone_number)) {
             return Base::jsonReturn(1000, '手机号格式不正确');
         }
         if (BModel::getCount('member', ['member_mobile' => $phone_number]) == 1) {

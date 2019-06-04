@@ -25,7 +25,7 @@ class MemberController extends Base
         if (empty($phone_number)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        if (!preg_match("/^1[34578]{1}\d{9}$/", $phone_number)) {
+        if (!preg_match("/^1[3456789]{1}\d{9}$/", $phone_number)) {
             return Base::jsonReturn(1000, '手机号格式不正确');
         }
 //        if (!Member::checkStorePhoneExist(['store_phone' => $phone_number]) || !Member::checkStoreJoinPhoneExist(['contacts_phone' => $phone_number]) || !Member::checkStoreRegTmpExist(['mobile_phone' => $phone_number])) {
@@ -48,7 +48,7 @@ class MemberController extends Base
         if (empty($phone_number) || empty($password) || empty($verify_code) || empty($app_type) || empty($device_tokens)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        if (!preg_match("/^1[34578]{1}\d{9}$/", $phone_number)) {
+        if (!preg_match("/^1[3456789]{1}\d{9}$/", $phone_number)) {
             return Base::jsonReturn(2000, '手机号格式不正确');
         }
         if (BModel::getCount('member', ['member_mobile' => $phone_number]) > 0) {
