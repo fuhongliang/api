@@ -1243,9 +1243,9 @@ class MemberController extends Base
         }
         $result = [];
         $order_data = BModel::getTableFieldFirstData('order', ['order_id' => $order_id],
-            ['store_id', 'order_state', 'shipping_fee', 'manjian_amount', 'order_sn', 'add_time', 'payment_code']);
+            ['store_id', 'order_state', 'shipping_fee', 'manjian_amount', 'order_sn', 'add_time', 'payment_code','refund_state','evaluation_state']);
         $store_data = BModel::getTableFieldFirstData('store', ['store_id' => $order_data->store_id], ['store_name', 'store_phone']);
-        $result['order_state'] = $order_data->order_state;
+        $result['order_state'] = self::getOrderState($order_id, $order_data->order_state, $order_data->refund_state, $order_data->evaluation_state);//$order_data->order_state;
         $result['store_name'] = $store_data->store_name;
         $result['store_phone'] = is_null($store_data->store_phone) ? "" : $store_data->store_phone;
 
@@ -1287,6 +1287,8 @@ class MemberController extends Base
             'add_time' => date('Y-m-d H:i:s', $order_data->add_time),
             'payment_code' => $order_data->payment_code,
         ];
+        unset( $order_data->refund_state);
+        unset($order_data->evaluation_state);
         return Base::jsonReturn(200, '获取成功', $result);
     }
 
