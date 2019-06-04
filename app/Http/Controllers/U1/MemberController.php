@@ -375,7 +375,7 @@ class MemberController extends Base
         $result['cart']['nums'] = BModel::getCount('cart', ['store_id' => $store_id]);
         $result['cart']['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
         $result['comment_url'] = getenv('HOST_URL').'/users/#/p_detail/'.$store_id.'/1';
-        $result['store_info_url'] = getenv('HOST_URL').'/users/#/evaluateall/'.$store_id;
+        $result['store_info_url'] = getenv('HOST_URL').'/users/#/evaluate/'.$store_id.'/evaluateall';
         return Base::jsonReturn(200, '获取成功', $result);
     }
 
