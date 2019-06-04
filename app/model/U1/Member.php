@@ -21,13 +21,7 @@ class Member extends BModel
             foreach ($data as $k=>$v) {
                 $result[$k]['gc_name']=$v->gc_name;
                 $result[$k]['gc_id']=$v->gc_id;
-                if(!empty($v->icon_iamge))
-                {
-                    $icon_image=getenv('ATTACH_ICON').$v->icon_image;
-                }else{
-                    $icon_image="";
-                }
-                $result[$k]['icon_image']=$icon_image;
+                $result[$k]['icon_image']=getenv('ATTACH_ICON').$v->icon_image;
             }
         }
         return $result;
