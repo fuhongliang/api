@@ -85,15 +85,15 @@ class Member extends BModel
                 $result[$k]->manjian = $manjian->isEmpty() ? [] : $manjian->toArray();
                 $lucheng = BaseController::getdistance($longitude, $dimension, $store_data->longitude, $store_data->dimension);
                 if ($lucheng < 1000) {
-                    $result[$k]->juli = ceil($lucheng) . "米";
+                    $result[$k]->distance = ceil($lucheng) . "米";
                 } else {
-                    $result[$k]->juli = round($lucheng / 1000, 2) . "公里"; //10.46;
+                    $result[$k]->distance = round($lucheng / 1000, 2) . "公里"; //10.46;
                 }
                 $shijian = ($lucheng / 3) / 60;
                 if ($shijian < 60) {
-                    $result[$k]->shijian = ceil($shijian) . "分";
+                    $result[$k]->need_time = ceil($shijian) . "分";
                 } else {
-                    $result[$k]->shijian = floor($shijian / 60) . "小时" . ceil($shijian % 60) . "分";
+                    $result[$k]->need_time = floor($shijian / 60) . "小时" . ceil($shijian % 60) . "分";
                 }
                 unset($store_data->longitude);
                 unset($store_data->dimension);
