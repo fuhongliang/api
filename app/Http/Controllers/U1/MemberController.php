@@ -352,7 +352,7 @@ class MemberController extends Base
         $result['goods_list'] = $calssLists;
 
         foreach ($result['goods_list'] as $k => &$m) {
-            $m['goods'] = Member::getStoreGoodsListByStcId($store_id, $m['stc_id']);
+            $m['goods'] = Member::getStoreGoodsListByStcId($store_id, $m['stc_id'],$member_id);
         }
         array_unshift($result['goods_list'],
             array(
@@ -379,8 +379,8 @@ class MemberController extends Base
 
         $result['cart']['nums'] = BModel::getCount('cart', ['store_id' => $store_id]);
         $result['cart']['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
-        $result['pignjia_url'] = getenv('HOST_URL').'/#/p_detail/'.$store_id.'/1';
-        $result['shangjia_url'] = getenv('HOST_URL').'/#/evaluateall/'.$store_id;
+        $result['comment_url'] = getenv('HOST_URL').'/#/p_detail/'.$store_id.'/1';
+        $result['store_info_url'] = getenv('HOST_URL').'/#/evaluateall/'.$store_id;
 //        if (!$tab_id || $tab_id == 1) {
 //            //
 //            $class_list = Store::getAllStoreClass(['store_id' => $store_id], ['stc_id', 'stc_name']);

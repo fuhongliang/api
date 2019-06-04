@@ -112,10 +112,10 @@ class Member extends BModel
             ->sum('voucher_t_price');
     }
 
-    static function getStoreGoodsListByStcId($store_id, $class_id)
+    static function getStoreGoodsListByStcId($store_id, $class_id,$member_id="")
     {
         $goods_info = $ids = array();
-        $fields = ['a.goods_id', 'a.goods_name', 'a.goods_price', 'a.goods_marketprice', 'b.goods_body as goods_desc', 'a.goods_image as img_name', 'a.goods_salenum'];
+        $fields = ['a.goods_id', 'a.goods_name', 'a.goods_price', 'a.goods_marketprice', 'b.goods_body as goods_desc', 'a.goods_image as img_name', 'a.goods_salenum','a.store_id'];
         if (!$class_id || $class_id == 'hot') {
             $data = DB::table('goods as a')
                 ->leftJoin('goods_common as b', 'a.goods_commonid', 'b.goods_commonid')
@@ -126,6 +126,7 @@ class Member extends BModel
             if (!$data->isEmpty()) {
                 foreach ($data as &$datum) {
                     $datum->zan = BModel::getCount('goods_zan', ['goods_id' => $datum->goods_id]);
+                    $datum->goods_detail_url=getenv('HOST_URL').'/#/p_detail/'.$store_id.'/'.$datum->goods_id.'/'.$member_id;
                 }
             }
             return $data->isEmpty() ? $goods_info : $data->toArray();
@@ -144,8 +145,9 @@ class Member extends BModel
                     $goods_info[$k]['goods_price'] = BModel::getSum('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'goods_price');
                     $goods_info[$k]['img_name'] = BModel::getTableValue('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'goods_image');
                     $goods_info[$k]['goods_salenum'] = 999;
-                    $goods_info[$k]['zan'] = BModel::getCount('goods_zan', ['goods_id' => $datum->goods_id]);
+                    $goods_info[$k]['zan'] = BModel::getCount('goods_zan', ['goods_id' => $val->goods_id]);
                     $goods_info[$k]['goods_marketprice'] = BModel::getSum('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'xianshi_price');
+                    $goods_info[$k]['goods_detail_url']=getenv('HOST_URL').'/#/p_detail/'.$store_id.'/'.$val->goods_id.'/'.$member_id;
                 }
             }
             return $goods_info;
@@ -164,8 +166,9 @@ class Member extends BModel
                     $goods_info[$k]['goods_price'] = BModel::getSum('p_bundling_goods', ['bl_id' => $val->bl_id], 'bl_goods_price');
                     $goods_info[$k]['img_name'] = BModel::getTableValue('p_bundling_goods', ['bl_id' => $val->bl_id], 'goods_image');
                     $goods_info[$k]['goods_salenum'] = 999;
-                    $goods_info[$k]['zan'] = BModel::getCount('goods_zan', ['goods_id' => $datum->goods_id]);
+                    $goods_info[$k]['zan'] = BModel::getCount('goods_zan', ['goods_id' => $val->goods_id]);
                     $goods_ids = BModel::getTableAllData('p_bundling_goods', ['bl_id' => $val->bl_id], ['goods_id']);
+                    $goods_info[$k]['goods_detail_url']=getenv('HOST_URL').'/#/p_detail/'.$store_id.'/'.$val->goods_id.'/'.$member_id;
                     $gids = [];
                     foreach ($goods_ids as $goods_id) {
                         array_push($gids, $goods_id->goods_id);
@@ -194,6 +197,7 @@ class Member extends BModel
                     foreach ($ids as $k => $goods_id) {
                         $goods_info[$k] = Goods::getGoodsInfo(['goods_id' => $goods_id], $fields);
                         $goods_info[$k]->zan = BModel::getCount('goods_zan', ['goods_id' => $goods_id]);
+                        $goods_info[$k]->goods_detail_url=getenv('HOST_URL').'/#/p_detail/'.$store_id.'/'.$goods_id.'/'.$member_id;
                     }
                 }
                 return $goods_info;
