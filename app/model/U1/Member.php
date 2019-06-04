@@ -44,10 +44,10 @@ class Member extends BModel
         {
             foreach ($data as $k=>$v)
             {
-                $result['type']=$v->type;
-                $result['background_image']=getenv('ATTACH_BANNER').$v->background_image;
-                $result['title']=$v->title;
-                $result['brief']=$v->brief;
+                $result[$k]['type']=$v->type;
+                $result[$k]['background_image']=getenv('ATTACH_BANNER').$v->background_image;
+                $result[$k]['title']=$v->title;
+                $result[$k]['brief']=$v->brief;
             }
         }
         return $result;
