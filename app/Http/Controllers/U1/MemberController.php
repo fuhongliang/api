@@ -463,7 +463,7 @@ class MemberController extends Base
         if (BModel::getCount('store', ['store_id' => $store_id]) == 0) {
             return Base::jsonReturn(1001, '店铺不存在');
         }
-        $field = ['a.area_info', 'a.store_address', 'b.face_img', 'b.logo_img', 'a.store_name', 'a.work_start_time', 'a.work_end_time', 'a.store_phone', 'a.sc_id'];
+        $field = ['a.area_info', 'a.store_address', 'b.face_img', 'b.logo_img', 'a.store_name', 'a.work_start_time', 'a.work_end_time', 'a.store_phone', 'a.sc_id','b.business_licence_number_electronic'];
         $store_info = BModel::getLeftData('store as a', 'store_joinin as b', 'a.member_id', 'b.member_id', ['a.store_id' => $store_id], $field)->first();
         $result = $store_info;
         $result->sc_name = BModel::getTableValue('store_class', ['sc_id' => $store_info->sc_id], 'sc_name');
