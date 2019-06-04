@@ -588,7 +588,7 @@ class StoreController extends Base
         if (empty($phone_number)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        if (!preg_match("/^1[34578]{1}\d{9}$/", $phone_number)) {
+        if (!preg_match("/^1[3456789]{1}\d{9}$/", $phone_number)) {
             return Base::jsonReturn(1000, '手机号格式不正确');
         }
         if (Redis::get($phone_number)) {
