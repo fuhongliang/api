@@ -104,13 +104,12 @@ class Member extends BModel
 
     static function getStoreVoucher($store_id)
     {
-        return DB::table('voucher')
-            ->where('voucher_store_id', $store_id)
-            ->where('voucher_start_date', '<', time())
-            ->where('voucher_end_date', '>', time())
-            ->where('voucher_state', 1)
-            ->sum('voucher_price');
-
+        return DB::table('voucher_template')
+            ->where('voucher_t_store_id', $store_id)
+            ->where('voucher_t_start_date', '<', time())
+            ->where('voucher_t_end_date', '>', time())
+            ->where('voucher_t_state', 1)
+            ->sum('voucher_t_price');
     }
 
     static function getStoreGoodsListByStcId($store_id, $class_id)

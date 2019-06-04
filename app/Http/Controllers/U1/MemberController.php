@@ -64,7 +64,7 @@ class MemberController extends Base
         $result['discount_data'] = Member::getAppDiscount();
         $page = !$page ? 1 : $page;
         $result['storelist_data'] = Member::getStoreList($longitude, $dimension, $keyword, $page, $type);
-
+        $result['city_list_url'] = getenv('HOST_URL')."/users/#/";
         return Base::jsonReturn(200, '获取成功', $result);
     }
 
@@ -329,7 +329,6 @@ class MemberController extends Base
         }
         //店铺详情
         $store_info = BModel::getTableFieldFirstData('store', ['store_id' => $store_id], ['store_id', 'store_name', 'store_avatar', 'store_sales', 'store_credit', 'store_description']);
-        $store_info->daijinquan = Member::getStoreVoucher($store_id);
         $result['store_info'] = $store_info;
         //是否收藏
         if (!$member_id) {
@@ -380,8 +379,8 @@ class MemberController extends Base
 
         $result['cart']['nums'] = BModel::getCount('cart', ['store_id' => $store_id]);
         $result['cart']['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
-        $result['pignjia_url'] = "8888888.com";
-        $result['shangjia_url'] = "99999999.com";
+        $result['pignjia_url'] = getenv('HOST_URL').'/#/p_detail/'.$store_id.'/1';
+        $result['shangjia_url'] = getenv('HOST_URL').'/#/evaluateall/'.$store_id;
 //        if (!$tab_id || $tab_id == 1) {
 //            //
 //            $class_list = Store::getAllStoreClass(['store_id' => $store_id], ['stc_id', 'stc_name']);
