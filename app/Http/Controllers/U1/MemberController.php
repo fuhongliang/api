@@ -58,8 +58,18 @@ class MemberController extends Base
         if (empty($longitude) || empty($dimension)) {
             return Base::jsonReturn(1000, '参数缺失');
         }
-        $result = [];
-        $result['banner_data'] = BModel::getOrderData('app_banner', 'sort', ['title', 'image_name', 'link_url']);
+        $result =$banners= [];
+        $banner=BModel::getOrderData('app_banner', 'sort', ['title', 'image_name', 'link_url']);
+        if(!empty($banner))
+        {
+            foreach ($banner as $k=>$v)
+            {
+                $banners[$k]['title']=$v->title;
+                $banners[$k]['image_name']=getenv('ATTACH_BANNER').$v->image_name;
+                $banners[$k]['link_url']=$v->link_url;
+            }
+        }
+        $result['banner_data'] =$banners;
         $result['gcsort_data'] = Member::getParentGoodsClass();
         $result['discount_data'] = Member::getAppDiscount();
         $page = !$page ? 1 : $page;

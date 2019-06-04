@@ -14,8 +14,17 @@ class Member extends BModel
      */
     static function getParentGoodsClass()
     {
+        $result=[];
         $data = BModel::getTableAllOrderData('goods_class', ['gc_parent_id' => 0, 'gc_show' => 1], 'gc_sort', ['gc_name', 'gc_id', 'icon_image']);
-        return $data->isEmpty() ? array() : $data->toArray();
+        if(!$data->isEmpty())
+        {
+            foreach ($data as $k=>$v) {
+                $result[$k]['gc_name']=$v->gc_name;
+                $result[$k]['gc_id']=$v->gc_id;
+                $result[$k]['icon_image']=getenv('ATTACH_ICON').$v->icon_image;
+            }
+        }
+        return $result;
     }
 
     /**优惠专区
@@ -23,8 +32,19 @@ class Member extends BModel
      */
     static function getAppDiscount()
     {
+        $result=[];
         $data = BModel::getTableAllOrderData('app_discount', ['is_show' => 1], 'sort', ['type', 'background_image', 'title', 'brief']);
-        return $data->isEmpty() ? array() : $data->toArray();
+        if(!$data->isEmpty())
+        {
+            foreach ($data as $k=>$v)
+            {
+                $result['type']=$v->type;
+                $result['background_image']=getenv('ATTACH_BANNER').$v->background_image;
+                $result['title']=$v->title;
+                $result['brief']=$v->brief;
+            }
+        }
+        return $result;
     }
 
     static function getStoreList($longitude, $dimension, $keyword, $page, $type)
