@@ -1287,10 +1287,6 @@ class MemberController extends Base
                 "pinyin" => "anhui",
                 "abbr" => "AH",
                 "name" => $arr[12]
-            ), array(
-                "pinyin" => "aomen",
-                "abbr" => "AM",
-                "name" => $arr[34]
             )],
             "C" => [array(
                 "pinyin" => "chongqing",
@@ -1380,11 +1376,6 @@ class MemberController extends Base
                 "abbr" => "SC",
                 "name" => $arr[23]
             )],
-            "T" => [array(
-                "pinyin" => "taiwan",
-                "abbr" => "TW",
-                "name" => $arr[32]
-            )],
             "X" => [array(
                 "pinyin" => "xizang",
                 "abbr" => "XZ",
@@ -1393,10 +1384,6 @@ class MemberController extends Base
                 "pinyin" => "xinjiang",
                 "abbr" => "XJ",
                 "name" => $arr[31]
-            ), array(
-                "pinyin" => "xianggang",
-                "abbr" => "XG",
-                "name" => $arr[33]
             )],
             "Y" => [array(
                 "pinyin" => "yunnan",
