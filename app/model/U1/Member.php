@@ -134,6 +134,7 @@ class Member extends BModel
 
     static function getStoreGoodsListByStcId($store_id, $class_id,$member_id="")
     {
+
         $goods_info = $ids = array();
         $fields = ['a.goods_id', 'a.goods_name', 'a.goods_price', 'a.goods_marketprice', 'b.goods_body as goods_desc', 'a.goods_image as img_name', 'a.goods_salenum','a.store_id'];
         if (!$class_id || $class_id == 'hot') {
@@ -150,12 +151,13 @@ class Member extends BModel
                 }
             }
             return $data->isEmpty() ? $goods_info : $data->toArray();
-        } elseif ($class_id == 'zhekou') {
+        } elseif ($class_id == 'xianshi') {
             $data = DB::table('p_xianshi')
                 ->where('store_id', $store_id)
                 ->where('state', 1)
                 ->orderBy('xianshi_id', 'desc')
-                ->get(['xianshi_id', 'xianshi_name as goods_name', 'xianshi_explain as goods_desc']);
+                ->get(['xianshi_id','xianshi_name as goods_name', 'xianshi_explain as goods_desc']);
+
             if (!$data->isEmpty()) {
                 $xianshi_data = $data->toArray();
                 foreach ($xianshi_data as $k => $val) {
@@ -165,9 +167,9 @@ class Member extends BModel
                     $goods_info[$k]['goods_price'] = BModel::getSum('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'goods_price');
                     $goods_info[$k]['img_name'] = BModel::getTableValue('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'goods_image');
                     $goods_info[$k]['goods_salenum'] = 999;
-                    $goods_info[$k]['zan'] = BModel::getCount('goods_zan', ['goods_id' => $val->goods_id]);
+                    $goods_info[$k]['zan'] = BModel::getCount('goods_zan', ['goods_id' => $val->xianshi_id]);
                     $goods_info[$k]['goods_marketprice'] = BModel::getSum('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'xianshi_price');
-                    $goods_info[$k]['goods_detail_url']=getenv('HOST_URL').'/users/#/p_detail/'.$store_id.'/'.$val->goods_id.'/'.$member_id;
+                    $goods_info[$k]['goods_detail_url']=getenv('HOST_URL').'/users/#/p_detail/'.$store_id.'/'.$val->xianshi_id.'/'.$member_id;
                 }
             }
             return $goods_info;

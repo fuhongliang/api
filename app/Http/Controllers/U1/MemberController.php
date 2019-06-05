@@ -326,11 +326,7 @@ class MemberController extends Base
     {
         $store_id = $request->input('store_id');
         $member_id = $request->input('member_id');
-        //       $class_id = $request->input('class_id');
-//        $tab_id = $request->input('tab_id');//1,2,3
-//        $type = $request->input('type');//1,2,3,4
         $result = [];
-
         if (!$store_id) {
             return Base::jsonReturn(1000, '参数缺失');
         }
@@ -364,18 +360,21 @@ class MemberController extends Base
         foreach ($result['goods_list'] as $k => &$m) {
             $m['goods'] = Member::getStoreGoodsListByStcId($store_id, $m['stc_id'],$member_id);
         }
+
         array_unshift($result['goods_list'],
             array(
                 'stc_id' => "taozhuang",
                 'stc_name' => "优惠",
                 'goods' => Member::getStoreGoodsListByStcId($store_id, 'taozhuang')
             ));
+
         array_unshift($result['goods_list'],
             array(
                 'stc_id' => "xianshi",
                 'stc_name' => "折扣",
                 'goods' => Member::getStoreGoodsListByStcId($store_id, 'xianshi')
             ));
+        dd($result);
         array_unshift($result['goods_list'],
             array(
                 'stc_id' => "hot",

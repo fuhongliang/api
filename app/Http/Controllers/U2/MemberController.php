@@ -5,6 +5,7 @@ namespace App\Http\Controllers\U2;
 
 use App\BModel;
 use App\Http\Controllers\BaseController as Base;
+use App\Http\Controllers\BaseController;
 use App\Http\Controllers\SMSController;
 use App\model\U2\Member;
 use App\model\V3\Store;
@@ -1447,8 +1448,51 @@ class MemberController extends Base
         }
     }
 
+    /**收藏列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function userCollectList(Request $request)
+    {
+        $member_id = $request->input('member_id');
+        $longitude = $request->input('longitude');
+        $dimension = $request->input('dimension');
+        if (!$member_id || !$longitude || !$dimension) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if(!Member::checkExist('member',['member_id'=>$member_id]))
+        {
+            return Base::jsonReturn(2000, '用户不存在');
+        }
+        $storeIds=BModel::getTableAllData('favorites',['member_id'=>$member_id],['store_id','log_id as favorites_id']);
+        $result=[];
+        if(!$storeIds->isEmpty())
+        {
+            foreach ($storeIds as $k=>$storeId) {
 
-
+                $store_data = BModel::getTableFieldFirstData('store', ['store_id' => $storeId->store_id], ['store_id', 'store_name', 'store_avatar', 'store_sales', 'store_credit', 'longitude', 'dimension']);
+                $lucheng = BaseController::getdistance($longitude, $dimension, $store_data->longitude, $store_data->dimension);
+                $store_data->favorites_id=$storeId->favorites_id;
+                $store_data->qisong="10";
+                $store_data->peisong="15";
+                if ($lucheng < 1000) {
+                    $store_data->distanct = ceil($lucheng) . "米";
+                } else {
+                    $store_data->distanct = round($lucheng / 1000, 2) . "公里"; //10.46;
+                }
+                $shijian = ($lucheng / 3) / 60;
+                if ($shijian < 60) {
+                    $store_data->need_time = ceil($shijian) . "分";
+                } else {
+                    $store_data->need_time = floor($shijian / 60) . "小时" . ceil($shijian % 60) . "分";
+                }
+                $result[$k]['store_data']=$store_data;
+                unset($store_data->longitude);
+                unset($store_data->dimension);
+            }
+        }
+        return Base::jsonReturn(200, '获取成功',$result);
+    }
 
 
 }
