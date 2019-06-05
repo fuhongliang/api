@@ -36,8 +36,8 @@ Route::group(['namespace' => 'U2'], function () {
     Route::post('add_cart', 'MemberController@addCart');//添加购物车
     Route::post('my_cart', 'MemberController@myCart');//我的购物车
     Route::post('clear_cart', 'MemberController@clearCart');//清购物车
-    Route::post('store_com', 'MemberController@storeComInfo');//评价展示
-    Route::post('add_store_com', 'MemberController@storeCom');//添加评价---
+    Route::post('store_com', 'MemberController@storeCom');//去评价---
+    Route::post('store_com_info', 'MemberController@storeComInfo');//评价---
     Route::post('cart_detail', 'MemberController@cartDetail');//购物车详情-----
     Route::post('go_settlement', 'MemberController@Settlement');//去结算
     Route::post('buy_step', 'MemberController@buyStep');//下单
