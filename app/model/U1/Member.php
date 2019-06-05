@@ -163,7 +163,7 @@ class Member extends BModel
                 foreach ($xianshi_data as $k => $val) {
                     $goods_info[$k]['goods_id'] = $val->xianshi_id;
                     $goods_info[$k]['goods_name'] = $val->goods_name;
-                    $goods_info[$k]['goods_desc'] = $val->goods_desc;
+                    $goods_info[$k]['goods_desc'] = is_null($val->goods_desc) ? "" :$val->goods_desc;
                     $goods_info[$k]['goods_price'] = BModel::getSum('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'goods_price');
                     $goods_info[$k]['img_name'] = BModel::getTableValue('p_xianshi_goods', ['xianshi_id' => $val->xianshi_id], 'goods_image');
                     $goods_info[$k]['goods_salenum'] = 999;
