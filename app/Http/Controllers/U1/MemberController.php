@@ -932,9 +932,9 @@ class MemberController extends Base
             return Base::jsonReturn(1001, '用户不存在');
         }
         $result = [];
-        $address = BModel::getTableFieldFirstData('address', ['member_id' => $member_id, 'is_default' => '1'], ['true_name', 'mob_phone', 'area_info', 'address', 'address_id']);
-        $result['address'] = !$address ? [] : $address;
 
+        $address = BModel::getTableFieldFirstData('address', ['member_id' => $member_id, 'is_default' => '1'], ['true_name', 'mob_phone', 'area_info', 'address', 'address_id']);
+        $result['address'] = !$address ? (object)[]: $address;
         $result['store_detail'] = BModel::getTableFieldFirstData('store', ['store_id' => $store_id], ['store_id', 'store_name']);
 
         $data = Member::getCartInfoByStoreId($store_id, $member_id);

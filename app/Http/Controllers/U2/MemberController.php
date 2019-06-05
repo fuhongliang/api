@@ -170,9 +170,12 @@ class MemberController extends Base
             );
             BModel::upTableData('member', ['member_id' => $member_data->member_id], $up_data);
             BModel::delData('token', ['member_id' => $member_data->member_id]);
-            $member_info = BModel::getTableFieldFirstData('member', ['member_id' => $member_data->member_id], ['member_id', 'member_mobile', 'member_name', 'member_avatar']);
+            $member_info = BModel::getTableFieldFirstData('member', ['member_id' => $member_data->member_id], ['member_id', 'member_mobile', 'member_name', 'member_avatar','member_wxopenid']);
             $member_info->member_avatar = is_null($member_info->member_avatar) ? '' : $member_info->member_avatar;
             $member_info->token = Base::makeToken(microtime());
+            $member_info->is_bind_openid=empty($member_info->member_wxopenid)?false:true;
+            $member_info->need_pwd=false;
+            unset($member_info->member_wxopenid);
             $token_data = array(
                 'member_id' => $member_data->member_id,
                 'token' => $member_info->token,
@@ -906,7 +909,7 @@ class MemberController extends Base
         }
         $result = [];
         $address = BModel::getTableFieldFirstData('address', ['member_id' => $member_id, 'is_default' => '1'], ['true_name', 'mob_phone', 'area_info', 'address', 'address_id']);
-        $result['address'] = !$address ? [] : $address;
+        $result['address'] = !$address ? (object)[]: $address;
 
         $result['store_detail'] = BModel::getTableFieldFirstData('store', ['store_id' => $store_id], ['store_id', 'store_name']);
 
@@ -1581,7 +1584,10 @@ class MemberController extends Base
     }
 
 
+    function wxLogin(Request $request)
+    {
 
+    }
 
 
 

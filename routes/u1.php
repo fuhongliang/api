@@ -24,7 +24,7 @@ Route::group(['namespace' => 'U1'], function () {
     Route::post('goods_detail', 'MemberController@goodsDetail');//商品详情
 });
 
-Route::group(['namespace' => 'U1', 'middleware' => ['checktoken']], function () {
+Route::group(['namespace' => 'U1'], function () {
     Route::post('user_add_pwd', 'MemberController@userAddPwd');//添加密码
     Route::post('user_address_list', 'MemberController@userAddrList');//用户收货地址列表
     Route::post('user_address_info', 'MemberController@userAddrInfo');//用户收货地址详情
