@@ -5,7 +5,6 @@ namespace App\Http\Controllers\U2;
 
 use App\BModel;
 use App\Http\Controllers\BaseController as Base;
-use App\Http\Controllers\BaseController;
 use App\Http\Controllers\SMSController;
 use App\model\U2\Member;
 use App\model\V3\Store;
@@ -319,76 +318,6 @@ class MemberController extends Base
         }
     }
 
-    /**店铺详情
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    function storeInfo(Request $request)
-    {
-        $store_id = $request->input('store_id');
-        $member_id = $request->input('member_id');
-        //       $class_id = $request->input('class_id');
-//        $tab_id = $request->input('tab_id');//1,2,3
-//        $type = $request->input('type');//1,2,3,4
-        $result = [];
-
-        if (!$store_id) {
-            return Base::jsonReturn(1000, '参数缺失');
-        }
-        if (BModel::getCount('store', ['store_id' => $store_id]) == 0) {
-            return Base::jsonReturn(1001, '店铺不存在');
-        }
-        //店铺详情
-        $store_info = BModel::getTableFieldFirstData('store', ['store_id' => $store_id], ['store_id', 'store_name', 'store_avatar', 'store_sales', 'store_credit', 'store_description']);
-        $result['store_info'] = $store_info;
-        //是否收藏
-        if (!$member_id) {
-            $count = BModel::getCount('favorites', ['member_id' => $member_id, 'fav_type' => 'store', 'store_id' => $store_id]);
-            $result['is_collect'] = $count == 1 ? true : false;
-        } else {
-            $result['is_collect'] = false;
-        }
-        $manjian = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $store_id], ['a.price', 'a.discount']);
-        $result['manjian'] = $manjian->isEmpty() ? [] : $manjian->toArray();
-        $class_list = Store::getAllStoreClass(['store_id' => $store_id], ['stc_id', 'stc_name']);
-        $calssLists = [];
-        if (!$class_list->isEmpty()) {
-            $calssList = $class_list->toArray();
-            foreach ($calssList as $k => $val) {
-                $calssLists[$k]['stc_id'] = (string)$val->stc_id;
-                $calssLists[$k]['stc_name'] = (string)$val->stc_name;
-            }
-        }
-        //$goods_list = Member::getStoreGoodsListByStcId($store_id, $class_id);
-        $result['goods_list'] = $calssLists;
-
-        foreach ($result['goods_list'] as $k => &$m) {
-            $m['goods'] = Member::getStoreGoodsListByStcId($store_id, $m['stc_id'],$member_id);
-        }
-        array_unshift($result['goods_list'],
-            array(
-                'stc_id' => "taozhuang",
-                'stc_name' => "优惠",
-                'goods' => Member::getStoreGoodsListByStcId($store_id, 'taozhuang')
-            ));
-        array_unshift($result['goods_list'],
-            array(
-                'stc_id' => "xianshi",
-                'stc_name' => "折扣",
-                'goods' => Member::getStoreGoodsListByStcId($store_id, 'xianshi')
-            ));
-        array_unshift($result['goods_list'],
-            array(
-                'stc_id' => "hot",
-                'stc_name' => "热销",
-                'goods' => Member::getStoreGoodsListByStcId($store_id, 'hot')
-            ));
-        $result['cart']['nums'] = BModel::getCount('cart', ['store_id' => $store_id]);
-        $result['cart']['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
-        $result['comment_url'] =  getenv('HOST_URL').'/users/#/evaluate/'.$store_id.'/evaluateall';
-        $result['store_info_url'] =  getenv('HOST_URL').'/users/#/business/'.$store_id;
-        return Base::jsonReturn(200, '获取成功', $result);
-    }
 
     /**
      * @param Request $request
@@ -593,7 +522,48 @@ class MemberController extends Base
                 });
             }
 
-        } else {
+        } elseif($stc_id == 'hot')
+        {
+            $goods_info = BModel::getTableFirstData('goods', array('goods_id' => $goods_id));
+            if (empty($goods_info) || $goods_info->goods_state != 1) {
+                return Base::jsonReturn(1001, '商品不存在或已下架');
+            }
+            if ($goods_info->is_much == 1 && intval($goods_info->goods_storage) < $quantity) {
+                return Base::jsonReturn(1002, '商品库存不足');
+            }
+            //不能购买自己店铺
+            if ($goods_info->store_id == $storeid) {
+                return Base::jsonReturn(1003, '不能购买自己的商品');
+            }
+
+            if (BModel::getCount('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id, 'bl_id' => 0, 'xs_id' => 0]) > 0) {
+                DB::transaction(function () use ($quantity, $member_id, $goods_id, $goods_info) {
+                    BModel::numIncrement('cart', ['goods_id' => $goods_id, 'buyer_id' => $member_id], 'goods_num', $quantity);
+                    $is_much = BModel::getTableValue('goods', ['goods_id' => $goods_id], 'is_much');
+                    if ($is_much == 1) {
+                        BModel::numDecrement('goods', ['goods_id' => $goods_id], 'goods_storage', $quantity);
+                    }
+                });
+            } else {
+                $goodsinfo = array();
+                $goodsinfo['store_id'] = $store_id;
+                $goodsinfo['goods_id'] = $goods_id;
+                $goodsinfo['goods_name'] = $goods_info->goods_name;
+                $goodsinfo['goods_price'] = Base::ncPriceFormat($goods_info->goods_price);
+                $goodsinfo['goods_num'] = $quantity;
+                $goodsinfo['goods_image'] = $goods_info->goods_image;
+                $goodsinfo['store_name'] = $goods_info->store_name;
+                $goodsinfo['buyer_id'] = $member_id;
+                $goodsinfo['hot']     = 1;
+                DB::transaction(function () use ($goodsinfo, $goods_id, $quantity) {
+                    BModel::insertData('cart', $goodsinfo);
+                    $is_much = BModel::getTableValue('goods', ['goods_id' => $goods_id], 'is_much');
+                    if ($is_much == 1) {
+                        BModel::numDecrement('goods', ['goods_id' => $goods_id], 'goods_storage', $quantity);
+                    }
+                });
+            }
+        }else{
             $goods_info = BModel::getTableFirstData('goods', array('goods_id' => $goods_id));
             if (empty($goods_info) || $goods_info->goods_state != 1) {
                 return Base::jsonReturn(1001, '商品不存在或已下架');
@@ -1398,8 +1368,9 @@ class MemberController extends Base
             )],
         ];
         return Base::jsonReturn(200, '获取成功', $array);
+
     }
-    ///////////////////////
+/////////////////////////
 
     /**全部分类
      * @param Request $request
@@ -1493,6 +1464,125 @@ class MemberController extends Base
         }
         return Base::jsonReturn(200, '获取成功',$result);
     }
+
+    /**取消订单
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function cancelOrder(Request $request)
+    {
+        $member_id = $request->input('member_id');
+        $order_id = $request->input('order_id');
+        if (!$member_id || !$order_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if(!Member::checkExist('member',['member_id'=>$member_id]))
+        {
+            return Base::jsonReturn(2000, '用户不存在');
+        }
+        if(!Member::checkExist('order',['order_id'=>$order_id]))
+        {
+            return Base::jsonReturn(2001, '订单不存在');
+        }
+        $result=BModel::upTableData('order',['order_id'=>$order_id],['order_state'=>0]);
+        if($result)
+        {
+            return Base::jsonReturn(200, '取消成功');
+        }else{
+            return Base::jsonReturn(2002, '取消失败');
+        }
+
+    }
+
+
+    /**店铺详情
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function storeInfo(Request $request)
+    {
+        $store_id = $request->input('store_id');
+        $member_id = $request->input('member_id');
+        $result = [];
+        if (!$store_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if (BModel::getCount('store', ['store_id' => $store_id]) == 0) {
+            return Base::jsonReturn(1001, '店铺不存在');
+        }
+        //店铺详情
+        $store_info = BModel::getTableFieldFirstData('store', ['store_id' => $store_id], ['store_id', 'store_name', 'store_avatar', 'store_sales', 'store_credit', 'store_description']);
+        $result['store_info'] = $store_info;
+        //是否收藏
+        if (!$member_id) {
+            $count = BModel::getCount('favorites', ['member_id' => $member_id, 'fav_type' => 'store', 'store_id' => $store_id]);
+            $result['is_collect'] = $count == 1 ? true : false;
+        } else {
+            $result['is_collect'] = false;
+        }
+        $manjian = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $store_id], ['a.price', 'a.discount']);
+        $result['manjian'] = $manjian->isEmpty() ? [] : $manjian->toArray();
+        $class_list = Store::getAllStoreClass(['store_id' => $store_id], ['stc_id', 'stc_name']);
+        $calssLists = [];
+        if (!$class_list->isEmpty()) {
+            $calssList = $class_list->toArray();
+            foreach ($calssList as $k => $val) {
+                $calssLists[$k]['stc_id'] = (string)$val->stc_id;
+                $calssLists[$k]['stc_name'] = (string)$val->stc_name;
+                $calssLists[$k]['cart_nums'] = Member::getCartGoodsNum($store_id, $val->stc_id, $member_id);
+            }
+        }
+        //$goods_list = Member::getStoreGoodsListByStcId($store_id, $class_id);
+        $result['goods_list'] = $calssLists;
+
+        foreach ($result['goods_list'] as $k => &$m) {
+            $m['goods'] = Member::getStoreGoodsListByStcId($store_id, $m['stc_id'], $member_id);
+        }
+        $taozhuang = Member::getStoreGoodsListByStcId($store_id, 'taozhuang');
+        if ($taozhuang)
+        {
+            array_unshift($result['goods_list'],
+                array(
+                    'stc_id' => "taozhuang",
+                    'stc_name' => "优惠",
+                    'cart_nums' => Member::getTaozhuangCartGoodsNum($store_id,$member_id),
+                    'goods' => $taozhuang
+            ));
+        }
+
+        $xianshi=Member::getStoreGoodsListByStcId($store_id, 'xianshi');
+        if($xianshi)
+        {
+            array_unshift($result['goods_list'],
+                array(
+                    'stc_id' => "xianshi",
+                    'stc_name' => "折扣",
+                    'cart_nums' => Member::getXianshiCartGoodsNum($store_id,$member_id),
+                    'goods' => $xianshi
+                ));
+        }
+
+        array_unshift($result['goods_list'],
+            array(
+                'stc_id' => "hot",
+                'stc_name' => "热销",
+                'cart_nums' => Member::getHotCartGoodsNum($store_id,$member_id),
+                'goods' =>Member::getStoreGoodsListByStcId($store_id, 'hot')
+            ));
+        $result['cart']=array(
+            'peisong'=>5,
+            'goods'=>Member::getCartGoods($store_id,$member_id)
+        );
+//        $result['cart']['nums'] = BModel::getCount('cart', ['store_id' => $store_id]);
+//        $result['cart']['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
+        $result['comment_url'] =  getenv('HOST_URL').'/users/#/evaluate/'.$store_id.'/evaluateall';
+        $result['store_info_url'] =  getenv('HOST_URL').'/users/#/business/'.$store_id;
+        return Base::jsonReturn(200, '获取成功', $result);
+    }
+
+
+
+
 
 
 }
