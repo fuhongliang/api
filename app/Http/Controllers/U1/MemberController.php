@@ -374,7 +374,6 @@ class MemberController extends Base
                 'stc_name' => "折扣",
                 'goods' => Member::getStoreGoodsListByStcId($store_id, 'xianshi')
             ));
-        dd($result);
         array_unshift($result['goods_list'],
             array(
                 'stc_id' => "hot",
