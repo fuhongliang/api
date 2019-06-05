@@ -1419,4 +1419,36 @@ class MemberController extends Base
         return Base::jsonReturn(200, '获取成功', $result);
     }
 
+    /**取消收藏
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    function cancelCollect(Request $request)
+    {
+        $member_id = $request->input('member_id');
+        $favorites_id = $request->input('favorites_id');
+        if (!$member_id || !$favorites_id) {
+            return Base::jsonReturn(1000, '参数缺失');
+        }
+        if(!Member::checkExist('member',['member_id'=>$member_id]))
+        {
+            return Base::jsonReturn(2000, '用户不存在');
+        }
+        if(!Member::checkExist('favorites',['log_id'=>$favorites_id]))
+        {
+            return Base::jsonReturn(2001, '收藏不存在');
+        }
+        $result=BModel::delData('favorites',['log_id'=>$favorites_id]);
+        if($result)
+        {
+            return Base::jsonReturn(200, '取消成功');
+        }else{
+            return Base::jsonReturn(2002, '取消失败');
+        }
+    }
+
+
+
+
+
 }

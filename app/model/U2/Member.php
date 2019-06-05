@@ -449,5 +449,12 @@ class Member extends BModel
         $result['data'] = $data;
         return $result;
     }
+    static function checkExist($table,$condition)
+    {
+        return BModel::getCount($table,$condition)==0?false:true;
+    }
+
+
+
 
 }
