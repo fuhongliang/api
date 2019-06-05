@@ -44,11 +44,8 @@ Route::group(['namespace' => 'U2'], function () {
     Route::post('order_list', 'MemberController@orderList');//订单列表
     Route::post('order_info', 'MemberController@orderInfo');//订单详情
 
-/**
- * 微信登录
- * 微信设置手机号
- */
-
+///////////////////////
+    Route::post('all_sorts', 'MemberController@allSorts');//全部分类
 
 
 
