@@ -1720,5 +1720,19 @@
             return Base::jsonReturn(200, '获取成功', $result);
         }
 
+        /**搜索分类
+         * @param Request $request
+         * @return \Illuminate\Http\JsonResponse
+         */
+        function searchClass(Request $request)
+        {
+            $gc_id  = $request->input('gc_id');
+            if(!$gc_id) {
+                return Base::jsonReturn(1000, '参数缺失');
+            }
+            if(!Member::checkExist('order', ['order_id' => $order_id])) {
+                return Base::jsonReturn(1001, '订单不存在');
+            }
 
+        }
     }
