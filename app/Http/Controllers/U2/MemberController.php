@@ -1617,35 +1617,29 @@
                 return Base::jsonReturn(1001, '用户不存在');
             }
             $result = [];
-            $data    = BModel::getTableAllData('store_com', ['member_id' => $member_id,'parent_id'=>0]);
+            $data   = BModel::getTableAllData('store_com', ['member_id' => $member_id, 'parent_id' => 0]);
             if(!$data->isEmpty()) {
                 foreach($data as $k => $v) {
-                    $member_data=BModel::getTableFieldFirstData('member',['member_id'=>$member_id],['member_name','member_avatar']);
-                    $result[$k]['com_id']  = $v->com_id;
-                    $result[$k]['content'] = $v->content;
-                    $result[$k]['images'] = !$v->images?[]:explode(',',$v->images);
-                    $result[$k]['kouwei'] = $v->kouwei;
-                    $result[$k]['baozhuang'] = $v->baozhuang;
-                    $result[$k]['peisong'] = $v->peisong;
-                    $result[$k]['haoping'] = $v->haoping;
-                    $result[$k]['member_name'] = $member_data->member_name;
-                    $result[$k]['member_avator'] = is_null($member_data->member_avatar)?"":$member_data->member_avatar;
-                    $result[$k]['add_time'] = date('Y-m-d H:i:s',$v->add_time);
-                    if($v->is_replay != 0)
-                    {
-                        $store_data=BModel::getTableFieldFirstData('store',['store_id'=>$v->store_id],['store_id','store_name','store_avatar']);
-                        $result[$k]['replay'] =array(
-                            'store_avator'=>$store_data->store_avatar,
-                            'store_name'=>$store_data->store_name,
-                            'store_id'=>$store_data->store_id
-                        );
-                    }else{
+                    $member_data                 = BModel::getTableFieldFirstData('member', ['member_id' => $member_id], ['member_name', 'member_avatar']);
+                    $result[$k]['com_id']        = $v->com_id;
+                    $result[$k]['content']       = is_null($v->content) ? "" : $v->content;
+                    $result[$k]['images']        = !$v->images ? [] : explode(',', $v->images);
+                    $result[$k]['kouwei']        = is_null($v->kouwei) ? 0 : $v->kouwei;
+                    $result[$k]['baozhuang']     = is_null($v->baozhuang) ? 0 : $v->baozhuang;
+                    $result[$k]['peisong']       = is_null($v->peisong) ? 0 : $v->peisong;
+                    $result[$k]['haoping']       = is_null($v->haoping) ? 0 : $v->haoping;
+                    $result[$k]['member_name']   = is_null($member_data->member_name) ? "" : $member_data->member_name;
+                    $result[$k]['member_avator'] = is_null($member_data->member_avatar) ? "" : $member_data->member_avatar;
+                    $result[$k]['add_time']      = date('Y-m-d H:i:s', $v->add_time);
+                    if($v->is_replay != 0) {
+                        $store_data           = BModel::getTableFieldFirstData('store', ['store_id' => $v->store_id], ['store_id', 'store_name', 'store_avatar']);
+                        $result[$k]['replay'] = ['store_avator' => $store_data->store_avatar, 'store_name' => $store_data->store_name, 'store_id' => $store_data->store_id];
+                    }
+                    else {
                         $result[$k]['replay'] = (object)[];
                     }
                 }
             }
-
             return Base::jsonReturn(200, '获取成功', $result);
-
         }
     }
