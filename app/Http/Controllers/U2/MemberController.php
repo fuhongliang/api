@@ -1583,11 +1583,165 @@ class MemberController extends Base
         return Base::jsonReturn(200, '获取成功', $result);
     }
 
-
-    function wxLogin(Request $request)
+    function wxPay(Request $request)
     {
+        $nonce_str = md5(microtime()); // uuid 生成随机不重复字符串
+        $data['appid']            = "appid"; //appid
+        $data['mch_id']           = "商户ID"; //商户ID
+        $data['nonce_str']        = $nonce_str; //随机字符串 这个随便一个字符串算法就可以，我是使用的UUID
+        $data['body']             = "商品描述"; // 商品描述
+        $data['out_trade_no']     = "订单号";    //商户订单号,不能重复
+        $data['total_fee']        = "金额" * 100; //金额
+        $data['spbill_create_ip'] = $_SERVER['SERVER_ADDR'];   //ip地址
+        $data['notify_url']       = "回调地址";   //回调地址,用户接收支付后的通知,必须为能直接访问的网址,不能跟参数
+        $data['trade_type']       = 'APP';      //支付方式
+        //将参与签名的数据保存到数组  注意：以上几个参数是追加到$data中的，$data中应该同时包含开发文档中要求必填的剔除sign以外的所有数据
+        $data['sign'] = $this->getSign($data);        //获取签名
+        $xml = $this->ToXml($data);            //数组转xml
+        //curl 传递给微信方
+        $url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+        $data = $this->curl($url,$xml,[]); // 请求微信生成预支付订单
+        //返回结果
+        if($data){
+            //返回成功,将xml数据转换为数组.
+            $re = $this->FromXml($data);
+            if($re['return_code'] != 'SUCCESS'){
+                $msg = isset($re['return_msg'])?$re['return_msg']:'签名失败';
+                return ['status'=>false,'msg'=>$msg];
+            }
+            else{
+                //接收微信返回的数据,传给APP!
+                $arr =array(
+                    'prepayid'  =>$re['prepay_id'], // 用返回的数据
+                    'appid'     => config('weChat.appPay.appId'),
+                    'partnerid' => config('weChat.appPay.mchId'), // 商户ID
+                    'package'   => 'Sign=WXPay',
+                    'noncestr'  => $nonce_str,
+                    'timestamp' =>time(),
+                );
+                //第二次生成签名
+                $sign = $this->getSign($arr);
+                $arr['sign'] = $sign;
+                return ['status'=>true,'msg'=>'生成预支付订单成功','data'=>json_encode($arr)];
+            }
+        } else {
+            return ['status'=>false,'msg'=>'签名数据为空'];
+        }
+    }
+     function getSign($params) {
+        ksort($params);        //将参数数组按照参数名ASCII码从小到大排序
+        foreach ($params as $key => $item) {
+            if (!empty($item)) {         //剔除参数值为空的参数
+                $newArr[] = $key.'='.$item;     // 整合新的参数数组
+            }
+        }
+        $stringA = implode("&", $newArr);         //使用 & 符号连接参数
+        $stringSignTemp = $stringA."&key=".config('weChat.appPay.key');        //拼接key
+        // key是在商户平台API安全里自己设置的
+        $stringSignTemp = MD5($stringSignTemp);       //将字符串进行MD5加密
+        $sign = strtoupper($stringSignTemp);      //将所有字符转换为大写
+        return $sign;
+    }
+    function ToXml($data=array())
+    {
+        if(!is_array($data) || count($data) <= 0)
+        {
+            return '数组异常';
+        }
+
+        $xml = "<xml>";
+        foreach ($data as $key=>$val)
+        {
+            if (is_numeric($val)){
+                $xml.="<".$key.">".$val."</".$key.">";
+            }else{
+                $xml.="<".$key."><![CDATA[".$val."]]></".$key.">";
+            }
+        }
+        $xml.="</xml>";
+        return $xml;
+    }
+    function curl($url = '',$request = [],$header = [],$method = 'POST'){
+        $header[] = 'Accept-Encoding: gzip, deflate';//gzip解压内容
+        $ch = curl_init();   //1.初始化
+        curl_setopt($ch, CURLOPT_URL, $url); //2.请求地址
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);//3.请求方式
+        //4.参数如下
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);//https
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (compatible; MSIE 5.01; Windows NT 5.0)');//模拟浏览器
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
+
+        if ($method == "POST") {//5.post方式的时候添加数据
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
+        }
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $tmpInfo = curl_exec($ch);//6.执行
+
+        if (curl_errno($ch)) {//7.如果出错
+            return curl_error($ch);
+        }
+        curl_close($ch);//8.关闭
+        return $tmpInfo;
+    }
+
+    function FromXml($xml)
+    {
+        if(!$xml){
+            echo "xml数据异常！";
+        }
+        //将XML转为array
+        //禁止引用外部xml实体
+        libxml_disable_entity_loader(true);
+        $data = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+        return $data;
+    }
+
+    /**
+     * 回调地址
+     */
+    function wx_notify(){
+        //接收微信返回的数据数据,返回的xml格式
+        $xmlData = file_get_contents('php://input');
+        //将xml格式转换为数组
+        $data = $this->FromXml($xmlData);
+        //用日志记录检查数据是否接受成功，验证成功一次之后，可删除。
+        $file = fopen('./log.txt', 'a+');
+        fwrite($file,var_export($data,true));
+        //为了防止假数据，验证签名是否和返回的一样。
+        //记录一下，返回回来的签名，生成签名的时候，必须剔除sign字段。
+        $sign = $data['sign'];
+        unset($data['sign']);
+        if($sign == $this->getSign($data)){
+            //签名验证成功后，判断返回微信返回的
+            if ($data['result_code'] == 'SUCCESS') {
+                //根据返回的订单号做业务逻辑
+/////////////////////////////////////////////////////////////////
+                //处理完成之后，告诉微信成功结果！
+                if($re){
+                    echo '<xml>
+              <return_code><![CDATA[SUCCESS]]></return_code>
+              <return_msg><![CDATA[OK]]></return_msg>
+              </xml>';exit();
+                }
+            }
+            //支付失败，输出错误信息
+            else{
+                $file = fopen('./log.txt', 'a+');
+                fwrite($file,"错误信息：".$data['return_msg'].date("Y-m-d H:i:s"),time()."\r\n");
+            }
+        }
+        else{
+            $file = fopen('./log.txt', 'a+');
+            fwrite($file,"错误信息：签名验证失败".date("Y-m-d H:i:s"),time()."\r\n");
+        }
 
     }
+
+
 
 
 
