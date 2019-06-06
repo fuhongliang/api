@@ -489,4 +489,63 @@ class Member extends BModel
         return $result;
     }
 
+    static function getCartGoodsNum($store_id,$stc_id,$member_id)
+    {
+        return DB::table('cart AS a')
+            ->leftJoin('goods AS b', 'a.goods_id','b.goods_id')
+            ->where('a.store_id',$store_id)
+            ->where('a.buyer_id',$member_id)
+            ->where('b.goods_stcid',$stc_id)
+            ->where('a.bl_id',0)
+            ->where('a.xs_id',0)
+            ->where('a.hot',0)
+            ->count();
+    }
+    static function getTaozhuangCartGoodsNum($store_id,$member_id)
+    {
+        return DB::table('cart')
+            ->where('store_id',$store_id)
+            ->where('buyer_id',$member_id)
+            ->where('bl_id','>',0)
+            ->where('xs_id',0)
+            ->where('hot',0)
+            ->count();
+    }
+    static function getXianshiCartGoodsNum($store_id,$member_id)
+    {
+        return DB::table('cart')
+            ->where('store_id',$store_id)
+            ->where('buyer_id',$member_id)
+            ->where('bl_id',0)
+            ->where('xs_id','>',0)
+            ->where('hot',0)
+            ->count();
+    }
+    static function getHotCartGoodsNum($store_id,$member_id)
+    {
+        return DB::table('cart')
+            ->where('store_id',$store_id)
+            ->where('buyer_id',$member_id)
+            ->where('bl_id',0)
+            ->where('xs_id',0)
+            ->where('hot','>',0)
+            ->count();
+    }
+    static function getCartGoods($store_id,$member_id)
+    {
+        $result=[];
+        $data=BModel::getTableAllData('cart',['store_id'=>$store_id,'buyer_id'=>$member_id]);
+        if(!$data->isEmpty())
+        {
+            foreach ($data as $k=>$v)
+            {
+                $result[$k]['goods_num']=$v->goods_num;
+                $result[$k]['img_name']=$v->goods_image;
+                $result[$k]['goods_price']=$v->goods_price;
+                $result[$k]['goods_name']=$v->goods_name;
+            }
+        }
+        return $result;
+    }
+
 }

@@ -322,6 +322,70 @@ class MemberController extends Base
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
+//    function storeInfo(Request $request)
+//    {
+//        $store_id = $request->input('store_id');
+//        $member_id = $request->input('member_id');
+//        $result = [];
+//        if (!$store_id) {
+//            return Base::jsonReturn(1000, '参数缺失');
+//        }
+//        if (BModel::getCount('store', ['store_id' => $store_id]) == 0) {
+//            return Base::jsonReturn(1001, '店铺不存在');
+//        }
+//        //店铺详情
+//        $store_info = BModel::getTableFieldFirstData('store', ['store_id' => $store_id], ['store_id', 'store_name', 'store_avatar', 'store_sales', 'store_credit', 'store_description']);
+//        $result['store_info'] = $store_info;
+//        //是否收藏
+//        if (!$member_id) {
+//            $count = BModel::getCount('favorites', ['member_id' => $member_id, 'fav_type' => 'store', 'store_id' => $store_id]);
+//            $result['is_collect'] = $count == 1 ? true : false;
+//        } else {
+//            $result['is_collect'] = false;
+//        }
+//        $manjian = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $store_id], ['a.price', 'a.discount']);
+//        $result['manjian'] = $manjian->isEmpty() ? [] : $manjian->toArray();
+//        $class_list = Store::getAllStoreClass(['store_id' => $store_id], ['stc_id', 'stc_name']);
+//        $calssLists = [];
+//        if (!$class_list->isEmpty()) {
+//            $calssList = $class_list->toArray();
+//            foreach ($calssList as $k => $val) {
+//                $calssLists[$k]['stc_id'] = (string)$val->stc_id;
+//                $calssLists[$k]['stc_name'] = (string)$val->stc_name;
+//            }
+//        }
+//        //$goods_list = Member::getStoreGoodsListByStcId($store_id, $class_id);
+//        $result['goods_list'] = $calssLists;
+//
+//        foreach ($result['goods_list'] as $k => &$m) {
+//            $m['goods'] = Member::getStoreGoodsListByStcId($store_id, $m['stc_id'],$member_id);
+//        }
+//
+//        array_unshift($result['goods_list'],
+//            array(
+//                'stc_id' => "taozhuang",
+//                'stc_name' => "优惠",
+//                'goods' => Member::getStoreGoodsListByStcId($store_id, 'taozhuang')
+//            ));
+//
+//        array_unshift($result['goods_list'],
+//            array(
+//                'stc_id' => "xianshi",
+//                'stc_name' => "折扣",
+//                'goods' => Member::getStoreGoodsListByStcId($store_id, 'xianshi')
+//            ));
+//        array_unshift($result['goods_list'],
+//            array(
+//                'stc_id' => "hot",
+//                'stc_name' => "热销",
+//                'goods' => Member::getStoreGoodsListByStcId($store_id, 'hot')
+//            ));
+//        $result['cart']['nums'] = BModel::getCount('cart', ['store_id' => $store_id]);
+//        $result['cart']['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
+//        $result['comment_url'] =  getenv('HOST_URL').'/users/#/evaluate/'.$store_id.'/evaluateall';
+//        $result['store_info_url'] =  getenv('HOST_URL').'/users/#/business/'.$store_id;
+//        return Base::jsonReturn(200, '获取成功', $result);
+//    }
     function storeInfo(Request $request)
     {
         $store_id = $request->input('store_id');
@@ -352,41 +416,56 @@ class MemberController extends Base
             foreach ($calssList as $k => $val) {
                 $calssLists[$k]['stc_id'] = (string)$val->stc_id;
                 $calssLists[$k]['stc_name'] = (string)$val->stc_name;
+                $calssLists[$k]['cart_nums'] = Member::getCartGoodsNum($store_id, $val->stc_id, $member_id);
             }
         }
         //$goods_list = Member::getStoreGoodsListByStcId($store_id, $class_id);
         $result['goods_list'] = $calssLists;
 
         foreach ($result['goods_list'] as $k => &$m) {
-            $m['goods'] = Member::getStoreGoodsListByStcId($store_id, $m['stc_id'],$member_id);
+            $m['goods'] = Member::getStoreGoodsListByStcId($store_id, $m['stc_id'], $member_id);
+        }
+        $taozhuang = Member::getStoreGoodsListByStcId($store_id, 'taozhuang');
+        if ($taozhuang)
+        {
+            array_unshift($result['goods_list'],
+                array(
+                    'stc_id' => "taozhuang",
+                    'stc_name' => "优惠",
+                    'cart_nums' => Member::getTaozhuangCartGoodsNum($store_id,$member_id),
+                    'goods' => $taozhuang
+                ));
+        }
+
+        $xianshi=Member::getStoreGoodsListByStcId($store_id, 'xianshi');
+        if($xianshi)
+        {
+            array_unshift($result['goods_list'],
+                array(
+                    'stc_id' => "xianshi",
+                    'stc_name' => "折扣",
+                    'cart_nums' => Member::getXianshiCartGoodsNum($store_id,$member_id),
+                    'goods' => $xianshi
+                ));
         }
 
         array_unshift($result['goods_list'],
             array(
-                'stc_id' => "taozhuang",
-                'stc_name' => "优惠",
-                'goods' => Member::getStoreGoodsListByStcId($store_id, 'taozhuang')
-            ));
-
-        array_unshift($result['goods_list'],
-            array(
-                'stc_id' => "xianshi",
-                'stc_name' => "折扣",
-                'goods' => Member::getStoreGoodsListByStcId($store_id, 'xianshi')
-            ));
-        array_unshift($result['goods_list'],
-            array(
                 'stc_id' => "hot",
                 'stc_name' => "热销",
-                'goods' => Member::getStoreGoodsListByStcId($store_id, 'hot')
+                'cart_nums' => Member::getHotCartGoodsNum($store_id,$member_id),
+                'goods' =>Member::getStoreGoodsListByStcId($store_id, 'hot')
             ));
-        $result['cart']['nums'] = BModel::getCount('cart', ['store_id' => $store_id]);
-        $result['cart']['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
+        $result['cart']=array(
+            'peisong'=>5,
+            'goods'=>Member::getCartGoods($store_id,$member_id)
+        );
+//        $result['cart']['nums'] = BModel::getCount('cart', ['store_id' => $store_id]);
+//        $result['cart']['amount'] = BModel::getSum('cart', ['store_id' => $store_id], 'goods_price');
         $result['comment_url'] =  getenv('HOST_URL').'/users/#/evaluate/'.$store_id.'/evaluateall';
         $result['store_info_url'] =  getenv('HOST_URL').'/users/#/business/'.$store_id;
         return Base::jsonReturn(200, '获取成功', $result);
     }
-
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
