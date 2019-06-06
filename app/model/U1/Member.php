@@ -541,7 +541,7 @@ class Member extends BModel
             {
                 $result[$k]['goods_num']=$v->goods_num;
                 $result[$k]['img_name']=$v->goods_image;
-                $result[$k]['goods_price']=$v->goods_price;
+                $result[$k]['goods_price']=BaseController::ncPriceFormat($v->goods_price);
                 $result[$k]['goods_name']=$v->goods_name;
             }
         }
