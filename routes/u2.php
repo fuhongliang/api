@@ -51,6 +51,9 @@ Route::group(['namespace' => 'U2'], function () {
     Route::post('cancel_order', 'MemberController@cancelOrder');//取消订单
     Route::post('store_info', 'MemberController@storeInfo');//店铺详情
     Route::post('wx_pay', 'MemberController@wxPay');//微信支付
+    Route::post('user_feedback', 'MemberController@userFeedback');//用户反馈
+    Route::post('user_voucher', 'MemberController@userVoucherList');//我的代金券
+    Route::post('user_comment', 'MemberController@userComment');//用户评价
 
 });
 
