@@ -808,15 +808,16 @@
             }
             $result           = [];
             $result['qishou'] = ['member_name' => '张琪', 'avator' => "xxxxx.jpg", 'time' => "2019-01-02 12:01"];
-            $store_info       = DB::table('store as a')->leftJoin('order_goods as b', 'a.store_id', 'b.store_id')->where(['b.order_id' => $order_id])->get(['a.store_name', 'a.store_avatar', 'b.goods_id', 'b.goods_name'])->toArray();
+            $store_info       = DB::table('store as a')->leftJoin('order_goods as b', 'a.store_id', 'b.store_id')->where(['b.order_id' => $order_id])->get(['a.store_id','a.store_name', 'a.store_avatar', 'b.goods_id', 'b.goods_name'])->toArray();
             $array            = [];
             foreach($store_info as $k => $v) {
                 $array[$k]['goods_id']   = $v->goods_id;
                 $array[$k]['goods_name'] = $v->goods_name;
                 $store_name              = $v->store_name;
                 $store_avatar            = $v->store_avatar;
+                $store_id            = $v->store_id;
             }
-            $result['info'] = ['goods_info' => $array, 'store_name' => is_null($store_name) ? "" : $store_name, 'store_avatar' => is_null($store_avatar) ? "" : $store_avatar];
+            $result['info'] = ['goods_info' => $array, 'store_name' => is_null($store_name) ? "" : $store_name, 'store_avatar' => is_null($store_avatar) ? "" : $store_avatar,'store_id'=>$store_id];
             return Base::jsonReturn(200, '请求成功', $result);
         }
 
