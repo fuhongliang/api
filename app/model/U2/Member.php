@@ -452,8 +452,189 @@
             else {
                 return [];
             }
-
         }
 
+        static function getCreditStoreList($keywords, $longitude, $latitude)
+        {
+            $storeIds        = [];
+            $result          = [];
+            $field           = ['store_id', 'store_name', 'store_avatar', 'store_credit', 'store_sales', 'store_qisong', 'store_peisong', 'longitude', 'dimension'];
+            $store_ids       = DB::table('store')->where('store_name', 'like', '%'.$keywords.'%')->get(['store_id']);
+            $goods_store_ids = DB::table('goods')->where('goods_name', 'like', '%'.$keywords.'%')->get(['store_id']);
+            if(!$store_ids->isEmpty()) {
+                foreach($store_ids as $v) {
+                    array_push($storeIds, $v);
+                }
+            }
+            if(!$goods_store_ids->isEmpty()) {
+                foreach($goods_store_ids as $v) {
+                    array_push($storeIds, $v);
+                }
+            }
+            if($storeIds) {
+                $ids = [];
+                foreach($storeIds as $val) {
+                    $ids[] = $val->store_id;
+                }
+                $ids  = array_unique($ids);
+                $data = DB::table('store')->whereIn('store_id', $ids)->where('store_state', 1)->orderBy('store_sales', 'desc')->get($field);
+                foreach($data as $k => $datum) {
+                    $result[$k]['store_id']     = $datum->store_id;
+                    $result[$k]['store_name']   = $datum->store_name;
+                    $result[$k]['store_avatar'] = $datum->store_avatar;
+                    $result[$k]['qisong']       = is_null($datum->store_qisong) ? 0 : $datum->store_qisong;
+                    $result[$k]['peisong']      = is_null($datum->store_peisong) ? 0 : $datum->store_peisong;
+                    $result[$k]['store_sales']  = $datum->store_sales;
+                    $result[$k]['store_credit'] = $datum->store_credit;
+                    $lucheng                    = BaseController::getdistance($longitude, $latitude, $datum->longitude, $datum->dimension);
+                    if($lucheng < 1000) {
+                        $result[$k]['distance'] = ceil($lucheng)."米";
+                    }
+                    else {
+                        $result[$k]['distance'] = round($lucheng / 1000, 2)."公里"; //10.46;
+                    }
+                    $shijian = ($lucheng / 3) / 60;
+                    if($shijian < 60) {
+                        $result[$k]['need_time'] = ceil($shijian)."分";
+                    }
+                    else {
+                        $result[$k]['need_time'] = floor($shijian / 60)."小时".ceil($shijian % 60)."分";
+                    }
+                }
+                return $result;
+            }
+            else {
+                return [];
+            }
+        }
 
+        static function getBestStoreList($keywords, $longitude, $latitude)
+        {
+            $storeIds        = [];
+            $result          = [];
+            $field           = ['store_id', 'store_name', 'store_avatar', 'store_credit', 'store_sales', 'store_qisong', 'store_peisong', 'longitude', 'dimension'];
+            $store_ids       = DB::table('store')->where('store_name', 'like', '%'.$keywords.'%')->get(['store_id']);
+            $goods_store_ids = DB::table('goods')->where('goods_name', 'like', '%'.$keywords.'%')->get(['store_id']);
+            if(!$store_ids->isEmpty()) {
+                foreach($store_ids as $v) {
+                    array_push($storeIds, $v);
+                }
+            }
+            if(!$goods_store_ids->isEmpty()) {
+                foreach($goods_store_ids as $v) {
+                    array_push($storeIds, $v);
+                }
+            }
+            if($storeIds) {
+                $ids = [];
+                foreach($storeIds as $val) {
+                    $ids[] = $val->store_id;
+                }
+                $ids     = array_unique($ids);
+                $com_ids = DB::table('store_com')->select('store_id', DB::raw('count(*) as nums'))->where('haoping', '>', 2)->groupBy('store_id')->get();
+                $comIds  = [];
+
+                if(!$com_ids->isEmpty()) {
+                    foreach($com_ids as $k => $v) {
+                        $comIds[$v->store_id] = $v->nums;
+                    }
+                    arsort($comIds);
+                    $n_ids = [];
+                    foreach($comIds as $k => $m) {
+                        $n_ids[] = $k;//1,3,2
+                    }
+                }
+                $ids  = array_intersect($n_ids, $ids);
+                $data = DB::table('store')->whereIn('store_id', $ids)->where('store_state', 1)->orderBy('store_sales', 'desc')->get($field);
+                foreach($data as $k => $datum) {
+                    $result[$k]['store_id']     = $datum->store_id;
+                    $result[$k]['store_name']   = $datum->store_name;
+                    $result[$k]['store_avatar'] = $datum->store_avatar;
+                    $result[$k]['qisong']       = is_null($datum->store_qisong) ? 0 : $datum->store_qisong;
+                    $result[$k]['peisong']      = is_null($datum->store_peisong) ? 0 : $datum->store_peisong;
+                    $result[$k]['store_sales']  = $datum->store_sales;
+                    $result[$k]['store_credit'] = $datum->store_credit;
+                    $lucheng                    = BaseController::getdistance($longitude, $latitude, $datum->longitude, $datum->dimension);
+                    if($lucheng < 1000) {
+                        $result[$k]['distance'] = ceil($lucheng)."米";
+                    }
+                    else {
+                        $result[$k]['distance'] = round($lucheng / 1000, 2)."公里"; //10.46;
+                    }
+                    $shijian = ($lucheng / 3) / 60;
+                    if($shijian < 60) {
+                        $result[$k]['need_time'] = ceil($shijian)."分";
+                    }
+                    else {
+                        $result[$k]['need_time'] = floor($shijian / 60)."小时".ceil($shijian % 60)."分";
+                    }
+                }
+                return $result;
+            }
+            else {
+                return [];
+            }
+        }
+
+        static function getLocalStoreList($keywords, $longitude, $latitude)
+        {
+            $storeIds        = [];
+            $result          = [];
+            $field           = ['store_id', 'store_name', 'store_avatar', 'store_credit', 'store_sales', 'store_qisong', 'store_peisong', 'longitude', 'dimension'];
+            $store_ids       = DB::table('store')->where('store_name', 'like', '%'.$keywords.'%')->get(['store_id']);
+            $goods_store_ids = DB::table('goods')->where('goods_name', 'like', '%'.$keywords.'%')->get(['store_id']);
+            if(!$store_ids->isEmpty()) {
+                foreach($store_ids as $v) {
+                    array_push($storeIds, $v);
+                }
+            }
+            if(!$goods_store_ids->isEmpty()) {
+                foreach($goods_store_ids as $v) {
+                    array_push($storeIds, $v);
+                }
+            }
+            if($storeIds) {
+                $ids = [];
+                foreach($storeIds as $val) {
+                    $ids[] = $val->store_id;
+                }
+                $ids        = array_unique($ids);
+                $local_data = [];
+                foreach($ids as $id) {
+                    $n_data          = BModel::getTableFieldFirstData('store', ['store_id' => $id], ['longitude', 'dimension']);
+                    $distanc         = BaseController::getdistance($longitude, $latitude, $n_data->longitude, $n_data->dimension);
+                    $local_data[$id] = $distanc;
+                }
+                arsort($local_data);
+                $ids  = array_keys($local_data);
+                $data = DB::table('store')->whereIn('store_id', $ids)->where('store_state', 1)->get($field);
+                foreach($data as $k => $datum) {
+                    $result[$k]['store_id']     = $datum->store_id;
+                    $result[$k]['store_name']   = $datum->store_name;
+                    $result[$k]['store_avatar'] = $datum->store_avatar;
+                    $result[$k]['qisong']       = is_null($datum->store_qisong) ? 0 : $datum->store_qisong;
+                    $result[$k]['peisong']      = is_null($datum->store_peisong) ? 0 : $datum->store_peisong;
+                    $result[$k]['store_sales']  = $datum->store_sales;
+                    $result[$k]['store_credit'] = $datum->store_credit;
+                    $lucheng                    = BaseController::getdistance($longitude, $latitude, $datum->longitude, $datum->dimension);
+                    if($lucheng < 1000) {
+                        $result[$k]['distance'] = ceil($lucheng)."米";
+                    }
+                    else {
+                        $result[$k]['distance'] = round($lucheng / 1000, 2)."公里"; //10.46;
+                    }
+                    $shijian = ($lucheng / 3) / 60;
+                    if($shijian < 60) {
+                        $result[$k]['need_time'] = ceil($shijian)."分";
+                    }
+                    else {
+                        $result[$k]['need_time'] = floor($shijian / 60)."小时".ceil($shijian % 60)."分";
+                    }
+                }
+                return $result;
+            }
+            else {
+                return [];
+            }
+        }
     }

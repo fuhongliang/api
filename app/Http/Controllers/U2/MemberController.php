@@ -1664,15 +1664,14 @@
                 $data=Member::getDefaultStoreList($keywords,$longitude,$latitude);
             }
             else if($type == 2) {
-
+                $data=Member::getCreditStoreList($keywords,$longitude,$latitude);
             }
             else if($type == 3) {
-
+                $data=Member::getLocalStoreList($keywords,$longitude,$latitude);
             }
             else {
-
+                $data=Member::getBestStoreList($keywords,$longitude,$latitude);
             }
-
             return Base::jsonReturn(200, '获取成功', $data);
         }
 
