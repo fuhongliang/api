@@ -726,16 +726,16 @@
             }
             $result           = [];
             $result['qishou'] = ['member_name' => '张琪', 'avator' => "xxxxx.jpg", 'time' => "2019-01-02 12:01"];
-            $store_info       = DB::table('store as a')->leftJoin('order_goods as b', 'a.store_id', 'b.store_id')->where(['b.order_id' => $order_id])->get(['a.store_id','a.store_name', 'a.store_avatar', 'b.goods_id', 'b.goods_name'])->toArray();
+            $store_info       = DB::table('store as a')->leftJoin('order_goods as b', 'a.store_id', 'b.store_id')->where(['b.order_id' => $order_id])->get(['a.store_id', 'a.store_name', 'a.store_avatar', 'b.goods_id', 'b.goods_name'])->toArray();
             $array            = [];
             foreach($store_info as $k => $v) {
                 $array[$k]['goods_id']   = $v->goods_id;
                 $array[$k]['goods_name'] = $v->goods_name;
                 $store_name              = $v->store_name;
                 $store_avatar            = $v->store_avatar;
-                $store_id            = $v->store_id;
+                $store_id                = $v->store_id;
             }
-            $result['info'] = ['goods_info' => $array, 'store_name' => is_null($store_name) ? "" : $store_name, 'store_avatar' => is_null($store_avatar) ? "" : $store_avatar,'store_id'=>$store_id];
+            $result['info'] = ['goods_info' => $array, 'store_name' => is_null($store_name) ? "" : $store_name, 'store_avatar' => is_null($store_avatar) ? "" : $store_avatar, 'store_id' => $store_id];
             return Base::jsonReturn(200, '请求成功', $result);
         }
 
@@ -1353,18 +1353,18 @@
          * @param Request $request
          * @return array
          */
-        function wxPay(Request $request)
+        function wxPay($amount, $order_sn)
         {
             $nonce_str                = md5(microtime()); // uuid 生成随机不重复字符串
-            $data['appid']            = "appid"; //appid
-            $data['mch_id']           = "商户ID"; //商户ID
+            $data['appid']            = config('wxpay.appid'); //appid
+            $data['mch_id']           = config('wxpay.mch_id'); //商户ID
             $data['nonce_str']        = $nonce_str; //随机字符串 这个随便一个字符串算法就可以，我是使用的UUID
             $data['body']             = "商品描述"; // 商品描述
-            $data['out_trade_no']     = "订单号";    //商户订单号,不能重复
-            $data['total_fee']        = "金额" * 100; //金额
+            $data['out_trade_no']     = $order_sn;    //商户订单号,不能重复
+            $data['total_fee']        = $amount * 100; //金额
             $data['spbill_create_ip'] = $_SERVER['SERVER_ADDR'];   //ip地址
-            $data['notify_url']       = "回调地址";   //回调地址,用户接收支付后的通知,必须为能直接访问的网址,不能跟参数
-            $data['trade_type']       = 'APP';      //支付方式
+            $data['notify_url']       = config('wxpay.notify_url');   //回调地址,用户接收支付后的通知,必须为能直接访问的网址,不能跟参数
+            $data['trade_type']       = config('wxpay.trade_type');      //支付方式
             //将参与签名的数据保存到数组  注意：以上几个参数是追加到$data中的，$data中应该同时包含开发文档中要求必填的剔除sign以外的所有数据
             $data['sign'] = $this->getSign($data);        //获取签名
             $xml          = $this->ToXml($data);            //数组转xml
@@ -1376,22 +1376,21 @@
                 //返回成功,将xml数据转换为数组.
                 $re = $this->FromXml($data);
                 if($re['return_code'] != 'SUCCESS') {
-                    $msg = isset($re['return_msg']) ? $re['return_msg'] : '签名失败';
-                    return ['status' => false, 'msg' => $msg];
+                    return [];
                 }
                 else {
                     //接收微信返回的数据,传给APP!
                     $arr = ['prepayid' => $re['prepay_id'], // 用返回的数据
-                        'appid' => config('weChat.appPay.appId'), 'partnerid' => config('weChat.appPay.mchId'), // 商户ID
+                        'appid' => config('wxpay.appid'), 'partnerid' => config('wxpay.mch_id'), // 商户ID
                         'package' => 'Sign=WXPay', 'noncestr' => $nonce_str, 'timestamp' => time(),];
                     //第二次生成签名
                     $sign        = $this->getSign($arr);
                     $arr['sign'] = $sign;
-                    return ['status' => true, 'msg' => '生成预支付订单成功', 'data' => json_encode($arr)];
+                    return $arr;
                 }
             }
             else {
-                return ['status' => false, 'msg' => '签名数据为空'];
+                return [];
             }
         }
 
@@ -1414,7 +1413,7 @@
         function ToXml($data = [])
         {
             if(!is_array($data) || count($data) <= 0) {
-                return '数组异常';
+                return "";
             }
 
             $xml = "<xml>";
@@ -1480,10 +1479,6 @@
             //将xml格式转换为数组
             $data = $this->FromXml($xmlData);
             //用日志记录检查数据是否接受成功，验证成功一次之后，可删除。
-            $file = fopen('./log.txt', 'a+');
-            fwrite($file, var_export($data, true));
-            //为了防止假数据，验证签名是否和返回的一样。
-            //记录一下，返回回来的签名，生成签名的时候，必须剔除sign字段。
             $sign = $data['sign'];
             unset($data['sign']);
             if($sign == $this->getSign($data)) {
@@ -1492,7 +1487,8 @@
                     //根据返回的订单号做业务逻辑
                     /////////////////////////////////////////////////////////////////
                     //处理完成之后，告诉微信成功结果！
-                    if($re) {
+                    $result = "5";//订单状态处理
+                    if($result) {
                         echo '<xml>
               <return_code><![CDATA[SUCCESS]]></return_code>
               <return_msg><![CDATA[OK]]></return_msg>
@@ -1651,7 +1647,7 @@
          */
         function search(Request $request)
         {
-            $keywords = $request->input('keywords');
+            $keywords  = $request->input('keywords');
             $type      = $request->input('type');
             $longitude = $request->input('longitude');
             $latitude  = $request->input('latitude');
@@ -1659,20 +1655,69 @@
             if(!$keywords || !$type || !$longitude || !$latitude) {
                 return Base::jsonReturn(1000, '参数缺失');
             }
-            $data=[];
+            $data = [];
             if($type == 1) {
-                $data=Member::getDefaultStoreList($keywords,$longitude,$latitude);
+                $data = Member::getDefaultStoreList($keywords, $longitude, $latitude);
             }
             else if($type == 2) {
-                $data=Member::getCreditStoreList($keywords,$longitude,$latitude);
+                $data = Member::getCreditStoreList($keywords, $longitude, $latitude);
             }
             else if($type == 3) {
-                $data=Member::getLocalStoreList($keywords,$longitude,$latitude);
+                $data = Member::getLocalStoreList($keywords, $longitude, $latitude);
             }
             else {
-                $data=Member::getBestStoreList($keywords,$longitude,$latitude);
+                $data = Member::getBestStoreList($keywords, $longitude, $latitude);
             }
             return Base::jsonReturn(200, '获取成功', $data);
+        }
+
+        /**等待支付
+         *
+         * @param Request $request
+         * @return \Illuminate\Http\JsonResponse
+         */
+        function waitingPay(Request $request)
+        {
+            $order_id  = $request->input('order_id');
+            $member_id = $request->input('member_id');
+
+            if(!$order_id || !$member_id) {
+                return Base::jsonReturn(1000, '参数缺失');
+            }
+            if(!Member::checkExist('order', ['order_id' => $order_id])) {
+                return Base::jsonReturn(1001, '订单不存在');
+            }
+            $exp_time = BModel::getTableValue('order', ['order_id' => $order_id], 'add_time');
+            if($exp_time + 15 * 60 <= time()) {
+                BModel::upTableData('order', ['order_id' => $order_id], ['order_state' => 0]);
+                return Base::jsonReturn(1001, '订单已超时');
+            }
+            $result                 = [];
+            $order_data             = BModel::getTableFieldFirstData('order', ['order_id' => $order_id], ['store_id', 'order_state', 'shipping_fee', 'manjian_amount', 'order_sn', 'add_time', 'payment_code', 'refund_state', 'evaluation_state']);
+            $result['order_detail'] = DB::table('order_goods AS a')->leftJoin('order AS b', 'a.order_id', 'b.order_id')->leftJoin('order_common AS c', 'a.order_id', 'c.order_id')->where('b.order_id', $order_id)->get(['a.goods_id', 'a.goods_name', 'a.goods_price', 'a.goods_num', 'c.voucher_code']);
+            $amount                 = 0;
+            foreach($result['order_detail'] as &$item) {
+                $amount += $item->goods_price * $item->goods_num;
+                unset($item->voucher_code);
+            }
+            $result['peisong']    = $order_data->shipping_fee;
+            $result['baozhuang']  = "0.00";
+            $result['manjian']    = $order_data->manjian_amount;
+            $voucher_price        = BModel::getTableValue('order_common', ['order_id' => $order_id], 'voucher_price');
+            $result['daijinquan'] = !$voucher_price ? '0.00' : $voucher_price;
+            $result['total']      = Base::ncPriceFormat($amount + $result['peisong'] - $result['manjian'] - $result['daijinquan']);//应支付价格
+
+            $receive_info = BModel::getTableFieldFirstData('order_common', ['order_id' => $order_id], ['reciver_name', 'reciver_info']);
+            if(!$receive_info) {
+                return Base::jsonReturn(2000, '获取失败');
+            }
+            $rec_data               = unserialize($receive_info->reciver_info);
+            $result['peisong_info'] = ['username' => $receive_info->reciver_name, 'address' => $rec_data['address'], 'mobile' => $rec_data['phone'], 'sex' => !isset($rec_data['sex']) ? 1 : $rec_data['sex'],];
+            unset($order_data->refund_state);
+            unset($order_data->evaluation_state);
+            $order_sn         = BModel::getTableValue('order', ['order_id' => $order_id], 'order_sn');
+            $result['wx_pay'] = $this->wxPay($amount, $order_sn);
+            return Base::jsonReturn(200, '获取成功', $result);
         }
 
 

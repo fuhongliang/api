@@ -55,6 +55,8 @@ Route::group(['namespace' => 'U2'], function () {
     Route::post('user_voucher', 'MemberController@userVoucherList');//我的代金券
     Route::post('user_comment', 'MemberController@userComment');//用户评价
     Route::post('search', 'MemberController@search');//主页搜索
+    Route::post('waiting_pay', 'MemberController@waitingPay');//等待支付
+    Route::post('search_class', 'MemberController@searchClass');//搜索——分类
 
 });
 
