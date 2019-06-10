@@ -57,6 +57,9 @@ Route::group(['namespace' => 'U2'], function () {
     Route::post('search', 'MemberController@search');//主页搜索
     Route::post('waiting_pay', 'MemberController@waitingPay');//等待支付
     Route::post('search_class', 'MemberController@searchClass');//搜索——分类
+    Route::post('confirm_order', 'MemberController@confirmOrder');//确认收货
+    Route::post('get_order_state', 'MemberController@getOrderStates');//获取订单状态
+
 
 });
 

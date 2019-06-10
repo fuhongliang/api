@@ -987,7 +987,8 @@
                     BModel::insertData('order_goods', $order_goods);
                 }
             }
-            return Base::jsonReturn(200, '下单成功');
+            $result= $this->wxPay($total, Base::makeOrderSn($pay_id));
+            return Base::jsonReturn(200, '下单成功',$result);
         }
 
         /**订单列表
@@ -1403,7 +1404,7 @@
                 }
             }
             $stringA        = implode("&", $newArr);         //使用 & 符号连接参数
-            $stringSignTemp = $stringA."&key=".config('weChat.appPay.key');        //拼接key
+            $stringSignTemp = $stringA."&key=".config('wxpay.key');        //拼接key
             // key是在商户平台API安全里自己设置的
             $stringSignTemp = MD5($stringSignTemp);       //将字符串进行MD5加密
             $sign           = strtoupper($stringSignTemp);      //将所有字符转换为大写
@@ -1715,24 +1716,142 @@
             $result['peisong_info'] = ['username' => $receive_info->reciver_name, 'address' => $rec_data['address'], 'mobile' => $rec_data['phone'], 'sex' => !isset($rec_data['sex']) ? 1 : $rec_data['sex'],];
             unset($order_data->refund_state);
             unset($order_data->evaluation_state);
-            $order_sn         = BModel::getTableValue('order', ['order_id' => $order_id], 'order_sn');
-            $result['wx_pay'] = $this->wxPay($amount, $order_sn);
+            //$order_sn         = BModel::getTableValue('order', ['order_id' => $order_id], 'order_sn');
+            //$result['wx_pay'] = $this->wxPay($amount, $order_sn);
             return Base::jsonReturn(200, '获取成功', $result);
         }
 
         /**搜索分类
+         *
          * @param Request $request
          * @return \Illuminate\Http\JsonResponse
          */
         function searchClass(Request $request)
         {
-            $gc_id  = $request->input('gc_id');
-            if(!$gc_id) {
+            $gc_id     = $request->input('gc_id');
+            $sc_id     = $request->input('sc_id');
+            $type      = $request->input('type');
+            $longitude = $request->input('longitude');
+            $latitude  = $request->input('latitude');
+            if(!$gc_id || !$longitude || !$latitude) {
+                return Base::jsonReturn(1000, '参数缺失');
+            }
+            $data               = [];
+            $sorts_list         = BModel::getTableAllData('goods_class', ['gc_parent_id' => $gc_id], ['gc_id', 'gc_name']);
+            $data['sorts_list'] = $sorts_list->isEmpty() ? [] : $sorts_list->toArray();
+            if(!$sc_id) {
+                $ids  = [];
+                $list = BModel::getTableAllData('goods_class', ['gc_parent_id' => $gc_id], ['gc_id']);
+                if(!$list->isEmpty()) {
+                    foreach($list as $v) {
+                        $ids[]     = $v->gc_id;
+                        $child_ids = BModel::getTableAllData('goods_class', ['gc_parent_id' => $v->gc_id], ['gc_id']);
+                        if(!$child_ids->isEmpty()) {
+                            foreach($child_ids as $val) {
+                                $ids[] = $val->gc_id;
+                            }
+
+                        }
+                    }
+                }
+            }
+            else {
+                $ids  = [];
+                $list = BModel::getTableAllData('goods_class', ['gc_parent_id' => $sc_id], ['gc_id']);
+                if(!$list->isEmpty()) {
+                    foreach($list as $v) {
+                        $ids[] = $v->gc_id;
+                    }
+                }
+            }
+            $ids = array_unique($ids);
+            if($type == 1) {
+                $data['store_list'] = Member::getDefaultKJStoreList($ids, $longitude, $latitude);
+            }
+            else if($type == 2) {
+                $data['store_list'] = Member::getCreditKJStoreList($ids, $longitude, $latitude);
+            }
+            else if($type == 3) {
+                $data['store_list'] = Member::getLocalKJStoreList($ids, $longitude, $latitude);
+            }
+            else {
+                $data['store_list'] = Member::getBestKJStoreList($ids, $longitude, $latitude);
+            }
+            return Base::jsonReturn(200, '获取成功', $data);
+        }
+
+        /**确认收货
+         *
+         * @param Request $request
+         * @return \Illuminate\Http\JsonResponse
+         */
+        function confirmOrder(Request $request)
+        {
+            $order_id  = $request->input('order_id');
+            $member_id = $request->input('member_id');
+
+            if(!$order_id || !$member_id) {
                 return Base::jsonReturn(1000, '参数缺失');
             }
             if(!Member::checkExist('order', ['order_id' => $order_id])) {
                 return Base::jsonReturn(1001, '订单不存在');
             }
+            $result = BModel::upTableData('order', ['buyer_id' => $member_id, 'order_id' => $order_id], ['order_state' => 40]);
+            if($result) {
+                return Base::jsonReturn(200, '收货成功');
+            }
+            else {
+                return Base::jsonReturn(2000, '收货失败');
+            }
+        }
 
+        /**查询订单状态
+         *
+         * @param Request $request
+         * @return \Illuminate\Http\JsonResponse
+         */
+        function getOrderStates(Request $request)
+        {
+            $member_id = $request->input('member_id');
+            if(!$member_id) {
+                return Base::jsonReturn(1000, '参数缺失');
+            }
+            if(!Member::checkExist('member', ['member_id' => $member_id])) {
+                return Base::jsonReturn(1001, '用户不存在');
+            }
+            $order_state = DB::table('order')->where('buyer_id', $member_id)->orderBy('order_id', 'desc')->limit(1)->value('order_state');
+            $result      = [];
+            if(isset($order_state)) {
+                $result = ['order_state' => self::_getOrderState($order_state), 'time' => date('H:i')];
+            }
+            else {
+                $result = (object)[];
+            }
+            return Base::jsonReturn(200, '查询成功', $result);
+        }
+
+        static function _getOrderState($order_state)
+        {
+            if($order_state == 0) {
+                return "订单已取消";
+            }
+            if($order_state == 10) {
+                return "待支付";
+            }
+            if($order_state == 20) {
+                return "等待商家接单";
+            }
+            if($order_state == 25) {
+                return "商家已接单，正准备商品";
+            }
+            if($order_state == 35) {
+                return "骑手已接单,正赶往商家";
+            }
+            if($order_state == 30) {
+                return "骑手正在送货";
+            }
+            if($order_state == 40) {
+                return "订单已完成";
+            }
         }
     }
