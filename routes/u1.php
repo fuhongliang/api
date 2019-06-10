@@ -44,5 +44,6 @@ Route::group(['namespace' => 'U1'], function () {
     Route::post('order_list', 'MemberController@orderList');//订单列表
     Route::post('order_info', 'MemberController@orderInfo');//订单详情
     Route::post('waiting_pay', 'MemberController@waitingPay');//等待支付
+    Route::any('log', 'MemberController@log');//等待支付
 
 });

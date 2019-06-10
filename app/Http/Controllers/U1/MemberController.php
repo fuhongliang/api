@@ -11,6 +11,7 @@
     use App\model\V3\Token;
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\DB;
+    use Illuminate\Support\Facades\Log;
     use Illuminate\Support\Facades\Redis;
 
     class MemberController extends Base
@@ -1302,14 +1303,16 @@
             $data['mch_id']           = config('wxpay.mch_id'); //商户ID
             $data['nonce_str']        = $nonce_str; //随机字符串 这个随便一个字符串算法就可以，我是使用的UUID
             $data['body']             = "商品描述"; // 商品描述
-            $data['out_trade_no']     = $order_sn;    //商户订单号,不能重复
-            $data['total_fee']        = $amount * 100; //金额
+            $data['out_trade_no']     = md5(microtime());    //商户订单号,不能重复
+            $data['total_fee']        = 0.01 * 100; //金额
             $data['spbill_create_ip'] = $_SERVER['SERVER_ADDR'];   //ip地址
             $data['notify_url']       = config('wxpay.notify_url');   //回调地址,用户接收支付后的通知,必须为能直接访问的网址,不能跟参数
             $data['trade_type']       = config('wxpay.trade_type');      //支付方式
+
             //将参与签名的数据保存到数组  注意：以上几个参数是追加到$data中的，$data中应该同时包含开发文档中要求必填的剔除sign以外的所有数据
             $data['sign'] = $this->getSign($data);        //获取签名
             $xml          = $this->ToXml($data);            //数组转xml
+
             //curl 传递给微信方
             $url  = "https://api.mch.weixin.qq.com/pay/unifiedorder";
             $data = $this->curl($url, $xml, []); // 请求微信生成预支付订单
@@ -1345,7 +1348,7 @@
                 }
             }
             $stringA        = implode("&", $newArr);         //使用 & 符号连接参数
-            $stringSignTemp = $stringA."&key=".config('weChat.appPay.key');        //拼接key
+            $stringSignTemp = $stringA."&key=".config('wxpay.key');        //拼接key
             // key是在商户平台API安全里自己设置的
             $stringSignTemp = MD5($stringSignTemp);       //将字符串进行MD5加密
             $sign           = strtoupper($stringSignTemp);      //将所有字符转换为大写
@@ -1447,6 +1450,12 @@
                 $file = fopen('./log.txt', 'a+');
                 fwrite($file, "错误信息：签名验证失败".date("Y-m-d H:i:s"), time()."\r\n");
             }
+        }
+        function log(Request $request)
+        {
+            $all=$request->all();
+            Log::info('进来了'.date('Y-m-d H:i:s'));
+            Log::info(json_encode($all));
         }
 
     }
