@@ -123,11 +123,12 @@
                 BModel::insertData('umeng', ['app_type' => $app_type, 'device_tokens' => $device_tokens, 'member_id' => $member_id]);
             });
             BModel::delData('token', ['member_id' => $member_id]);
-            $member_info                = BModel::getTableFieldFirstData('member', ['member_id' => $member_id], ['member_id', 'member_mobile', 'member_name', 'member_avatar']);
-            $member_info->member_avatar = is_null($member_info->member_avatar) ? '' : $member_info->member_avatar;
-            $member_info->need_pwd      = $need_pwd;
-            $member_info->token         = Base::makeToken(microtime());
-            $token_data                 = ['member_id' => $member_id, 'token' => $member_info->token, 'add_time' => time(), 'expire_time' => time() + 24 * 5 * 3600];
+            $member_info                 = BModel::getTableFieldFirstData('member', ['member_id' => $member_id], ['member_id', 'member_mobile', 'member_name', 'member_avatar', 'member_wxopenid']);
+            $member_info->member_avatar  = is_null($member_info->member_avatar) ? '' : $member_info->member_avatar;
+            $member_info->need_pwd       = $need_pwd;
+            $member_info->is_bind_openid = empty($member_info->member_wxopenid) ? false : true;
+            $member_info->token          = Base::makeToken(microtime());
+            $token_data                  = ['member_id' => $member_id, 'token' => $member_info->token, 'add_time' => time(), 'expire_time' => time() + 24 * 5 * 3600];
             Token::addToken($token_data);
             return Base::jsonReturn(200, '登录成功', $member_info);
         }
@@ -987,8 +988,8 @@
                     BModel::insertData('order_goods', $order_goods);
                 }
             }
-            $result= $this->wxPay($total, Base::makeOrderSn($pay_id));
-            return Base::jsonReturn(200, '下单成功',$result);
+            $result = $this->wxPay($total, Base::makeOrderSn($pay_id));
+            return Base::jsonReturn(200, '下单成功', $result);
         }
 
         /**订单列表
@@ -1852,6 +1853,85 @@
             }
             if($order_state == 40) {
                 return "订单已完成";
+            }
+        }
+
+        /**退款原因
+         *
+         * @return \Illuminate\Http\JsonResponse
+         */
+        static function reasonList()
+        {
+            $data = DB::table('refund_reason')->get(['reason_id', 'reason_info']);
+            return Base::jsonReturn(200, '获取成功', $data->isEmpty() ? [] : $data->toArray());
+        }
+
+        /**微信登录
+         *
+         * @param Request $request
+         * @return \Illuminate\Http\JsonResponse
+         */
+        function wxLogin(Request $request)
+        {
+            $code   = $request->input('code');
+            $openid = self::getOpenID(config('wxpay.appid'), config('wxpay.appsecret'), $code);
+            if($openid) {
+                $data = BModel::getTableFieldFirstData('member', ['member_wxopenid' => $openid], ['member_id', 'member_mobile', 'member_name', 'member_avatar', 'member_wxopenid']);
+                if(!$data) {
+                    $ins_data  = ['member_name' => '未设置_'.microtime(), 'member_mobile_bind' => 0, 'member_time' => time(), 'member_wxopenid' => $openid];
+                    $member_id = BModel::insertData('member', $ins_data);
+                    BModel::insertData('member_common', ['member_id' => $member_id]);
+                }
+                $member_info                 = BModel::getTableFieldFirstData('member', ['member_wxopenid' => $openid], ['member_id', 'member_passwd', 'member_mobile', 'member_name', 'member_avatar', 'member_wxopenid']);
+                $member_info->member_avatar  = is_null($member_info->member_avatar) ? '' : $member_info->member_avatar;
+                $member_info->need_pwd       = empty($member_info->member_passwd) ? true : false;
+                $member_info->is_bind_openid = empty($member_info->member_wxopenid) ? false : true;
+                $member_info->token          = Base::makeToken(microtime());
+                $token_data                  = ['member_id' => $member_info->member_id, 'token' => $member_info->token, 'add_time' => time(), 'expire_time' => time() + 24 * 5 * 3600];
+                Token::addToken($token_data);
+                return Base::jsonReturn(200, '登录成功', $member_info);
+            }
+            else {
+                return Base::jsonReturn(2000, '登录失败');
+            }
+        }
+
+        static function getOpenID($appid, $appsecret, $code)
+        {
+            $url        = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=".$appid."&secret=".$appsecret."&code=".$code."&grant_type=authorization_code";
+            $weixin     = file_get_contents($url);//通过code换取网页授权access_token
+            $jsondecode = json_decode($weixin); //对JSON格式的字符串进行编码
+            $array      = get_object_vars($jsondecode);//转换成数组
+            $openid     = $array['openid'];//输出openid
+            return $openid;
+        }
+
+        /**售后详情
+         * @param Request $request
+         * @return \Illuminate\Http\JsonResponse
+         */
+        function refundInfo(Request $request)
+        {
+            $code   = $request->input('code');
+            $openid = self::getOpenID(config('wxpay.appid'), config('wxpay.appsecret'), $code);
+            if($openid) {
+                $data = BModel::getTableFieldFirstData('member', ['member_wxopenid' => $openid], ['member_id', 'member_mobile', 'member_name', 'member_avatar', 'member_wxopenid']);
+                if(!$data) {
+                    $ins_data  = ['member_name' => '未设置_'.microtime(), 'member_mobile_bind' => 0, 'member_time' => time(), 'member_wxopenid' => $openid];
+                    $member_id = BModel::insertData('member', $ins_data);
+                    BModel::insertData('member_common', ['member_id' => $member_id]);
+                }
+                $member_info                 = BModel::getTableFieldFirstData('member', ['member_wxopenid' => $openid], ['member_id', 'member_passwd', 'member_mobile', 'member_name', 'member_avatar', 'member_wxopenid']);
+                $member_info->member_avatar  = is_null($member_info->member_avatar) ? '' : $member_info->member_avatar;
+                $member_info->need_pwd       = empty($member_info->member_passwd) ? true : false;
+                $member_info->is_bind_openid = empty($member_info->member_wxopenid) ? false : true;
+                $member_info->token          = Base::makeToken(microtime());
+                $token_data                  = ['member_id' => $member_info->member_id, 'token' => $member_info->token, 'add_time' => time(), 'expire_time' => time() + 24 * 5 * 3600];
+                Token::addToken($token_data);
+                return Base::jsonReturn(200, '登录成功', $member_info);
+            }
+            else {
+                return Base::jsonReturn(2000, '登录失败');
             }
         }
     }

@@ -16,7 +16,6 @@ Route::group(['namespace' => 'U2'], function () {
     Route::post('sms_login', 'MemberController@smsLogin');//验证码登录
     Route::post('user_login', 'MemberController@userLogin');//账号密码登录  最新
     Route::post('get_sms', 'MemberController@getSMS');//获取验证码
-    Route::post('wx_login', 'MemberController@wxLogin');//微信登录
     Route::post('home_page', 'MemberController@homePage');//首页
     //Route::post('store_info', 'MemberController@storeInfo');//店铺详情
     Route::post('area_list', 'MemberController@areaList');//地区列表
@@ -59,6 +58,9 @@ Route::group(['namespace' => 'U2'], function () {
     Route::post('search_class', 'MemberController@searchClass');//搜索——分类
     Route::post('confirm_order', 'MemberController@confirmOrder');//确认收货
     Route::post('get_order_state', 'MemberController@getOrderStates');//获取订单状态
+    Route::post('reason_list', 'MemberController@reasonList');//退款原因
+    Route::post('wx_login', 'MemberController@wxLogin');//微信登录
+    Route::post('refund_info', 'MemberController@refundInfo');//售后详情
 
 
 });
