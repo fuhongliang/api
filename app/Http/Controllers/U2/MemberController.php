@@ -1941,7 +1941,7 @@
                     $result['goods_list'] = $goods;
                 }
                 else {
-                    $goods = [['goods_name' => $data->goods_name, 'goods_num' => $data->goods_num, 'goods_image' => is_null($data->goods_image)?"":$data->goods_image,'goods_price'=>BModel::getTableValue('goods',['goods_id'=>$data->order_goods_id],'goods_price')]];
+                    $goods = [['goods_name' => $data->goods_name, 'goods_num' => $data->goods_num, 'goods_image' => is_null($data->goods_image) ? "" : $data->goods_image, 'goods_price' => BModel::getTableValue('goods', ['goods_id' => $data->order_goods_id], 'goods_price')]];
 
                     $result['goods_list'] = $goods;
                 }
@@ -1967,19 +1967,34 @@
         }
 
         /**骑手入驻
+         *
          * @param Request $request
          * @return \Illuminate\Http\JsonResponse
          */
         function qishouJoinin(Request $request)
         {
-            $refund_id = $request->input('refund_id');
-            if(!$refund_id) {
+            $member_id = $request->input('member_id');
+            $city      = $request->input('city');
+            $address   = $request->input('address');
+            $work_type = $request->input('work_type');
+            $mobile    = $request->input('mobile');
+            if(!$member_id || !$city || !$address || !$work_type || !$mobile) {
                 return Base::jsonReturn(1000, '参数缺失');
             }
-            if(!Member::checkExist('refund_return', ['refund_id' => $refund_id])) {
-                return Base::jsonReturn(1001, '数据不存在');
+            if(!Member::checkExist('member', ['member_id' => $member_id])) {
+                return Base::jsonReturn(1001, '用户不存在');
             }
-
+            if(Member::checkExist('qishou_joinin', ['member_id' => $member_id])) {
+                return Base::jsonReturn(1002, '已存在申请记录');
+            }
+            $data = ['member_id' => $member_id, 'city' => $city, 'address' => $address, 'work_type' => $work_type, 'mobile' => $mobile,];
+            $res  = BModel::insertData('qishou_joinin', $data);
+            if($res) {
+                return Base::jsonReturn(200, '申请成功');
+            }
+            else {
+                return Base::jsonReturn(2000, '申请失败');
+            }
         }
 
 

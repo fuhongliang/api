@@ -44,6 +44,7 @@ Route::group(['namespace' => 'U2'], function () {
     Route::post('order_info', 'MemberController@orderInfo');//订单详情
 
 ///////////////////////
+
     Route::post('all_sorts', 'MemberController@allSorts');//全部分类
     Route::post('user_cancel_collect', 'MemberController@cancelCollect');//取消收藏
     Route::post('user_collect', 'MemberController@userCollectList');//收藏列表
