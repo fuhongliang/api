@@ -1950,14 +1950,12 @@
 
                     $result['goods_list'] = $goods;
                 }
-
                 return Base::jsonReturn(200, '获取成功', $result);
             }
             else {
                 return Base::jsonReturn(2000, '获取失败');
             }
         }
-
         static function getRefundState($refund_state)
         {
             if($refund_state == 1) {
@@ -2003,18 +2001,18 @@
         }
 
         /**售后申请
+         *
          * @param Request $request
          * @return \Illuminate\Http\JsonResponse
          */
         function refundOrder(Request $request)
         {
-            $member_id = $request->input('member_id');
-            $order_id  = $request->input('order_id');
-            $goods_id  = $request->input('goods_id');
+            $member_id    = $request->input('member_id');
+            $order_id     = $request->input('order_id');
+            $goods_id     = $request->input('goods_id');
             $reason_id    = $request->input('reason_id');
-            $reason    = $request->input('reason');
-            $total_amount   = $request->input('total_amount');
-
+            $reason       = $request->input('reason');
+            $total_amount = $request->input('total_amount');
             if(!$member_id || !$order_id || !$goods_id || !$reason_id || !$total_amount) {
                 return Base::jsonReturn(1000, '参数缺失');
             }
@@ -2024,11 +2022,42 @@
             if(!Member::checkExist('order', ['order_id' => $order_id])) {
                 return Base::jsonReturn(1002, '订单不存在');
             }
-            $order_data=BModel::getTableFirstData('order',['order_id'=>$order_id]);
-            $order_goods_data=BModel::getTableAllData('order_goods',['order_id'=>$order_id],['goods_id']);
-            dd($order_goods_data);
-
-
+            if(!Member::checkExist('goods', ['goods_id' => $goods_id])) {
+                return Base::jsonReturn(1003, '商品不存在');
+            }
+            if(Member::checkExist('refund_return', ['goods_id' => $goods_id, 'order_id' => $order_id])) {
+                return Base::jsonReturn(1004, '已存在退款申请');
+            }
+            //判断订单状态  是否符合退款要求
+            $order_data                     = BModel::getTableFirstData('order', ['order_id' => $order_id]);
+            $store_data                     = BModel::getTableFirstData('store', ['store_id' => $order_data->store_id]);
+            $member_data                    = BModel::getTableFirstData('member', ['member_id' => $order_data->buyer_id]);
+            $refund_array                   = [];
+            $refund_array['order_id']       = $order_id;
+            $refund_array['order_sn']       = $order_data->order_sn;
+            $refund_array['refund_sn']      = mt_rand(100, 999).substr(100 + $order_data->store_id, -3).date('ymdHis');
+            $refund_array['store_id']       = $store_data->store_id;
+            $refund_array['store_name']     = $store_data->store_name;
+            $refund_array['buyer_id']       = $member_data->member_id;
+            $refund_array['buyer_name']     = $member_data->member_name;
+            $refund_array['refund_type']    = '1';//类型:1为退款,2为退货
+            $refund_array['seller_state']   = '1';//状态:1为待审核,2为同意,3为不同意
+            $refund_array['order_lock']     = '2';//锁定类型:1为不用锁定,2为需要锁定
+            $refund_array['goods_id']       = $goods_id;
+            $refund_array['order_goods_id'] = $goods_id;
+            $refund_array['reason_id']      = $reason_id;
+            $refund_array['reason_info']    = BModel::getTableValue('refund_reason', ['reason_id' => $reason_id], 'reason_info');
+            $refund_array['goods_name']     = BModel::getTableValue('goods', ['goods_id' => $goods_id], 'goods_name');
+            $refund_array['refund_amount']  = Base::ncPriceFormat($total_amount);
+            $refund_array['buyer_message']  = $reason;
+            $refund_array['add_time']       = time();
+            $res                            = BModel::insertData('refund_return', $refund_array);
+            if($res) {
+                return Base::jsonReturn(200, '申请成功');
+            }
+            else {
+                return Base::jsonReturn(2000, '申请失败');
+            }
         }
 
     }
