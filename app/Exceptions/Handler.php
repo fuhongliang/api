@@ -46,7 +46,7 @@
          */
         public function render($request, Exception $exception)
         {
-            return response()->json(['code' => 2000, 'data' => null, 'msg' => "异常错误"]);
+            return response()->json(['code' => 2000, 'data' => null, 'msg' => $exception->getMessage()]);
             //return parent::render($request, $exception);
         }
     }
