@@ -1907,31 +1907,80 @@
         }
 
         /**售后详情
+         *
          * @param Request $request
          * @return \Illuminate\Http\JsonResponse
          */
         function refundInfo(Request $request)
         {
-            $code   = $request->input('code');
-            $openid = self::getOpenID(config('wxpay.appid'), config('wxpay.appsecret'), $code);
-            if($openid) {
-                $data = BModel::getTableFieldFirstData('member', ['member_wxopenid' => $openid], ['member_id', 'member_mobile', 'member_name', 'member_avatar', 'member_wxopenid']);
-                if(!$data) {
-                    $ins_data  = ['member_name' => '未设置_'.microtime(), 'member_mobile_bind' => 0, 'member_time' => time(), 'member_wxopenid' => $openid];
-                    $member_id = BModel::insertData('member', $ins_data);
-                    BModel::insertData('member_common', ['member_id' => $member_id]);
+            $refund_id = $request->input('refund_id');
+            if(!$refund_id) {
+                return Base::jsonReturn(1000, '参数缺失');
+            }
+            if(!Member::checkExist('refund_return', ['refund_id' => $refund_id])) {
+                return Base::jsonReturn(1001, '数据不存在');
+            }
+            $result = [];
+            $data   = BModel::getTableFirstData('refund_return', ['refund_id' => $refund_id]);
+            if($data) {
+                $result['refund_state']  = self::getRefundState($data->refund_state);
+                $result['refund_amount'] = $data->refund_amount;
+                $result['order_sn']      = $data->order_sn;
+                $result['reason_info']   = $data->reason_info;
+                if($data->order_goods_id == 0) {
+                    $goods      = [];
+                    $goods_data = BModel::getTableAllData('order_goods', ['order_id' => $data->order_id]);
+                    if(!$goods_data->isEmpty()) {
+                        foreach($goods_data as $k => $goods_datum) {
+                            $goods[$k]['goods_name']  = $goods_datum->goods_name;
+                            $goods[$k]['goods_num']   = $goods_datum->goods_num;
+                            $goods[$k]['goods_image'] = $goods_datum->goods_image;
+                            $goods[$k]['goods_price'] = $goods_datum->goods_price;
+                        }
+                    }
+                    $result['goods_list'] = $goods;
                 }
-                $member_info                 = BModel::getTableFieldFirstData('member', ['member_wxopenid' => $openid], ['member_id', 'member_passwd', 'member_mobile', 'member_name', 'member_avatar', 'member_wxopenid']);
-                $member_info->member_avatar  = is_null($member_info->member_avatar) ? '' : $member_info->member_avatar;
-                $member_info->need_pwd       = empty($member_info->member_passwd) ? true : false;
-                $member_info->is_bind_openid = empty($member_info->member_wxopenid) ? false : true;
-                $member_info->token          = Base::makeToken(microtime());
-                $token_data                  = ['member_id' => $member_info->member_id, 'token' => $member_info->token, 'add_time' => time(), 'expire_time' => time() + 24 * 5 * 3600];
-                Token::addToken($token_data);
-                return Base::jsonReturn(200, '登录成功', $member_info);
+                else {
+                    $goods = [['goods_name' => $data->goods_name, 'goods_num' => $data->goods_num, 'goods_image' => is_null($data->goods_image)?"":$data->goods_image,'goods_price'=>BModel::getTableValue('goods',['goods_id'=>$data->order_goods_id],'goods_price')]];
+
+                    $result['goods_list'] = $goods;
+                }
+
+                return Base::jsonReturn(200, '获取成功', $result);
             }
             else {
-                return Base::jsonReturn(2000, '登录失败');
+                return Base::jsonReturn(2000, '获取失败');
             }
         }
+
+        static function getRefundState($refund_state)
+        {
+            if($refund_state == 1) {
+                return '处理中';
+            }
+            else if($refund_state == 2) {
+                return '待管理员处理';
+            }
+            else if($refund_state == 3) {
+                return '已完成';
+            }
+        }
+
+        /**骑手入驻
+         * @param Request $request
+         * @return \Illuminate\Http\JsonResponse
+         */
+        function qishouJoinin(Request $request)
+        {
+            $refund_id = $request->input('refund_id');
+            if(!$refund_id) {
+                return Base::jsonReturn(1000, '参数缺失');
+            }
+            if(!Member::checkExist('refund_return', ['refund_id' => $refund_id])) {
+                return Base::jsonReturn(1001, '数据不存在');
+            }
+
+        }
+
+
     }
