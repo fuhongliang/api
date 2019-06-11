@@ -427,7 +427,7 @@
                 foreach($data as $k => $datum) {
                     $result[$k]['store_id']     = $datum->store_id;
                     $result[$k]['store_name']   = $datum->store_name;
-                    $result[$k]['store_avatar'] = $datum->store_avatar;
+                    $result[$k]['store_avatar'] = is_null($datum->store_avatar)? '':$datum->store_avatar;
                     $result[$k]['qisong']       = is_null($datum->store_qisong) ? 0 : $datum->store_qisong;
                     $result[$k]['peisong']      = is_null($datum->store_peisong) ? 0 : $datum->store_peisong;
                     $result[$k]['store_sales']  = $datum->store_sales;

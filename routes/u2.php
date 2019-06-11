@@ -63,6 +63,7 @@ Route::group(['namespace' => 'U2'], function () {
     Route::post('wx_login', 'MemberController@wxLogin');//微信登录
     Route::post('refund_info', 'MemberController@refundInfo');//售后详情
     Route::post('member_joinin_qishou', 'MemberController@qishouJoinin');//申请骑手入驻
+    Route::post('refund_order', 'MemberController@refundOrder');//申请售后
 
 
 });

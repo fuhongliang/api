@@ -5,6 +5,7 @@
 
     use App\BModel;
     use App\Http\Controllers\BaseController as Base;
+    use App\Http\Controllers\BaseController;
     use App\Http\Controllers\SMSController;
     use App\model\U2\Member;
     use App\model\V3\Store;
@@ -1652,9 +1653,9 @@
             $keywords  = $request->input('keywords');
             $type      = $request->input('type');
             $longitude = $request->input('longitude');
-            $latitude  = $request->input('latitude');
+            $latitude  = $request->input('dimension');
 
-            if(!$keywords || !$type || !$longitude || !$latitude) {
+            if(!$type || !$longitude || !$latitude) {
                 return Base::jsonReturn(1000, '参数缺失');
             }
             $data = [];
@@ -1733,7 +1734,7 @@
             $sc_id     = $request->input('sc_id');
             $type      = $request->input('type');
             $longitude = $request->input('longitude');
-            $latitude  = $request->input('latitude');
+            $latitude  = $request->input('dimension');
             if(!$gc_id || !$longitude || !$latitude) {
                 return Base::jsonReturn(1000, '参数缺失');
             }
@@ -1814,7 +1815,7 @@
         function getOrderStates(Request $request)
         {
             $member_id = $request->input('member_id');
-            $order_id = $request->input('order_id');
+            $order_id  = $request->input('order_id');
             if(!$member_id || !$order_id) {
                 return Base::jsonReturn(1000, '参数缺失');
             }
@@ -1866,7 +1867,7 @@
          */
         static function reasonList()
         {
-            $data = DB::table('refund_reason')->get(['reason_id', 'reason_info']);
+            $data = DB::table('refund_reason')->limit(7)->get(['reason_id', 'reason_info']);
             return Base::jsonReturn(200, '获取成功', $data->isEmpty() ? [] : $data->toArray());
         }
 
@@ -2001,5 +2002,33 @@
             }
         }
 
+        /**售后申请
+         * @param Request $request
+         * @return \Illuminate\Http\JsonResponse
+         */
+        function refundOrder(Request $request)
+        {
+            $member_id = $request->input('member_id');
+            $order_id  = $request->input('order_id');
+            $goods_id  = $request->input('goods_id');
+            $reason_id    = $request->input('reason_id');
+            $reason    = $request->input('reason');
+            $total_amount   = $request->input('total_amount');
+
+            if(!$member_id || !$order_id || !$goods_id || !$reason_id || !$total_amount) {
+                return Base::jsonReturn(1000, '参数缺失');
+            }
+            if(!Member::checkExist('member', ['member_id' => $member_id])) {
+                return Base::jsonReturn(1001, '用户不存在');
+            }
+            if(!Member::checkExist('order', ['order_id' => $order_id])) {
+                return Base::jsonReturn(1002, '订单不存在');
+            }
+            $order_data=BModel::getTableFirstData('order',['order_id'=>$order_id]);
+            $order_goods_data=BModel::getTableAllData('order_goods',['order_id'=>$order_id],['goods_id']);
+            dd($order_goods_data);
+
+
+        }
 
     }
