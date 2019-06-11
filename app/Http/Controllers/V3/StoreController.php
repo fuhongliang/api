@@ -888,7 +888,7 @@ class StoreController extends Base
         $param['dimension']                          = $request->input('dimension',40.058359);
         $param['sc_id']                              = $request->input('sc_id');
         $param['joinin_state']                       = 10;
-        $store_class_ids[]                           = "959,961,979,";//$request->input('store_class_ids') . ',';
+        $store_class_ids[]                           = "1058,1066,1067,";//$request->input('store_class_ids') . ',';
         $store_class_names[]                         = "玩具乐器,DIY玩具,绘画工具,";//$request->input('store_class_names') . ',';
         $param['sg_id']                              = 1;
         $param['sg_name']                            = "系统默认";
