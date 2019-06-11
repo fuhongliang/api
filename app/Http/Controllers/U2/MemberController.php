@@ -1814,13 +1814,17 @@
         function getOrderStates(Request $request)
         {
             $member_id = $request->input('member_id');
-            if(!$member_id) {
+            $order_id = $request->input('order_id');
+            if(!$member_id || !$order_id) {
                 return Base::jsonReturn(1000, '参数缺失');
             }
             if(!Member::checkExist('member', ['member_id' => $member_id])) {
                 return Base::jsonReturn(1001, '用户不存在');
             }
-            $order_state = DB::table('order')->where('buyer_id', $member_id)->orderBy('order_id', 'desc')->limit(1)->value('order_state');
+            if(!Member::checkExist('order', ['order_id' => $order_id])) {
+                return Base::jsonReturn(1002, '订单不存在');
+            }
+            $order_state = DB::table('order')->where('order_id', $order_id)->value('order_state');
             $result      = [];
             if(isset($order_state)) {
                 $result = ['order_state' => self::_getOrderState($order_state), 'time' => date('H:i')];
