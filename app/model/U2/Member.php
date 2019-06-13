@@ -74,8 +74,6 @@
                     unset($store_data->dimension);
                 }
             }
-            dd($result);
-            dd($result);
             return $result;
         }
 
