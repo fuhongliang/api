@@ -74,6 +74,8 @@
                     unset($store_data->dimension);
                 }
             }
+            dd($result);
+            dd($result);
             return $result;
         }
 
@@ -407,6 +409,7 @@
             $data   = BModel::getTableAllData('cart', ['store_id' => $store_id, 'buyer_id' => $member_id]);
             if(!$data->isEmpty()) {
                 foreach($data as $k => $v) {
+                    $result[$k]['goods_id']   = $v->goods_id;
                     $result[$k]['goods_num']   = $v->goods_num;
                     $result[$k]['img_name']    = $v->goods_image;
                     $result[$k]['goods_price'] = BaseController::ncPriceFormat($v->goods_price);
