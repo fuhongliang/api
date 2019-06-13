@@ -29,7 +29,7 @@
             return $data->isEmpty() ? [] : $data->toArray();
         }
 
-        static function getStoreList($keyword, $page, $type)
+        static function getStoreList($longitude, $dimension, $keyword, $page, $type)
         {
             $result = [];
             $skip   = ($page - 1) * 10;
@@ -50,12 +50,28 @@
             if(!$store_ids->isEmpty()) {
                 $storeIds = $store_ids->toArray();
                 foreach($storeIds as $k => $val) {
-                    $store_data          = BModel::getTableFieldFirstData('store', ['store_id' => $val->store_id], ['store_id', 'store_name', 'store_avatar', 'store_sales', 'store_credit']);
+                    $store_data          = BModel::getTableFieldFirstData('store', ['store_id' => $val->store_id], ['store_id', 'store_name', 'store_avatar', 'store_sales', 'store_credit', 'longitude', 'dimension']);
                     $result[$k]          = $store_data;
                     $xianshi_data        = BModel::getTableAllData('p_xianshi', ['store_id' => $val->store_id, 'state' => 1], ['xianshi_name', 'xianshi_id']);
                     $result[$k]->xianshi = $xianshi_data->isEmpty() ? [] : $xianshi_data->toArray();
                     $manjian             = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $val->store_id], ['a.rule_id', 'a.price', 'a.discount']);
                     $result[$k]->manjian = $manjian->isEmpty() ? [] : $manjian->toArray();
+                    $lucheng             = BaseController::getdistance($longitude, $dimension, $store_data->longitude, $store_data->dimension);
+                    if($lucheng < 1000) {
+                        $result[$k]->distance = ceil($lucheng)."米";
+                    }
+                    else {
+                        $result[$k]->distance = round($lucheng / 1000, 2)."公里"; //10.46;
+                    }
+                    $shijian = ($lucheng / 3) / 60;
+                    if($shijian < 60) {
+                        $result[$k]->need_time = ceil($shijian)."分";
+                    }
+                    else {
+                        $result[$k]->need_time = floor($shijian / 60)."小时".ceil($shijian % 60)."分";
+                    }
+                    unset($store_data->longitude);
+                    unset($store_data->dimension);
                 }
             }
             return $result;
