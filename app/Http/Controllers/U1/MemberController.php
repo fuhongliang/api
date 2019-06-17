@@ -682,15 +682,17 @@
                     });
                 }
             }
-            $data         = [];
-            $data['nums'] = BModel::getCount('cart', ['store_id' => $store_id, 'buyer_id' => $member_id]);
-            $carts        = BModel::getTableAllData('cart', ['store_id' => $store_id, 'buyer_id' => $member_id], ['goods_price', 'goods_num']);
-            $money        = 0;
-            foreach($carts as $cart) {
-                $money += $cart->goods_price * $cart->goods_num;
-            }
-            $data['amount'] = Base::ncPriceFormat($money);
-            return Base::jsonReturn(200, '获取成功', $data);
+//            $data         = [];
+//            $data['nums'] = BModel::getCount('cart', ['store_id' => $store_id, 'buyer_id' => $member_id]);
+//            $carts        = BModel::getTableAllData('cart', ['store_id' => $store_id, 'buyer_id' => $member_id], ['goods_price', 'goods_num']);
+//            $money        = 0;
+//            foreach($carts as $cart) {
+//                $money += $cart->goods_price * $cart->goods_num;
+//            }
+//            $data['amount'] = Base::ncPriceFormat($money);
+
+            $result = ['peisong' => 5, 'goods' => Member::getCartGoods($store_id, $member_id)];
+            return Base::jsonReturn(200, '获取成功', $result);
         }
 
         /**店铺代金券
@@ -1070,7 +1072,8 @@
                     BModel::insertData('order_goods', $order_goods);
                 }
             }
-            return Base::jsonReturn(200, '下单成功');
+            $result= $this->wxPay($total, Base::makeOrderSn($pay_id));
+            return Base::jsonReturn(200, '下单成功',$result);
         }
 
         /**订单列表
@@ -1287,8 +1290,8 @@
             $result['peisong_info'] = ['username' => $receive_info->reciver_name, 'address' => $rec_data['address'], 'mobile' => $rec_data['phone'], 'sex' => !isset($rec_data['sex']) ? 1 : $rec_data['sex'],];
             unset($order_data->refund_state);
             unset($order_data->evaluation_state);
-            $order_sn         = BModel::getTableValue('order', ['order_id' => $order_id], 'order_sn');
-            $result['wx_pay'] = $this->wxPay($amount, $order_sn);
+            //$order_sn         = BModel::getTableValue('order', ['order_id' => $order_id], 'order_sn');
+            //$result['wx_pay'] = $this->wxPay($amount, $order_sn);
             return Base::jsonReturn(200, '获取成功', $result);
         }
         /**返回统一下单

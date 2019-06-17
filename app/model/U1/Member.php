@@ -325,19 +325,19 @@
 
         static function getAllOrder($member_id)
         {
-            $data = DB::table('order as a')->leftJoin('order_common as b', 'a.order_id', 'b.order_id')->leftJoin('store as c', 'a.store_id', 'c.store_id')->where('a.buyer_id', $member_id)->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state', 'a.refund_state', 'a.evaluation_state']);
+            $data = DB::table('order as a')->leftJoin('order_common as b', 'a.order_id', 'b.order_id')->leftJoin('store as c', 'a.store_id', 'c.store_id')->where('a.buyer_id', $member_id)->get(['a.order_id','c.store_id', 'c.store_name', 'c.store_avatar', 'a.order_state', 'a.refund_state', 'a.evaluation_state']);
             return $data->isEmpty() ? [] : $data->toArray();
         }
 
         static function getEvaluationOrder($member_id)
         {
-            $data = DB::table('order as a')->leftJoin('order_common as b', 'a.order_id', 'b.order_id')->leftJoin('store as c', 'a.store_id', 'c.store_id')->where('a.buyer_id', $member_id)->where('a.order_state', 40)->where('evaluation_state', 0)->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state', 'a.refund_state', 'a.evaluation_state']);
+            $data = DB::table('order as a')->leftJoin('order_common as b', 'a.order_id', 'b.order_id')->leftJoin('store as c', 'a.store_id', 'c.store_id')->where('a.buyer_id', $member_id)->where('a.order_state', 40)->where('evaluation_state', 0)->get(['a.order_id', 'c.store_id','c.store_name', 'c.store_avatar', 'a.order_state', 'a.refund_state', 'a.evaluation_state']);
             return $data->isEmpty() ? [] : $data->toArray();
         }
 
         static function getRefundStateOrder($member_id)
         {
-            $data = DB::table('order as a')->leftJoin('order_common as b', 'a.order_id', 'b.order_id')->leftJoin('store as c', 'a.store_id', 'c.store_id')->where('a.buyer_id', $member_id)->where('refund_state', 2)->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state', 'a.refund_state', 'a.evaluation_state']);
+            $data = DB::table('order as a')->leftJoin('order_common as b', 'a.order_id', 'b.order_id')->leftJoin('store as c', 'a.store_id', 'c.store_id')->where('a.buyer_id', $member_id)->where('refund_state', 2)->get(['a.order_id',  'c.store_id','c.store_name', 'c.store_avatar', 'a.order_state', 'a.refund_state', 'a.evaluation_state']);
             return $data->isEmpty() ? [] : $data->toArray();
         }
 
@@ -419,6 +419,7 @@
             $data   = BModel::getTableAllData('cart', ['store_id' => $store_id, 'buyer_id' => $member_id]);
             if(!$data->isEmpty()) {
                 foreach($data as $k => $v) {
+                    $result[$k]['goods_id']   = $v->goods_id;
                     $result[$k]['goods_num']   = $v->goods_num;
                     $result[$k]['img_name']    = $v->goods_image;
                     $result[$k]['goods_price'] = BaseController::ncPriceFormat($v->goods_price);

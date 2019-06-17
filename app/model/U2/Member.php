@@ -29,7 +29,7 @@
             return $data->isEmpty() ? [] : $data->toArray();
         }
 
-        static function getStoreList($keyword, $page, $type)
+        static function getStoreList($longitude, $dimension, $keyword, $page, $type)
         {
             $result = [];
             $skip   = ($page - 1) * 10;
@@ -50,12 +50,28 @@
             if(!$store_ids->isEmpty()) {
                 $storeIds = $store_ids->toArray();
                 foreach($storeIds as $k => $val) {
-                    $store_data          = BModel::getTableFieldFirstData('store', ['store_id' => $val->store_id], ['store_id', 'store_name', 'store_avatar', 'store_sales', 'store_credit']);
+                    $store_data          = BModel::getTableFieldFirstData('store', ['store_id' => $val->store_id], ['store_id', 'store_name', 'store_avatar', 'store_sales', 'store_credit', 'longitude', 'dimension']);
                     $result[$k]          = $store_data;
                     $xianshi_data        = BModel::getTableAllData('p_xianshi', ['store_id' => $val->store_id, 'state' => 1], ['xianshi_name', 'xianshi_id']);
                     $result[$k]->xianshi = $xianshi_data->isEmpty() ? [] : $xianshi_data->toArray();
                     $manjian             = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $val->store_id], ['a.rule_id', 'a.price', 'a.discount']);
                     $result[$k]->manjian = $manjian->isEmpty() ? [] : $manjian->toArray();
+                    $lucheng             = BaseController::getdistance($longitude, $dimension, $store_data->longitude, $store_data->dimension);
+                    if($lucheng < 1000) {
+                        $result[$k]->distance = ceil($lucheng)."米";
+                    }
+                    else {
+                        $result[$k]->distance = round($lucheng / 1000, 2)."公里"; //10.46;
+                    }
+                    $shijian = ($lucheng / 3) / 60;
+                    if($shijian < 60) {
+                        $result[$k]->need_time = ceil($shijian)."分";
+                    }
+                    else {
+                        $result[$k]->need_time = floor($shijian / 60)."小时".ceil($shijian % 60)."分";
+                    }
+                    unset($store_data->longitude);
+                    unset($store_data->dimension);
                 }
             }
             return $result;
@@ -292,19 +308,19 @@
 
         static function getAllOrder($member_id)
         {
-            $data = DB::table('order as a')->leftJoin('order_common as b', 'a.order_id', 'b.order_id')->leftJoin('store as c', 'a.store_id', 'c.store_id')->where('a.buyer_id', $member_id)->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state']);
+            $data = DB::table('order as a')->leftJoin('order_common as b', 'a.order_id', 'b.order_id')->leftJoin('store as c', 'a.store_id', 'c.store_id')->where('a.buyer_id', $member_id)->get(['a.order_id','c.store_id', 'c.store_name', 'c.store_avatar', 'a.order_state', 'a.refund_state', 'a.evaluation_state']);
             return $data->isEmpty() ? [] : $data->toArray();
         }
 
         static function getEvaluationOrder($member_id)
         {
-            $data = DB::table('order as a')->leftJoin('order_common as b', 'a.order_id', 'b.order_id')->leftJoin('store as c', 'a.store_id', 'c.store_id')->where('a.buyer_id', $member_id)->where('a.order_state', 40)->where('evaluation_state', 0)->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state']);
+            $data = DB::table('order as a')->leftJoin('order_common as b', 'a.order_id', 'b.order_id')->leftJoin('store as c', 'a.store_id', 'c.store_id')->where('a.buyer_id', $member_id)->where('a.order_state', 40)->where('evaluation_state', 0)->get(['a.order_id', 'c.store_id','c.store_name', 'c.store_avatar', 'a.order_state', 'a.refund_state', 'a.evaluation_state']);
             return $data->isEmpty() ? [] : $data->toArray();
         }
 
         static function getRefundStateOrder($member_id)
         {
-            $data = DB::table('order as a')->leftJoin('order_common as b', 'a.order_id', 'b.order_id')->leftJoin('store as c', 'a.store_id', 'c.store_id')->where('a.buyer_id', $member_id)->where('refund_state', 2)->get(['a.order_id', 'c.store_name', 'c.store_avatar', 'a.order_state']);
+            $data = DB::table('order as a')->leftJoin('order_common as b', 'a.order_id', 'b.order_id')->leftJoin('store as c', 'a.store_id', 'c.store_id')->where('a.buyer_id', $member_id)->where('refund_state', 2)->get(['a.order_id',  'c.store_id','c.store_name', 'c.store_avatar', 'a.order_state', 'a.refund_state', 'a.evaluation_state']);
             return $data->isEmpty() ? [] : $data->toArray();
         }
 
@@ -391,6 +407,7 @@
             $data   = BModel::getTableAllData('cart', ['store_id' => $store_id, 'buyer_id' => $member_id]);
             if(!$data->isEmpty()) {
                 foreach($data as $k => $v) {
+                    $result[$k]['goods_id']   = $v->goods_id;
                     $result[$k]['goods_num']   = $v->goods_num;
                     $result[$k]['img_name']    = $v->goods_image;
                     $result[$k]['goods_price'] = BaseController::ncPriceFormat($v->goods_price);
@@ -427,7 +444,7 @@
                 foreach($data as $k => $datum) {
                     $result[$k]['store_id']     = $datum->store_id;
                     $result[$k]['store_name']   = $datum->store_name;
-                    $result[$k]['store_avatar'] = $datum->store_avatar;
+                    $result[$k]['store_avatar'] = is_null($datum->store_avatar)? '':$datum->store_avatar;
                     $result[$k]['qisong']       = is_null($datum->store_qisong) ? 0 : $datum->store_qisong;
                     $result[$k]['peisong']      = is_null($datum->store_peisong) ? 0 : $datum->store_peisong;
                     $result[$k]['store_sales']  = $datum->store_sales;
@@ -630,6 +647,170 @@
                     else {
                         $result[$k]['need_time'] = floor($shijian / 60)."小时".ceil($shijian % 60)."分";
                     }
+                }
+                return $result;
+            }
+            else {
+                return [];
+            }
+        }
+
+        static function getDefaultKJStoreList($ids, $longitude, $latitude)
+        {
+
+            $result = [];
+            $field  = ['store_id', 'store_name', 'store_avatar', 'store_credit', 'store_sales', 'store_qisong', 'store_peisong', 'longitude', 'dimension'];
+            if($ids) {
+                $data = DB::table('store')->whereIn('sc_id', $ids)->where('store_state', 1)->orderBy('store_sales', 'desc')->orderBy('store_credit', 'desc')->orderBy('store_id', 'desc')->orderBy('store_sort', 'desc')->get($field);
+                foreach($data as $k => $datum) {
+                    $result[$k]['store_id']     = $datum->store_id;
+                    $result[$k]['store_name']   = $datum->store_name;
+                    $result[$k]['store_avatar'] = $datum->store_avatar;
+                    $result[$k]['qisong']       = is_null($datum->store_qisong) ? 0 : $datum->store_qisong;
+                    $result[$k]['peisong']      = is_null($datum->store_peisong) ? 0 : $datum->store_peisong;
+                    $result[$k]['store_sales']  = $datum->store_sales;
+                    $result[$k]['store_credit'] = $datum->store_credit;
+                    $lucheng                    = BaseController::getdistance($longitude, $latitude, $datum->longitude, $datum->dimension);
+                    if($lucheng < 1000) {
+                        $result[$k]['distance'] = ceil($lucheng)."米";
+                    }
+                    else {
+                        $result[$k]['distance'] = round($lucheng / 1000, 2)."公里"; //10.46;
+                    }
+                    $shijian = ($lucheng / 3) / 60;
+                    if($shijian < 60) {
+                        $result[$k]['need_time'] = ceil($shijian)."分";
+                    }
+                    else {
+                        $result[$k]['need_time'] = floor($shijian / 60)."小时".ceil($shijian % 60)."分";
+                    }
+                    $xianshi_data          = BModel::getTableAllData('p_xianshi', ['store_id' => $datum->store_id, 'state' => 1], ['xianshi_name', 'xianshi_id']);
+                    $result[$k]['xianshi'] = $xianshi_data->isEmpty() ? [] : $xianshi_data->toArray();
+                    $manjian               = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $datum->store_id], ['a.rule_id', 'a.price', 'a.discount']);
+                    $result[$k]['manjian'] = $manjian->isEmpty() ? [] : $manjian->toArray();
+                }
+                return $result;
+            }
+            else {
+                return [];
+            }
+        }
+
+        static function getCreditKJStoreList($ids, $longitude, $latitude)
+        {
+
+            $result = [];
+            $field  = ['store_id', 'store_name', 'store_avatar', 'store_credit', 'store_sales', 'store_qisong', 'store_peisong', 'longitude', 'dimension'];
+
+            if($ids) {
+                $data = DB::table('store')->whereIn('sc_id', $ids)->where('store_state', 1)->orderBy('store_sales', 'desc')->get($field);
+                foreach($data as $k => $datum) {
+                    $result[$k]['store_id']     = $datum->store_id;
+                    $result[$k]['store_name']   = $datum->store_name;
+                    $result[$k]['store_avatar'] = $datum->store_avatar;
+                    $result[$k]['qisong']       = is_null($datum->store_qisong) ? 0 : $datum->store_qisong;
+                    $result[$k]['peisong']      = is_null($datum->store_peisong) ? 0 : $datum->store_peisong;
+                    $result[$k]['store_sales']  = $datum->store_sales;
+                    $result[$k]['store_credit'] = $datum->store_credit;
+                    $lucheng                    = BaseController::getdistance($longitude, $latitude, $datum->longitude, $datum->dimension);
+                    if($lucheng < 1000) {
+                        $result[$k]['distance'] = ceil($lucheng)."米";
+                    }
+                    else {
+                        $result[$k]['distance'] = round($lucheng / 1000, 2)."公里"; //10.46;
+                    }
+                    $shijian = ($lucheng / 3) / 60;
+                    if($shijian < 60) {
+                        $result[$k]['need_time'] = ceil($shijian)."分";
+                    }
+                    else {
+                        $result[$k]['need_time'] = floor($shijian / 60)."小时".ceil($shijian % 60)."分";
+                    }
+                    $xianshi_data          = BModel::getTableAllData('p_xianshi', ['store_id' => $datum->store_id, 'state' => 1], ['xianshi_name', 'xianshi_id']);
+                    $result[$k]['xianshi'] = $xianshi_data->isEmpty() ? [] : $xianshi_data->toArray();
+                    $manjian               = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $datum->store_id], ['a.rule_id', 'a.price', 'a.discount']);
+                    $result[$k]['manjian'] = $manjian->isEmpty() ? [] : $manjian->toArray();
+                }
+                return $result;
+            }
+            else {
+                return [];
+            }
+        }
+
+        static function getLocalKJStoreList($ids, $longitude, $latitude)
+        {
+            $result = [];
+            $field  = ['store_id', 'store_name', 'store_avatar', 'store_credit', 'store_sales', 'store_qisong', 'store_peisong', 'longitude', 'dimension'];
+
+            if($ids) {
+                $data = DB::table('store')->whereIn('sc_id', $ids)->where('store_state', 1)->get($field);
+                foreach($data as $k => $datum) {
+                    $result[$k]['store_id']     = $datum->store_id;
+                    $result[$k]['store_name']   = $datum->store_name;
+                    $result[$k]['store_avatar'] = $datum->store_avatar;
+                    $result[$k]['qisong']       = is_null($datum->store_qisong) ? 0 : $datum->store_qisong;
+                    $result[$k]['peisong']      = is_null($datum->store_peisong) ? 0 : $datum->store_peisong;
+                    $result[$k]['store_sales']  = $datum->store_sales;
+                    $result[$k]['store_credit'] = $datum->store_credit;
+                    $lucheng                    = BaseController::getdistance($longitude, $latitude, $datum->longitude, $datum->dimension);
+                    if($lucheng < 1000) {
+                        $result[$k]['distance'] = ceil($lucheng)."米";
+                    }
+                    else {
+                        $result[$k]['distance'] = round($lucheng / 1000, 2)."公里"; //10.46;
+                    }
+                    $shijian = ($lucheng / 3) / 60;
+                    if($shijian < 60) {
+                        $result[$k]['need_time'] = ceil($shijian)."分";
+                    }
+                    else {
+                        $result[$k]['need_time'] = floor($shijian / 60)."小时".ceil($shijian % 60)."分";
+                    }
+                    $xianshi_data          = BModel::getTableAllData('p_xianshi', ['store_id' => $datum->store_id, 'state' => 1], ['xianshi_name', 'xianshi_id']);
+                    $result[$k]['xianshi'] = $xianshi_data->isEmpty() ? [] : $xianshi_data->toArray();
+                    $manjian               = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $datum->store_id], ['a.rule_id', 'a.price', 'a.discount']);
+                    $result[$k]['manjian'] = $manjian->isEmpty() ? [] : $manjian->toArray();
+                }
+                return $result;
+            }
+            else {
+                return [];
+            }
+        }
+
+        static function getBestKJStoreList($ids, $longitude, $latitude)
+        {
+            $result = [];
+            $field  = ['store_id', 'store_name', 'store_avatar', 'store_credit', 'store_sales', 'store_qisong', 'store_peisong', 'longitude', 'dimension'];
+            if($ids) {
+                $data = DB::table('store')->whereIn('sc_id', $ids)->where('store_state', 1)->orderBy('store_sales', 'desc')->get($field);
+                foreach($data as $k => $datum) {
+                    $result[$k]['store_id']     = $datum->store_id;
+                    $result[$k]['store_name']   = $datum->store_name;
+                    $result[$k]['store_avatar'] = $datum->store_avatar;
+                    $result[$k]['qisong']       = is_null($datum->store_qisong) ? 0 : $datum->store_qisong;
+                    $result[$k]['peisong']      = is_null($datum->store_peisong) ? 0 : $datum->store_peisong;
+                    $result[$k]['store_sales']  = $datum->store_sales;
+                    $result[$k]['store_credit'] = $datum->store_credit;
+                    $lucheng                    = BaseController::getdistance($longitude, $latitude, $datum->longitude, $datum->dimension);
+                    if($lucheng < 1000) {
+                        $result[$k]['distance'] = ceil($lucheng)."米";
+                    }
+                    else {
+                        $result[$k]['distance'] = round($lucheng / 1000, 2)."公里"; //10.46;
+                    }
+                    $shijian = ($lucheng / 3) / 60;
+                    if($shijian < 60) {
+                        $result[$k]['need_time'] = ceil($shijian)."分";
+                    }
+                    else {
+                        $result[$k]['need_time'] = floor($shijian / 60)."小时".ceil($shijian % 60)."分";
+                    }
+                    $xianshi_data          = BModel::getTableAllData('p_xianshi', ['store_id' => $datum->store_id, 'state' => 1], ['xianshi_name', 'xianshi_id']);
+                    $result[$k]['xianshi'] = $xianshi_data->isEmpty() ? [] : $xianshi_data->toArray();
+                    $manjian               = BModel::getLeftData('p_mansong_rule AS a', 'p_mansong AS b', 'a.mansong_id', 'b.mansong_id', ['b.store_id' => $datum->store_id], ['a.rule_id', 'a.price', 'a.discount']);
+                    $result[$k]['manjian'] = $manjian->isEmpty() ? [] : $manjian->toArray();
                 }
                 return $result;
             }
